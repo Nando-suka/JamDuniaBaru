@@ -1,0 +1,80 @@
+import pandas as pd
+import numpy as np
+
+# Baca data
+df = pd.read_csv("data.csv")
+
+# Melihat struktur data
+df.head()
+df.info()
+df.describe()
+
+# Seleksi kolom/baris
+df['kolom']
+df[['kolom1', 'kolom2']]
+df.loc[baris_index]
+df.iloc[baris_ke]
+
+# Filter data
+df[df['harga'] > 1000]
+df[(df['negara'] == 'France') & (df['harga'] > 500)]
+
+# Tambah kolom baru
+df['kolom_baru'] = df['kolom1'] * 2
+
+# Menghapus kolom/baris
+df.drop('kolom', axis=1, inplace=True)
+df.dropna()      # hapus baris kosong
+df.fillna(0)     # isi nilai kosong
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Scatter plot
+sns.scatterplot(x='Screen_Size_inch', y='Price', data=df)
+
+# Histogram
+sns.histplot(df['Price'], bins=20)
+
+# Boxplot (untuk melihat outlier)
+sns.boxplot(x='Negara', y='Price', data=df)
+
+# Korelasi antar variabel
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+
+# Statistik dasar
+df['Price'].mean()
+df['Price'].median()
+df['Price'].std()
+df['Price'].var()
+
+# Korelasi antar variabel
+df.corr()
+
+# Frekuensi tiap kategori
+df['Negara'].value_counts()
+
+# Normalisasi/standarisasi
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+df[['x_scaled', 'y_scaled']] = scaler.fit_transform(df[['x', 'y']])
+
+# Encode kategori ke angka
+pd.get_dummies(df['Negara'])
+---------------------------------------------------------------------------------------
+// Creating and activating a virtual environment
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+
+// Upgrading pip
+python -m pip install --upgrade pip
+
+// install library
+python -m pip install .... .... numpy
+----------------------------------------------------------------------------------------
+# Panduan untuk menjalankan pyinstaller tanpa memanggil gui, langsung jalan di CMD saya
+pyinstaller --noconsole --onefile "nama file (latihan_key.py)"
+
+
+
