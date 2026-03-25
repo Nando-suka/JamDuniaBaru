@@ -2,7 +2,7 @@
   background: white;
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: none;
   max-width: 500px;
   width: 95%;
   margin: 2rem auto;
@@ -10,6 +10,9 @@
 }
 
 .location {
+  font-family: 'Betania Patmos', cursive;
+  font-weight: 400;
+  font-style: normal;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,11 +30,445 @@
 }
 
 .time-box {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Betania Patmos', cursive;
+  font-weight: 400;
+  font-style: normal;
   color: #34db58;
   background: #e8f5e9;
   padding: 6px 12px;
   border-radius: 8px;
-  font-weight: bold;
   margin: 0;
+}
+
+/* ========== LOADING & LOAD MORE ========== */
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 15px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(44, 44, 44, 0.2);
+  border-top: 4px solid #2C2C2C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Load More Button */
+.load-more-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 1.5rem 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.load-more-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.load-more-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* All Loaded Message */
+.all-loaded {
+  text-align: center;
+  color: #34db58;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: rgba(52, 219, 88, 0.1);
+  border-radius: 12px;
+  border-left: 4px solid #34db58;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Main Wrapper untuk layout */
+.main-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Tombol Scroll to Top - Lingkaran */
+.scroll-to-top-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #2C2C2C;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(44, 44, 44, 0.3);
+  z-index: 999;
+}
+
+.scroll-to-top-btn:hover {
+  background-color: #1a1a1a;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(44, 44, 44, 0.4);
+}
+
+.scroll-to-top-btn:active {
+  transform: translateY(-1px);
+}
+
+.scroll-to-top-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: white;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Mobile - Ukuran layar kecil (< 768px) */
+@media (max-width: 767px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1rem auto;
+    max-width: 100%;
+  }
+
+  .location {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .city-name {
+    font-size: 14px;
+  }
+
+  .time-box {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+
+  .scroll-to-top-btn {
+    width: 50px;
+    height: 50px;
+    right: 15px;
+    bottom: 15px;
+  }
+
+  .scroll-to-top-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .loading-container {
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 12px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+    margin-bottom: 0.75rem;
+  }
+
+  .loading-text {
+    font-size: 13px;
+  }
+
+  .load-more-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    margin: 1rem 0;
+    width: 90%;
+  }
+
+  .all-loaded {
+    font-size: 14px;
+    padding: 1rem;
+    margin: 1rem auto;
+    width: 90%;
+  }
+}
+
+/* Tablet - Ukuran menengah (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    padding: 1.8rem;
+    max-width: 600px;
+    width: 90%;
+  }
+
+  .location {
+    padding: 0.8rem;
+  }
+
+  .scroll-to-top-btn {
+    width: 56px;
+    height: 56px;
+    right: 20px;
+    bottom: 20px;
+  }
+
+  .scroll-to-top-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .loading-container {
+    padding: 1.75rem;
+    margin: 1.25rem 0;
+  }
+
+  .spinner {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 1rem;
+  }
+
+  .loading-text {
+    font-size: 14px;
+  }
+
+  .load-more-btn {
+    padding: 11px 26px;
+    font-size: 15px;
+    margin: 1.25rem 0;
+  }
+
+  .all-loaded {
+    font-size: 15px;
+    padding: 1.25rem;
+  }
+}
+
+/* Desktop besar (> 1024px) */
+@media (min-width: 1025px) {
+  .container {
+    padding: 2rem;
+    max-width: 500px;
+    width: 95%;
+  }
+
+  .scroll-to-top-btn {
+    width: 60px;
+    height: 60px;
+    right: 30px;
+    bottom: 30px;
+  }
+
+  .scroll-to-top-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .loading-container {
+    padding: 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1rem;
+  }
+
+  .loading-text {
+    font-size: 15px;
+  }
+
+  .load-more-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    margin: 1.5rem 0;
+  }
+
+  .all-loaded {
+    font-size: 16px;
+    padding: 1.5rem;
+  }
+}
+
+/* Extra small devices (< 360px) */
+@media (max-width: 359px) {
+  .container {
+    padding: 1rem;
+    margin: 0.5rem auto;
+  }
+
+  .location {
+    padding: 0.75rem;
+    margin: 8px 0;
+  }
+
+  .city-name {
+    font-size: 12px;
+  }
+
+  .time-box {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+
+  .scroll-to-top-btn {
+    width: 48px;
+    height: 48px;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .scroll-to-top-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .loading-container {
+    padding: 1rem;
+    margin: 0.75rem 0;
+  }
+
+  .spinner {
+    width: 35px;
+    height: 35px;
+    border-width: 2.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .loading-text {
+    font-size: 12px;
+  }
+
+  .load-more-btn {
+    padding: 8px 20px;
+    font-size: 12px;
+    margin: 0.75rem auto;
+    width: 85%;
+  }
+
+  .all-loaded {
+    font-size: 12px;
+    padding: 0.75rem;
+    margin: 0.75rem auto;
+    width: 85%;
+  }
+}
+
+/* iPad & Tablet Landscape (Landscape Orientation) */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .main-wrapper {
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  .scroll-to-top-btn {
+    right: 15px;
+    bottom: 15px;
+  }
+}
+
+/* Landscape orientation responsive */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .loading-container {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.5rem;
+  }
+
+  .loading-text {
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .load-more-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    margin: 1rem 0;
+  }
+
+  .all-loaded {
+    font-size: 14px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
 }
