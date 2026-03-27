@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { LanguageService } from './languange.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,12 +13,14 @@ import { CommonModule } from '@angular/common';
 export class App implements OnInit, OnDestroy {
   // Pakai Signal! Ini standar Angular masa depan
   currentTime = signal(new Date());
+  langService = inject(LanguageService); // berhubungan dengan layanan languange
   itemsToShow = signal(12); // Mulai tampil 12 item
   isLoading = signal(false); // Status loading
   private timer: any;
 
+  dict = this.langService.text;
   locations = [
- { name: 'Honolulu', offset: -10 },   // Hawaii, AS
+  { name: 'Honolulu', offset: -10 },   // Hawaii, AS
   { name: 'Anchorage', offset: -9 },   // Alaska, AS
   { name: 'Los Angeles', offset: -8 }, // Pantai Barat AS (PST)
   { name: 'Denver', offset: -7 },      // Pegunungan AS (MST)
