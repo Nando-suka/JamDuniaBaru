@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { LanguageService } from './languange.service';
+import { LanguageDetectionService } from './languange-detection.service';
+import { ThemeService } from './theme.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,6 +16,8 @@ export class App implements OnInit, OnDestroy {
   // Pakai Signal! Ini standar Angular masa depan
   currentTime = signal(new Date());
   langService = inject(LanguageService); // berhubungan dengan layanan languange
+  detectionService = inject(LanguageDetectionService); // untuk deteksi bahasa otomatis
+  themeService = inject(ThemeService); // untuk mengelola tema
   itemsToShow = signal(12); // Mulai tampil 12 item
   isLoading = signal(false); // Status loading
   private timer: any;
@@ -47,6 +51,7 @@ export class App implements OnInit, OnDestroy {
   { name: 'Moscow', offset: 3 },       // Rusia
   { name: 'Riyadh', offset: 3 },       // Arab Saudi
   { name: 'Nairobi', offset: 3 },      // Kenya
+  { name: 'Betlehem', offset: 5},      // Israel
 
   // --- ASIA & TIMUR TENGAH ---
   { name: 'Dubai', offset: 4 },        // Uni Emirat Arab
@@ -54,6 +59,7 @@ export class App implements OnInit, OnDestroy {
   { name: 'Karachi', offset: 5 },      // Pakistan
   { name: 'Mumbai', offset: 5.5 },     // India
   { name: 'Kathmandu', offset: 5.75 }, // Nepal (Offset unik!)
+  { name: 'Manama', offset: 6},        // Bahrain
   { name: 'Dhaka', offset: 6 },        // Bangladesh
   { name: 'Bangkok', offset: 7 },      // Thailand
   { name: 'Jakarta', offset: 7 },      // Indonesia (WIB)
@@ -63,7 +69,9 @@ export class App implements OnInit, OnDestroy {
   { name: 'Beijing', offset: 8 },      // China
   { name: 'Bali', offset: 8 },         // Indonesia (WITA)
   { name: 'Perth', offset: 8 },        // Australia Barat
-  { name: 'Tokyo', offset: 9 },        // Jepang
+  { name: 'Tokyo', offset: 9 },   
+  { name: 'Osaka', offset: 9},
+  { name: 'Kyoto', offset: 9},     // Jepang
   { name: 'Seoul', offset: 9 },        // Korea Selatan
   { name: 'Jayapura', offset: 9 },     // Indonesia (WIT)
   { name: 'Adelaide', offset: 9.5 },   // Australia Tengah
@@ -77,9 +85,27 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.timer = setInterval(() => {
-      // Cara update signal: .set()
+      // Update signal: .set()
       this.currentTime.set(new Date());
     }, 1000);
+
+    // Deteksi bahasa otomatis berdasarkan lokasi jika browser language adalah default
+    this.detectAndSetLanguage();
+  }
+
+  async detectAndSetLanguage() {
+    try {
+      const browserLang = this.detectionService.detectBrowserLanguage();
+      if (browserLang === 'en') { // Jika browser adalah English, coba deteksi berdasarkan lokasi
+        const locationLang = await this.detectionService.detectLanguageByLocation();
+        this.langService.setLanguage(locationLang as 'id' | 'en');
+      } else {
+        this.langService.setLanguage(browserLang as 'id' | 'en');
+      }
+    } catch (error) {
+      console.error('Error detecting language:', error);
+      // Fallback ke bahasa default
+    }
   }
 
   getCityTime(offset: number): Date {
@@ -109,6 +135,10 @@ export class App implements OnInit, OnDestroy {
       this.itemsToShow.update(current => current + 12); // Tambah 12 item
       this.isLoading.set(false);
     }, 2000);
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
 
   ngOnDestroy() {

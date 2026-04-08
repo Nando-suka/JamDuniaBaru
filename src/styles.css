@@ -11,10 +11,31 @@
   box-sizing: border-box;
 }
 
+/* 3. CSS Custom Properties untuk Tema */
+:root {
+  --bg-color: #f0f2f5;
+  --text-color: #1a1a1a;
+  --card-bg: #ffffff;
+  --card-border: #e1e5e9;
+  --button-bg: #007bff;
+  --button-text: #ffffff;
+  --button-hover: #0056b3;
+}
+
+.dark-theme {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --card-border: #333333;
+  --button-bg: #bb86fc;
+  --button-text: #121212;
+  --button-hover: #9d4edd;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #f0f2f5; /* Warna abu-abu soft khas aplikasi modern */
-  color: #1a1a1a;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   line-height: 1.6;
   display: flex;
   justify-content: center;
@@ -22,15 +43,15 @@ body {
   min-height: 100vh;
 }
 
-/* 3. Global Utility for Titles */
+/* 4. Global Utility for Titles */
 h1 {
   font-weight: 800;
   letter-spacing: -1px;
-  color: #2d3436;
+  color: var(--text-color);
   margin-bottom: 2rem;
 }
 
-/* 4. Smooth Transitions */
+/* 5. Smooth Transitions */
 * {
   transition: all 0.3s ease;
 }
