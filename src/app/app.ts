@@ -72,6 +72,7 @@ export class App implements OnInit, OnDestroy {
   // --- ASIA & TIMUR TENGAH ---
   { name: 'Dubai', offset: 4 },        // Uni Emirat Arab
   { name: 'Tehran', offset: 3.5 },     // Iran
+  { name: 'Jerusalem', offset: 3},     // Israel
   { name: 'Karachi', offset: 5 },      // Pakistan
   { name: 'Mumbai', offset: 5.5 },     // India
   { name: 'Kathmandu', offset: 5.75 }, // Nepal (Offset unik!)
@@ -209,6 +210,12 @@ export class App implements OnInit, OnDestroy {
       this.isLoading.set(false);
     }, 2000);
   }
+
+  isAllLoaded = computed(() => {
+  return !this.searchService.searchQuery() &&
+         this.itemsToShow() >= this.filteredLocations().length &&
+         this.filteredLocations().length > 0;
+  });
 
   /**
    * Toggle antara light/dark theme
