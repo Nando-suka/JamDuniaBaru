@@ -5,6 +5,7 @@ import { ThemeService } from './theme.service';
 import { SearchService } from './search.service';
 import { FavoritesService } from './favorites.service';
 import { CommonModule } from '@angular/common';
+import { ClockFacade } from './clock.facade';
 
 @Component({
   selector: 'app-root',
@@ -22,9 +23,7 @@ export class App implements OnInit, OnDestroy {
   themeService = inject(ThemeService); // untuk mengelola tema
   searchService = inject(SearchService); // untuk search/filter cities
   favoritesService = inject(FavoritesService); // untuk manage favorites
-  itemsToShow = signal(12); // Mulai tampil 12 item
-  isLoading = signal(false); // Status loading
-  showFavoritesOnly = signal(false); // Toggle untuk show favorites saja
+  facade = inject(ClockFacade);
   timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
   private timer: any;
 
@@ -39,82 +38,6 @@ export class App implements OnInit, OnDestroy {
       return '24h';
     }
   }
-  locations = [
-  { name: 'Honolulu', offset: -10 },   // Hawaii, AS
-  { name: 'Anchorage', offset: -9 },   // Alaska, AS
-  { name: 'Los Angeles', offset: -8 }, // Pantai Barat AS (PST)
-  { name: 'Denver', offset: -7 },      // Pegunungan AS (MST)
-  { name: 'Chicago', offset: -6 },     // Tengah AS (CST)
-  { name: 'Mexico City', offset: -6 }, // Meksiko
-  { name: 'New York', offset: -5 },    // Pantai Timur AS (EST)
-  { name: 'Toronto', offset: -5 },     // Kanada
-  { name: 'Santiago', offset: -4 },    // Chile
-  { name: 'Sao Paulo', offset: -3 },   // Brasil
-  { name: 'Buenos Aires', offset: -3 },// Argentina
-
-  // --- EROPA & AFRIKA (Garis Tengah) ---
-  { name: 'Reykjavik', offset: 0 },    // Islandia
-  { name: 'London', offset: 0 },       // Inggris (GMT)
-  { name: 'Casablanca', offset: 1 },   // Maroko
-  { name: 'Paris', offset: 1 },        // Prancis (CET)
-  { name: 'Berlin', offset: 1 },       // Jerman (CET)
-  { name: 'Rome', offset: 1 },         // Italia (CET)
-  { name: 'Lagos', offset: 1 },        // Nigeria
-  { name: 'Cape Town', offset: 2 },    // Afrika Selatan
-  { name: 'Cairo', offset: 2 },        // Mesir
-  { name: 'Athens', offset: 2 },       // Yunani
-  { name: 'Istanbul', offset: 3 },     // Turki
-  { name: 'Moscow', offset: 3 },       // Rusia
-  { name: 'Riyadh', offset: 3 },       // Arab Saudi
-  { name: 'Nairobi', offset: 3 },      // Kenya
-  { name: 'Betlehem', offset: 5},      // Israel
-
-  // --- ASIA & TIMUR TENGAH ---
-  { name: 'Dubai', offset: 4 },        // Uni Emirat Arab
-  { name: 'Tehran', offset: 3.5 },     // Iran
-  { name: 'Jerusalem', offset: 3},     // Israel
-  { name: 'Karachi', offset: 5 },      // Pakistan
-  { name: 'Mumbai', offset: 5.5 },     // India
-  { name: 'Kathmandu', offset: 5.75 }, // Nepal (Offset unik!)
-  { name: 'Manama', offset: 6},        // Bahrain
-  { name: 'Dhaka', offset: 6 },        // Bangladesh
-  { name: 'Bangkok', offset: 7 },      // Thailand
-  { name: 'Medan', offset: 7},         // Indonesia (WIB)
-  { name: 'Jakarta', offset: 7 },      // Indonesia (WIB)
-  { name: 'Singapore', offset: 8 },    // Singapura
-  { name: 'Kuala Lumpur', offset: 8 }, // Malaysia
-  { name: 'Hong Kong', offset: 8 },    // Hong Kong
-  { name: 'Beijing', offset: 8 },      // China
-  { name: 'Bali', offset: 8 },         // Indonesia (WITA)
-  { name: 'Perth', offset: 8 },        // Australia Barat
-  { name: 'Tokyo', offset: 9 },   
-  { name: 'Osaka', offset: 9},
-  { name: 'Kyoto', offset: 9},     // Jepang
-  { name: 'Seoul', offset: 9 },        // Korea Selatan
-  { name: 'Jayapura', offset: 9 },     // Indonesia (WIT)
-  { name: 'Adelaide', offset: 9.5 },   // Australia Tengah
-
-  // --- PASIFIK & AUSTRALIA ---
-  { name: 'Sydney', offset: 10 },      // Australia Timur
-  { name: 'Guam', offset: 10 },        // Teritori AS
-  { name: 'Auckland', offset: 12 },    // Selandia Baru
-  { name: 'Fiji', offset: 12 }         // Fiji
-  ];
-
-  // Computed signal untuk filtered locations berdasarkan search query dan favorites filter
-  filteredLocations = computed(() => {
-    let filtered = this.locations;
-
-    // Filter berdasarkan favorites jika showFavoritesOnly aktif
-    if (this.showFavoritesOnly()) {
-      filtered = filtered.filter(loc => this.favoritesService.isFavorite(loc));
-    }
-
-    // Filter berdasarkan search query
-    filtered = this.searchService.filterCities(filtered, this.searchService.searchQuery());
-
-    return filtered;
-  });
 
   ngOnInit() {
     this.timer = setInterval(() => {
@@ -199,40 +122,10 @@ export class App implements OnInit, OnDestroy {
   }
 
   /**
-   * Load lebih banyak cities (pagination)
-   */
-  loadMore(): void {
-    this.isLoading.set(true);
-    
-    // Simulasi loading selama 2 detik
-    setTimeout(() => {
-      this.itemsToShow.update(current => current + 12); // Tambah 12 item
-      this.isLoading.set(false);
-    }, 2000);
-  }
-
-  isAllLoaded = computed(() => {
-  return !this.searchService.searchQuery() &&
-         this.itemsToShow() >= this.filteredLocations().length &&
-         this.filteredLocations().length > 0;
-  });
-
-  /**
    * Toggle antara light/dark theme
    */
   toggleTheme(): void {
     this.themeService.toggleTheme();
-  }
-
-  /**
-   * Toggle antara show all cities atau favorites only
-   */
-  toggleShowFavoritesOnly(): void {
-    this.showFavoritesOnly.update(current => !current);
-    // Reset itemsToShow ketika toggle favorites view
-    this.itemsToShow.set(12);
-    // Reset search ketika toggle favorites view
-    this.searchService.clearSearch();
   }
 
   /**
