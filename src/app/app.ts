@@ -6,11 +6,12 @@ import { SearchService } from './search.service';
 import { FavoritesService } from './favorites.service';
 import { CommonModule } from '@angular/common';
 import { ClockFacade } from './clock.facade';
+import { AlarmTimerComponent } from './alarm-timer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AlarmTimerComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -25,6 +26,7 @@ export class App implements OnInit, OnDestroy {
   favoritesService = inject(FavoritesService); // untuk manage favorites
   facade = inject(ClockFacade);
   timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
+  showAlarmTimer = signal(false); // Toggle untuk panel alarm/timer
   private timer: any;
 
   dict = this.langService.text;

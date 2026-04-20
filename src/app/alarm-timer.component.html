@@ -1,0 +1,200 @@
+<div class="alarm-timer-container">
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'alarm'"
+      (click)="activeTab.set('alarm')">
+      🔔 Alarm
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'timer'"
+      (click)="activeTab.set('timer')">
+      ⏱️ Timer
+    </button>
+  </div>
+
+  <!-- Notification Permission Banner -->
+  <div class="notification-banner" *ngIf="notificationPermission() !== 'granted'">
+    <p>Untuk menerima notifikasi alarm dan timer, izinkan akses notifikasi.</p>
+    <button class="btn-primary" (click)="requestNotificationPermission()">
+      Izinkan Notifikasi
+    </button>
+  </div>
+
+  <!-- Alarm Section -->
+  <div class="alarm-section" *ngIf="activeTab() === 'alarm'">
+    <div class="section-header">
+      <h3>Alarm Harian</h3>
+      <button class="btn-primary" (click)="openAlarmModal()">+ Tambah Alarm</button>
+    </div>
+
+    <div class="alarms-list">
+      <div class="alarm-item" *ngFor="let alarm of alarms()">
+        <div class="alarm-info">
+          <div class="alarm-time">{{ alarm.time }}</div>
+          <div class="alarm-label">{{ alarm.label }}</div>
+          <div class="alarm-repeat" *ngIf="alarm.repeat">🔄 Harian</div>
+        </div>
+        <div class="alarm-controls">
+          <button
+            class="toggle-btn"
+            [class.active]="alarm.enabled"
+            (click)="toggleAlarm(alarm.id)">
+            {{ alarm.enabled ? 'ON' : 'OFF' }}
+          </button>
+          <button class="delete-btn" (click)="removeAlarm(alarm.id)">🗑️</button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="alarms().length === 0">
+        <p>Belum ada alarm. Tambah alarm pertama Anda!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer Section -->
+  <div class="timer-section" *ngIf="activeTab() === 'timer'">
+    <div class="section-header">
+      <h3>Timer Countdown</h3>
+      <button class="btn-primary" (click)="openTimerModal()">+ Set Timer</button>
+    </div>
+
+    <!-- Active Timer Display -->
+    <div class="active-timer" *ngIf="activeTimer()">
+      <div class="timer-display">
+        <div class="timer-time">{{ formatTimerDisplay(activeTimer()!.remaining) }}</div>
+        <div class="timer-label">{{ activeTimer()!.label }}</div>
+      </div>
+      <div class="timer-controls">
+        <button
+          class="btn-secondary"
+          (click)="activeTimer()!.isRunning ? pauseTimer() : resumeTimer()">
+          {{ activeTimer()!.isRunning ? '⏸️ Pause' : '▶️ Resume' }}
+        </button>
+        <button class="btn-danger" (click)="stopTimer()">⏹️ Stop</button>
+      </div>
+    </div>
+
+    <div class="timer-placeholder" *ngIf="!activeTimer()">
+      <p>Tidak ada timer aktif. Set timer baru untuk memulai countdown!</p>
+    </div>
+  </div>
+</div>
+
+<!-- Alarm Modal -->
+<div class="modal-overlay" *ngIf="showAlarmModal()" (click)="closeAlarmModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Tambah Alarm Baru</h3>
+      <button class="close-btn" (click)="closeAlarmModal()">×</button>
+    </div>
+
+    <form class="alarm-form" (ngSubmit)="addAlarm()">
+      <div class="form-group">
+        <label for="alarm-time">Waktu:</label>
+        <input
+          id="alarm-time"
+          type="time"
+          [(ngModel)]="alarmTime"
+          name="alarmTime"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="alarm-label">Label:</label>
+        <input
+          id="alarm-label"
+          type="text"
+          [(ngModel)]="alarmLabel"
+          name="alarmLabel"
+          placeholder="Contoh: Bangun Pagi"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="alarmRepeat"
+            name="alarmRepeat">
+          Ulangi setiap hari
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeAlarmModal()">Batal</button>
+        <button type="submit" class="btn-primary">Tambah Alarm</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Timer Modal -->
+<div class="modal-overlay" *ngIf="showTimerModal()" (click)="closeTimerModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Set Timer Baru</h3>
+      <button class="close-btn" (click)="closeTimerModal()">×</button>
+    </div>
+
+    <form class="timer-form" (ngSubmit)="startTimer()">
+      <div class="form-group">
+        <label for="timer-label">Label:</label>
+        <input
+          id="timer-label"
+          type="text"
+          [(ngModel)]="timerLabel"
+          name="timerLabel"
+          placeholder="Contoh: Memasak Nasi"
+          required>
+      </div>
+
+      <div class="time-inputs">
+        <div class="form-group">
+          <label for="timer-hours">Jam:</label>
+          <input
+            id="timer-hours"
+            type="number"
+            [(ngModel)]="timerHours"
+            name="timerHours"
+            min="0"
+            max="23">
+        </div>
+
+        <div class="form-group">
+          <label for="timer-minutes">Menit:</label>
+          <input
+            id="timer-minutes"
+            type="number"
+            [(ngModel)]="timerMinutes"
+            name="timerMinutes"
+            min="0"
+            max="59"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="timer-seconds">Detik:</label>
+          <input
+            id="timer-seconds"
+            type="number"
+            [(ngModel)]="timerSeconds"
+            name="timerSeconds"
+            min="0"
+            max="59">
+        </div>
+      </div>
+
+      <div class="time-preview">
+        <p>Durasi: {{ formatTimerDisplay((timerHours() * 3600) + (timerMinutes() * 60) + timerSeconds()) }}</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeTimerModal()">Batal</button>
+        <button type="submit" class="btn-primary">Start Timer</button>
+      </div>
+    </form>
+  </div>
+</div>
