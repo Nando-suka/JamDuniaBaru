@@ -8,6 +8,14 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.input-helper {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+}
+
 /* Tabs */
 .tabs {
   display: flex;
@@ -244,15 +252,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(6px);
 }
 
 .modal-content {
-  background: var(--bg-color, #ffffff);
+  background: #ffffff;
   border-radius: 12px;
   padding: 0;
   max-width: 500px;
@@ -408,7 +417,7 @@
 /* Dark Theme Support */
 @media (prefers-color-scheme: dark) {
   .alarm-timer-container {
-    --bg-color: #1a1a1a;
+    --bg-color: #ffffff;
     --text-color: #ffffff;
     --border-color: #333;
     --card-bg: #2d2d2d;
