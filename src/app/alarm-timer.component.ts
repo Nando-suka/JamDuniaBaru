@@ -30,8 +30,13 @@ export class AlarmTimerComponent {
 
   // Computed signals
   alarms = this.alarmTimerService.alarms;
-  activeTimer = this.alarmTimerService.activeTimer;
+  activeTimers = this.alarmTimerService.activeTimers;
   notificationPermission = this.alarmTimerService.notificationPermission;
+
+  // Helper to get first active timer (for backward compatibility)
+  get activeTimer() {
+    return () => this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+  }
 
   // ===== ALARM METHODS =====
   openAlarmModal(): void {
@@ -87,15 +92,24 @@ export class AlarmTimerComponent {
   }
 
   stopTimer(): void {
-    this.alarmTimerService.stopTimer();
+    const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+    if (timer) {
+      this.alarmTimerService.stopTimer(timer.id);
+    }
   }
 
   pauseTimer(): void {
-    this.alarmTimerService.pauseTimer();
+    const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+    if (timer) {
+      this.alarmTimerService.pauseTimer(timer.id);
+    }
   }
 
   resumeTimer(): void {
-    this.alarmTimerService.resumeTimer();
+    const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+    if (timer) {
+      this.alarmTimerService.resumeTimer(timer.id);
+    }
   }
 
   private resetTimerForm(): void {

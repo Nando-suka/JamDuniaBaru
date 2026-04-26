@@ -1,0 +1,153 @@
+<div class="timezone-converter" [class.expanded]="isExpanded()">
+  <!-- Header / Toggle Button -->
+  <button class="converter-toggle" (click)="togglePanel()">
+    <span class="toggle-icon">{{ isExpanded() ? '−' : '+' }}</span>
+    <span class="toggle-text">{{ dict().timezoneConverter || 'Konverter Zona Waktu' }}</span>
+  </button>
+
+  <!-- Converter Panel -->
+  @if (isExpanded()) {
+    <div class="converter-panel">
+      <!-- City Selection Row -->
+      <div class="city-selection">
+        <!-- From City -->
+        <div class="city-input-group">
+          <label>{{ dict().fromCity || 'Dari Kota' }}</label>
+          <div class="dropdown-container">
+            <input 
+              type="text" 
+              class="city-search-input"
+              [placeholder]="dict().selectCity || 'Pilih kota...'"
+              [value]="selectedFromCity()?.name || ''"
+              (input)="onFromSearchChange($any($event.target).value)"
+              (focus)="toggleFromDropdown()"
+            />
+            @if (selectedFromCity()) {
+              <span class="offset-badge">{{ getOffsetString(selectedFromCity()!.offset) }}</span>
+            }
+            @if (showFromDropdown()) {
+              <div class="dropdown-list">
+                @for (city of filteredFromCities; track city.name) {
+                  <div class="dropdown-item" (click)="selectFromCity(city)">
+                    <span class="city-name">{{ city.name }}</span>
+                    <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Swap Button -->
+        <button class="swap-btn" (click)="swapCities()" [disabled]="!selectedFromCity() || !selectedToCity()">
+          ⇄
+        </button>
+
+        <!-- To City -->
+        <div class="city-input-group">
+          <label>{{ dict().toCity || 'Ke Kota' }}</label>
+          <div class="dropdown-container">
+            <input 
+              type="text" 
+              class="city-search-input"
+              [placeholder]="dict().selectCity || 'Pilih kota...'"
+              [value]="selectedToCity()?.name || ''"
+              (input)="onToSearchChange($any($event.target).value)"
+              (focus)="toggleToDropdown()"
+            />
+            @if (selectedToCity()) {
+              <span class="offset-badge">{{ getOffsetString(selectedToCity()!.offset) }}</span>
+            }
+            @if (showToDropdown()) {
+              <div class="dropdown-list">
+                @for (city of filteredToCities; track city.name) {
+                  <div class="dropdown-item" (click)="selectToCity(city)">
+                    <span class="city-name">{{ city.name }}</span>
+                    <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Input Section -->
+      <div class="time-input-section">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="useCurrentTime()"
+            (change)="onUseCurrentTimeChange($event)"
+          />
+          {{ dict().useCurrentTime || 'Gunakan waktu saat ini' }}
+        </label>
+
+        @if (!useCurrentTime()) {
+          <div class="manual-time-inputs">
+            <div class="input-group">
+              <label>{{ dict().time || 'Waktu' }}</label>
+              <input 
+                type="time" 
+                [value]="inputTime()"
+                (change)="onTimeChange($event)"
+              />
+            </div>
+            <div class="input-group">
+              <label>{{ dict().date || 'Tanggal' }}</label>
+              <input 
+                type="date" 
+                [value]="inputDate()"
+                (change)="onDateChange($event)"
+              />
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Result Section -->
+      @if (convertedResult()) {
+        <div class="result-section">
+          <div class="offset-info">
+            {{ dict().timeDifference || 'Selisih waktu' }}: {{ getOffsetInfo() }}
+          </div>
+          
+          <div class="result-cards">
+            <!-- Source Time -->
+            <div class="result-card source">
+              <div class="card-label">{{ dict().from || 'Dari' }}</div>
+              <div class="city-name">{{ convertedResult()!.fromCity.name }}</div>
+              <div class="time-display">{{ formatTime(convertedResult()!.sourceTime) }}</div>
+              <div class="date-display">{{ formatDate(convertedResult()!.sourceTime) }}</div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="result-arrow">→</div>
+
+            <!-- Converted Time -->
+            <div class="result-card target">
+              <div class="card-label">{{ dict().to || 'Ke' }}</div>
+              <div class="city-name">{{ convertedResult()!.toCity.name }}</div>
+              <div class="time-display">{{ formatTime(convertedResult()!.convertedTime) }}</div>
+              <div class="date-display">{{ formatDate(convertedResult()!.convertedTime) }}</div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="no-result">
+          {{ dict().selectBothCities || 'Pilih kota asal dan tujuan' }}
+        </div>
+      }
+
+      <!-- Reset Button -->
+      <button class="reset-btn" (click)="reset()">
+        {{ dict().reset || 'Reset' }}
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Click outside to close dropdowns -->
+@if (showFromDropdown() || showToDropdown()) {
+  <div class="dropdown-overlay" (click)="closeDropdowns()"></div>
+}

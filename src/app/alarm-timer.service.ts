@@ -18,6 +18,7 @@ export class AlarmTimerService {
 
   // SESUDAH:
   timers = signal<Timer[]>([]);
+  activeTimers = signal<Timer[]>([]); // Add this signal
   private timerIntervals = new Map<string, any>();
   notificationPermission = signal<NotificationPermission>('default');
 
@@ -225,8 +226,9 @@ export class AlarmTimerService {
     };
 
     this.timers.update(timers => [...timers, timer]);
+    this.activeTimers.update(timers => [...timers, timer]);
 
-    this.runTimer(timers.id);
+    this.runTimer(timer);
   }
 
   stopTimer(id: string): void {

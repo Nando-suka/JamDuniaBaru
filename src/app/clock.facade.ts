@@ -61,7 +61,9 @@ export class ClockFacade {
   { name: 'Kuala Lumpur', offset: 8 }, // Malaysia
   { name: 'Hong Kong', offset: 8 },    // Hong Kong
   { name: 'Beijing', offset: 8 },      // China
+  { name: 'Chongqing', offset: 8},     // China
   { name: 'Bali', offset: 8 },         // Indonesia (WITA)
+  { name: 'Tanjung Selor', offset: 8}, // Indonesia (WITA)
   { name: 'Perth', offset: 8 },        // Australia Barat
   { name: 'Tokyo', offset: 9 },   
   { name: 'Osaka', offset: 9},
@@ -119,6 +121,11 @@ export class ClockFacade {
 
   getFavoritesCount() {
     return this.favoritesService.getFavoritesCount();
+  }
+
+  // Get all locations (raw array) for timezone converter
+  getAllLocations(): City[] {
+    return this.locations;
   }
 
   isFavorite(city: City) {

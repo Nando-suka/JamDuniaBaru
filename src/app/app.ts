@@ -7,11 +7,12 @@ import { FavoritesService } from './favorites.service';
 import { CommonModule } from '@angular/common';
 import { ClockFacade } from './clock.facade';
 import { AlarmTimerComponent } from './alarm-timer.component';
+import { TimezoneConverterComponent } from './timezone-converter.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, AlarmTimerComponent],
+  imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -27,6 +28,7 @@ export class App implements OnInit, OnDestroy {
   facade = inject(ClockFacade);
   timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
   showAlarmTimer = signal(false); // Toggle untuk panel alarm/timer
+  showTimezoneConverter = signal(false); // Toggle untuk panel konverter zona waktu
   private timer: any;
 
   dict = this.langService.text;
@@ -128,6 +130,13 @@ export class App implements OnInit, OnDestroy {
    */
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  /**
+   * Toggle timezone converter panel
+   */
+  toggleTimezoneConverter(): void {
+    this.showTimezoneConverter.update(v => !v);
   }
 
   /**

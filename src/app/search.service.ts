@@ -18,15 +18,25 @@ export class SearchService {
    * @returns Filtered cities array
    */
   filterCities(cities: City[], query: string): City[] {
-    if (!query.trim()) {
-      return cities;
-    }
-
-    const lowerQuery = query.toLowerCase().trim();
-    return cities.filter(city => 
-      city.name.toLowerCase().includes(lowerQuery)
-    );
+  if (!query.trim()) {
+    return cities;
   }
+
+  const lowerQuery = query.toLowerCase().trim();
+
+  return cities
+    .filter(city =>
+      city.name.toLowerCase().includes(lowerQuery)
+    )
+    .sort((a, b) => {
+      const aStarts = a.name.toLowerCase().startsWith(lowerQuery);
+      const bStarts = b.name.toLowerCase().startsWith(lowerQuery);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return a.name.localeCompare(b.name);
+    });
+}
 
   /**
    * Update search query
