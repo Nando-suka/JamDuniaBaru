@@ -203,7 +203,7 @@
 /* Active Timer */
 .active-timer {
   background: var(--card-bg, #f8f9fa);
-  border: 2px solid var(--primary-color, #007bff);
+  border: 2px solid var(--primary-color, #181a1d);
   border-radius: 12px;
   padding: 24px;
   text-align: center;
@@ -217,7 +217,7 @@
 .timer-time {
   font-size: 48px;
   font-weight: bold;
-  color: var(--primary-color, #007bff);
+  color: var(--primary-color, #181a1d);
   font-family: monospace;
   margin-bottom: 8px;
 }
@@ -418,9 +418,9 @@
 @media (prefers-color-scheme: dark) {
   .alarm-timer-container {
     --bg-color: #ffffff;
-    --text-color: #ffffff;
+    --text-color: #3a3535;
     --border-color: #333;
-    --card-bg: #2d2d2d;
+    --card-bg: #ffffff;
     --hover-bg: #333;
     --primary-color: #4dabf7;
     --primary-hover: #339af0;
