@@ -71,6 +71,15 @@
   position: relative;
 }
 
+.dropdown-item.active {
+  background: #4a90d9;
+  color: white;
+}
+
+.dropdown-item.active .city-offset {
+  color: #e0e0e0;
+}
+
 .city-search-input {
   width: 100%;
   padding: 10px 12px;

@@ -25,6 +25,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   showFromDropdown = signal(false);
   showToDropdown = signal(false);
   private timer: any;
+  highlightedIndex = signal<number>(-1);
 
   // Dictionary untuk terjemahan
   dict = this.langService.text;
@@ -136,6 +137,38 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     const checked = (event.target as HTMLInputElement).checked;
     this.converterService.setUseCurrentTime(checked);
   }
+
+  updateSearch(query: string) {
+  this.searchToQuery.set(query);
+  this.highlightedIndex.set(-1);
+}
+
+  handleKeydown(event: KeyboardEvent, cities: City[]): void {
+  if (!cities || cities.length === 0) return;
+
+  const currentIndex = this.highlightedIndex();
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    this.highlightedIndex.set(
+      currentIndex < cities.length - 1 ? currentIndex + 1 : 0
+    );
+  }
+
+  else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    this.highlightedIndex.set(
+      currentIndex > 0 ? currentIndex - 1 : cities.length - 1
+    );
+  }
+
+  else if (event.key === 'Enter') {
+    event.preventDefault();
+    if (currentIndex >= 0) {
+      this.selectToCity(cities[currentIndex]);
+    }
+  }
+}
 
   // Swap cities
   swapCities(): void {
