@@ -226,7 +226,7 @@
 .offset-info {
   text-align: center;
   font-size: 14px;
-  color: var(--primary-color, #4a90d9);
+  color: var(--primary-color, #06080a);
   font-weight: 500;
   margin-bottom: 16px;
   padding: 8px;
@@ -353,5 +353,18 @@
 
   .manual-time-inputs {
     flex-direction: column;
+  }
+
+    /* Pembatas untuk area tombol Reset */
+  .reset-section {
+    margin-top: 28px;           /* jarak dari bagian atas (hasil atau input waktu) */
+    border-top: 1px solid var(--border-color, #e0e0e0); /* garis pemisah */
+    padding-top: 20px;          /* ruang antara garis dan tombol */
+  }
+
+  /* Opsional: jika Anda ingin tombol lebih lebar atau gaya tambahan */
+  .reset-btn {
+    width: 100%;
+    /* properti lain tetap seperti semula */
   }
 }

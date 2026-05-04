@@ -140,6 +140,56 @@ export class App implements OnInit, OnDestroy {
   }
 
   /**
+   * Cycle through view modes (list -> grid -> compact -> list)
+   */
+  cycleViewMode(): void {
+    const modes: Array<'list' | 'grid' | 'compact'> = ['list', 'grid', 'compact'];
+    const currentMode = this.facade.getViewMode()();
+    const currentIndex = modes.indexOf(currentMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    this.facade.setViewMode(modes[nextIndex]);
+  }
+
+  /**
+   * Get icon for current view mode
+   */
+  getViewModeIcon(): string {
+    const mode = this.facade.getViewMode()();
+    switch (mode) {
+      case 'list': return '📋';
+      case 'grid': return '🔲';
+      case 'compact': return '≡';
+      default: return '📋';
+    }
+  }
+
+  /**
+   * Get title for current view mode
+   */
+  getViewModeTitle(): string {
+    const mode = this.facade.getViewMode()();
+    switch (mode) {
+      case 'list': return 'Mode Daftar (List)';
+      case 'grid': return 'Mode Grid';
+      case 'compact': return 'Mode Kompak';
+      default: return 'Mode Daftar';
+    }
+  }
+
+  /**
+   * Get CSS classes for current view mode
+   */
+  getViewModeClass(): string {
+    const mode = this.facade.getViewMode()();
+    switch (mode) {
+      case 'list': return 'view-mode-list';
+      case 'grid': return 'view-mode-grid';
+      case 'compact': return 'view-mode-compact';
+      default: return 'view-mode-list';
+    }
+  }
+
+  /**
    * Cleanup ketika component destroy
    */
   ngOnDestroy(): void {

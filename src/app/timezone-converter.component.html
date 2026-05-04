@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <!-- Time Input Section -->
+      <!-- Time Input Section bagian yang dapat berubah menjadi section jika diperlukan-->
       <div class="time-input-section">
         <label class="checkbox-label">
           <input 
@@ -111,6 +111,12 @@
           <div class="offset-info">
             {{ dict().timeDifference || 'Selisih waktu' }}: {{ getOffsetInfo() }}
           </div>
+
+        <div class="reset-section">
+          <button class="reset-btn" (click)="reset()">
+            {{ dict().reset || 'Reset' }}
+          </button>
+        </div>
           
           <div class="result-cards">
             <!-- Source Time -->

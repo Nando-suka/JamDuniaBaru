@@ -14,6 +14,15 @@ export class ClockFacade {
   isLoading = signal(false);
   showFavoritesOnly = signal(false);
 
+  // ===== VIEW MODE STATE =====
+  viewMode = signal<'list' | 'grid' | 'compact'>('list');
+  animationEnabled = signal(true);
+
+  // Animation states
+  recentlyAdded = signal<string | null>(null);
+  recentlyRemoved = signal<string | null>(null);
+  recentlyToggledTheme = signal(false);
+
   // ===== DATA SOURCE =====
   private locations: City[] = [
     { name: 'Honolulu', offset: -10 },   // Hawaii, AS
@@ -134,5 +143,76 @@ export class ClockFacade {
 
   toggleFavorite(city: City) {
     this.favoritesService.toggleFavorite(city);
+  }
+
+  // ===== VIEW MODE ACTIONS =====
+  getViewMode() {
+    return this.viewMode;
+  }
+
+  setViewMode(mode: 'list' | 'grid' | 'compact'): void {
+    this.viewMode.set(mode);
+    this.saveViewModeToStorage(mode);
+  }
+
+  toggleAnimation(): void {
+    this.animationEnabled.update(v => !v);
+  }
+
+  isAnimationEnabled(): boolean {
+    return this.animationEnabled();
+  }
+
+  // Animation triggers
+  triggerAddAnimation(cityName: string): void {
+    this.recentlyAdded.set(cityName);
+    setTimeout(() => this.recentlyAdded.set(null), 1000);
+  }
+
+  triggerRemoveAnimation(cityName: string): void {
+    this.recentlyRemoved.set(cityName);
+    setTimeout(() => this.recentlyRemoved.set(null), 1000);
+  }
+
+  triggerThemeAnimation(): void {
+    this.recentlyToggledTheme.set(true);
+    setTimeout(() => this.recentlyToggledTheme.set(false), 500);
+  }
+
+  getRecentlyAdded() {
+    return this.recentlyAdded;
+  }
+
+  getRecentlyRemoved() {
+    return this.recentlyRemoved;
+  }
+
+  getRecentlyToggledTheme() {
+    return this.recentlyToggledTheme;
+  }
+
+  private saveViewModeToStorage(mode: 'list' | 'grid' | 'compact'): void {
+    try {
+      localStorage.setItem('jam-dunia-view-mode', mode);
+    } catch (e) {
+      console.error('Error saving view mode:', e);
+    }
+  }
+
+  private getStoredViewMode(): 'list' | 'grid' | 'compact' {
+    try {
+      const stored = localStorage.getItem('jam-dunia-view-mode');
+      if (stored === 'list' || stored === 'grid' || stored === 'compact') {
+        return stored;
+      }
+    } catch (e) {
+      console.error('Error loading view mode:', e);
+    }
+    return 'list';
+  }
+
+  // ===== INIT =====
+  constructor() {
+    this.viewMode.set(this.getStoredViewMode());
   }
 }
