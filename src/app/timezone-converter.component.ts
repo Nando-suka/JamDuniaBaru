@@ -37,19 +37,35 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   // Get filtered cities untuk dropdown
   get filteredFromCities(): City[] {
-    const query = this.searchFromQuery().toLowerCase();
+    const query = this.searchFromQuery().toLowerCase().trim();
     if (!query) return this.cities;
-    return this.cities.filter(city => 
-      city.name.toLowerCase().includes(query)
+
+    const starts = this.cities.filter(city =>
+      city.name.toLowerCase().startsWith(query)
     );
+
+    const includes = this.cities.filter(city =>
+      city.name.toLowerCase().includes(query) &&
+      !city.name.toLowerCase().startsWith(query)
+    );
+
+    return [...starts, ...includes];
   }
 
   get filteredToCities(): City[] {
-    const query = this.searchToQuery().toLowerCase();
+    const query = this.searchToQuery().toLowerCase().trim();
     if (!query) return this.cities;
-    return this.cities.filter(city => 
-      city.name.toLowerCase().includes(query)
+
+    const starts = this.cities.filter(city =>
+      city.name.toLowerCase().startsWith(query)
     );
+
+    const includes = this.cities.filter(city =>
+      city.name.toLowerCase().includes(query) &&
+      !city.name.toLowerCase().startsWith(query)
+    );
+
+    return [...starts, ...includes];
   }
 
   // Signal bindings
