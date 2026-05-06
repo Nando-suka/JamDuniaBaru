@@ -381,9 +381,9 @@
 
 /* Load More Button */
 .load-more-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--card-border);
   padding: 12px 28px;
   border-radius: 25px;
   font-size: 15px;
@@ -391,7 +391,6 @@
   cursor: pointer;
   margin: 1.5rem 0;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .load-more-btn:hover:not(:disabled) {

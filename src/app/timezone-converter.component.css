@@ -240,7 +240,8 @@
   margin-bottom: 16px;
   padding: 8px;
   background: rgba(74, 144, 217, 0.1);
-  border-radius: 6px;
+
+  border-radius: 0;
 }
 
 .result-cards {
@@ -254,16 +255,16 @@
   flex: 1;
   text-align: center;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 0px;
   background: var(--bg-color, #f8f9fa);
 }
 
 .result-card.source {
-  border-left: 4px solid var(--primary-color, #4a90d9);
+  border-left: 0px solid var(--primary-color, #4a90d9);
 }
 
 .result-card.target {
-  border-right: 4px solid var(--success-color, #28a745);
+  border-right: 0px solid var(--success-color, #28a745);
 }
 
 .result-card .card-label {
@@ -305,15 +306,15 @@
   color: var(--secondary-text, #666);
   font-size: 14px;
   background: white;
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 /* Reset Button */
 .reset-btn {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
+  border: 0px solid var(--border-color, #ddd);
+  border-radius: 0px;
   background: white;
   color: var(--text-color, #333);
   font-size: 14px;
