@@ -12,7 +12,7 @@ import { TimezoneConverterComponent } from './timezone-converter.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
