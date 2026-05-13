@@ -14,9 +14,8 @@ import { TimezoneConverterComponent } from './timezone-converter.component';
   standalone: true,
   imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
-
 export class App implements OnInit, OnDestroy {
   // Pakai Signal! Ini standar Angular masa depan
   currentTime = signal(new Date());
@@ -37,7 +36,7 @@ export class App implements OnInit, OnDestroy {
   private getStoredTimeFormat(): '12h' | '24h' {
     try {
       const stored = localStorage.getItem('jam-dunia-time-format');
-      return (stored === '12h' || stored === '24h') ? stored : '24h';
+      return stored === '12h' || stored === '24h' ? stored : '24h';
     } catch {
       return '24h';
     }
@@ -56,7 +55,8 @@ export class App implements OnInit, OnDestroy {
   async detectAndSetLanguage() {
     try {
       const browserLang = this.detectionService.detectBrowserLanguage();
-      if (browserLang === 'en') { // Jika browser adalah English, coba deteksi berdasarkan lokasi
+      if (browserLang === 'en') {
+        // Jika browser adalah English, coba deteksi berdasarkan lokasi
         const locationLang = await this.detectionService.detectLanguageByLocation();
         this.langService.setLanguage(locationLang as 'id' | 'en');
       } else {
@@ -71,15 +71,15 @@ export class App implements OnInit, OnDestroy {
   // mendaptkan function untuk waktu setiap kota
   getCityTime(offset: number): Date {
     const now = new Date();
-    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-    return new Date(utcTime + (offset * 3600000));
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcTime + offset * 3600000);
   }
 
   // mendapaktna bagian waktu untuk setiap offset dari angkanya
   getTimeByOffset(offset: number): Date {
     const d = this.currentTime(); // Ambil nilai signal dengan tanda kurung ()
-    const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-    return new Date(utc + (3600000 * offset));
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000;
+    return new Date(utc + 3600000 * offset);
   }
 
   /**
@@ -92,7 +92,7 @@ export class App implements OnInit, OnDestroy {
     const hours = timeDate.getHours();
     const minutes = timeDate.getMinutes();
     const seconds = timeDate.getSeconds();
-    
+
     if (this.timeFormat() === '12h') {
       const ampm = hours >= 12 ? 'PM' : 'AM';
       const hours12 = hours % 12 || 12;
@@ -121,7 +121,7 @@ export class App implements OnInit, OnDestroy {
   scrollToTop(): void {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth' // Scroll halus
+      behavior: 'smooth', // Scroll halus
     });
   }
 
@@ -136,7 +136,7 @@ export class App implements OnInit, OnDestroy {
    * Toggle timezone converter panel
    */
   toggleTimezoneConverter(): void {
-    this.showTimezoneConverter.update(v => !v);
+    this.showTimezoneConverter.update((v) => !v);
   }
 
   /**
@@ -156,10 +156,14 @@ export class App implements OnInit, OnDestroy {
   getViewModeIcon(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
-      case 'list': return '📋';
-      case 'grid': return '🔲';
-      case 'compact': return '≡';
-      default: return '📋';
+      case 'list':
+        return '📋';
+      case 'grid':
+        return '🔲';
+      case 'compact':
+        return '≡';
+      default:
+        return '📋';
     }
   }
 
@@ -169,10 +173,14 @@ export class App implements OnInit, OnDestroy {
   getViewModeTitle(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
-      case 'list': return 'Mode Daftar (List)';
-      case 'grid': return 'Mode Grid';
-      case 'compact': return 'Mode Kompak';
-      default: return 'Mode Daftar';
+      case 'list':
+        return 'Mode Daftar (List)';
+      case 'grid':
+        return 'Mode Grid';
+      case 'compact':
+        return 'Mode Kompak';
+      default:
+        return 'Mode Daftar';
     }
   }
 
@@ -182,10 +190,14 @@ export class App implements OnInit, OnDestroy {
   getViewModeClass(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
-      case 'list': return 'view-mode-list';
-      case 'grid': return 'view-mode-grid';
-      case 'compact': return 'view-mode-compact';
-      default: return 'view-mode-list';
+      case 'list':
+        return 'view-mode-list';
+      case 'grid':
+        return 'view-mode-grid';
+      case 'compact':
+        return 'view-mode-compact';
+      default:
+        return 'view-mode-list';
     }
   }
 

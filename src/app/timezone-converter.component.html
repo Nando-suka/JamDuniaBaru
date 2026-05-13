@@ -14,8 +14,8 @@
         <div class="city-input-group">
           <label>{{ dict().fromCity || 'Dari Kota' }}</label>
           <div class="dropdown-container">
-            <input 
-              type="text" 
+            <input
+              type="text"
               class="city-search-input"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
               [value]="selectedFromCity()?.name || ''"
@@ -39,7 +39,11 @@
         </div>
 
         <!-- Swap Button -->
-        <button class="swap-btn" (click)="swapCities()" [disabled]="!selectedFromCity() || !selectedToCity()">
+        <button
+          class="swap-btn"
+          (click)="swapCities()"
+          [disabled]="!selectedFromCity() || !selectedToCity()"
+        >
           ⇄
         </button>
 
@@ -47,8 +51,8 @@
         <div class="city-input-group">
           <label>{{ dict().toCity || 'Ke Kota' }}</label>
           <div class="dropdown-container">
-            <input 
-              type="text" 
+            <input
+              type="text"
               class="city-search-input"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
               [value]="selectedToCity()?.name || ''"
@@ -75,8 +79,8 @@
       <!-- Time Input Section bagian yang dapat berubah menjadi section jika diperlukan-->
       <div class="time-input-section">
         <label class="checkbox-label">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             [checked]="useCurrentTime()"
             (change)="onUseCurrentTimeChange($event)"
           />
@@ -87,19 +91,11 @@
           <div class="manual-time-inputs">
             <div class="input-group">
               <label>{{ dict().time || 'Waktu' }}</label>
-              <input 
-                type="time" 
-                [value]="inputTime()"
-                (change)="onTimeChange($event)"
-              />
+              <input type="time" [value]="inputTime()" (change)="onTimeChange($event)" />
             </div>
             <div class="input-group">
               <label>{{ dict().date || 'Tanggal' }}</label>
-              <input 
-                type="date" 
-                [value]="inputDate()"
-                (change)="onDateChange($event)"
-              />
+              <input type="date" [value]="inputDate()" (change)="onDateChange($event)" />
             </div>
           </div>
         }
@@ -112,9 +108,8 @@
             {{ dict().timeDifference || 'Selisih waktu' }}: {{ getOffsetInfo() }}
           </div>
 
-        <div class="reset-section">
-        </div>
-          
+          <div class="reset-section"></div>
+
           <div class="result-cards">
             <!-- Source Time -->
             <div class="result-card source">

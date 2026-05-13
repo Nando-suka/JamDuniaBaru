@@ -10,10 +10,9 @@ export interface TimeConversion {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TimezoneConverterService {
-  
   // State untuk konverter
   selectedFromCity = signal<City | null>(null);
   selectedToCity = signal<City | null>(null);
@@ -25,13 +24,13 @@ export class TimezoneConverterService {
   convertedResult = computed(() => {
     const from = this.selectedFromCity();
     const to = this.selectedToCity();
-    
+
     if (!from || !to) {
       return null;
     }
 
     let sourceDate: Date;
-    
+
     if (this.useCurrentTime()) {
       sourceDate = new Date();
     } else {
@@ -43,7 +42,7 @@ export class TimezoneConverterService {
 
     // Hitung perbedaan offset
     const offsetDiff = to.offset - from.offset;
-    
+
     // Konversi waktu
     const convertedDate = new Date(sourceDate.getTime() + offsetDiff * 60 * 60 * 1000);
 
@@ -52,7 +51,7 @@ export class TimezoneConverterService {
       toCity: to,
       sourceTime: sourceDate,
       convertedTime: convertedDate,
-      offsetDifference: offsetDiff
+      offsetDifference: offsetDiff,
     } as TimeConversion;
   });
 
@@ -149,7 +148,7 @@ export class TimezoneConverterService {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 

@@ -3,7 +3,6 @@ import { Injectable, signal, inject, Renderer2, RendererFactory2 } from '@angula
 @Injectable({
   providedIn: 'root',
 })
-
 export class ThemeService {
   private renderer = inject(RendererFactory2).createRenderer(null, null);
   private readonly THEME_KEY = 'app-theme';

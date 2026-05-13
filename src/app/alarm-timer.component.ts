@@ -8,7 +8,7 @@ import { AlarmTimerService, Alarm, Timer } from './alarm-timer.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './alarm-timer.component.html',
-  styleUrl: './alarm-timer.component.css'
+  styleUrl: './alarm-timer.component.css',
 })
 export class AlarmTimerComponent {
   private alarmTimerService = inject(AlarmTimerService);
@@ -35,7 +35,7 @@ export class AlarmTimerComponent {
 
   // Helper to get first active timer (for backward compatibility)
   get activeTimer() {
-    return () => this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+    return () => (this.activeTimers().length > 0 ? this.activeTimers()[0] : null);
   }
 
   // ===== ALARM METHODS =====
@@ -51,11 +51,7 @@ export class AlarmTimerComponent {
   addAlarm(): void {
     if (!this.alarmTime()) return;
 
-    this.alarmTimerService.addAlarm(
-      this.alarmTime(),
-      this.alarmLabel(),
-      this.alarmRepeat()
-    );
+    this.alarmTimerService.addAlarm(this.alarmTime(), this.alarmLabel(), this.alarmRepeat());
     this.closeAlarmModal();
   }
 
@@ -84,7 +80,7 @@ export class AlarmTimerComponent {
   }
 
   startTimer(): void {
-    const totalSeconds = (this.timerHours() * 3600) + (this.timerMinutes() * 60) + this.timerSeconds();
+    const totalSeconds = this.timerHours() * 3600 + this.timerMinutes() * 60 + this.timerSeconds();
     if (totalSeconds <= 0) return;
 
     this.alarmTimerService.startTimer(totalSeconds, this.timerLabel());
@@ -132,7 +128,7 @@ export class AlarmTimerComponent {
   getCurrentTime(): string {
     return new Date().toLocaleTimeString('id-ID', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 }

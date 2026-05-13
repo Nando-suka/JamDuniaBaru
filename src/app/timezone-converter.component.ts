@@ -11,7 +11,7 @@ import { City } from './search.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './timezone-converter.component.html',
-  styleUrl: './timezone-converter.component.css'
+  styleUrl: './timezone-converter.component.css',
 })
 export class TimezoneConverterComponent implements OnInit, OnDestroy {
   private converterService = inject(TimezoneConverterService);
@@ -40,13 +40,11 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     const query = this.searchFromQuery().toLowerCase().trim();
     if (!query) return this.cities;
 
-    const starts = this.cities.filter(city =>
-      city.name.toLowerCase().startsWith(query)
-    );
+    const starts = this.cities.filter((city) => city.name.toLowerCase().startsWith(query));
 
-    const includes = this.cities.filter(city =>
-      city.name.toLowerCase().includes(query) &&
-      !city.name.toLowerCase().startsWith(query)
+    const includes = this.cities.filter(
+      (city) =>
+        city.name.toLowerCase().includes(query) && !city.name.toLowerCase().startsWith(query)
     );
 
     return [...starts, ...includes];
@@ -56,25 +54,35 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     const query = this.searchToQuery().toLowerCase().trim();
     if (!query) return this.cities;
 
-    const starts = this.cities.filter(city =>
-      city.name.toLowerCase().startsWith(query)
-    );
+    const starts = this.cities.filter((city) => city.name.toLowerCase().startsWith(query));
 
-    const includes = this.cities.filter(city =>
-      city.name.toLowerCase().includes(query) &&
-      !city.name.toLowerCase().startsWith(query)
+    const includes = this.cities.filter(
+      (city) =>
+        city.name.toLowerCase().includes(query) && !city.name.toLowerCase().startsWith(query)
     );
 
     return [...starts, ...includes];
   }
 
   // Signal bindings
-  get selectedFromCity() { return this.converterService.selectedFromCity; }
-  get selectedToCity() { return this.converterService.selectedToCity; }
-  get inputTime() { return this.converterService.inputTime; }
-  get inputDate() { return this.converterService.inputDate; }
-  get useCurrentTime() { return this.converterService.useCurrentTime; }
-  get convertedResult() { return this.converterService.convertedResult; }
+  get selectedFromCity() {
+    return this.converterService.selectedFromCity;
+  }
+  get selectedToCity() {
+    return this.converterService.selectedToCity;
+  }
+  get inputTime() {
+    return this.converterService.inputTime;
+  }
+  get inputDate() {
+    return this.converterService.inputDate;
+  }
+  get useCurrentTime() {
+    return this.converterService.useCurrentTime;
+  }
+  get convertedResult() {
+    return this.converterService.convertedResult;
+  }
 
   ngOnInit() {
     // Update waktu setiap detik jika menggunakan waktu saat ini
@@ -94,7 +102,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   // Toggle panel
   togglePanel(): void {
-    this.isExpanded.update(v => !v);
+    this.isExpanded.update((v) => !v);
   }
 
   // Select city from dropdown
@@ -112,12 +120,12 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   // Toggle dropdowns
   toggleFromDropdown(): void {
-    this.showFromDropdown.update(v => !v);
+    this.showFromDropdown.update((v) => !v);
     this.showToDropdown.set(false);
   }
 
   toggleToDropdown(): void {
-    this.showToDropdown.update(v => !v);
+    this.showToDropdown.update((v) => !v);
     this.showFromDropdown.set(false);
   }
 
@@ -155,36 +163,28 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   }
 
   updateSearch(query: string) {
-  this.searchToQuery.set(query);
-  this.highlightedIndex.set(-1);
-}
+    this.searchToQuery.set(query);
+    this.highlightedIndex.set(-1);
+  }
 
   handleKeydown(event: KeyboardEvent, cities: City[]): void {
-  if (!cities || cities.length === 0) return;
+    if (!cities || cities.length === 0) return;
 
-  const currentIndex = this.highlightedIndex();
+    const currentIndex = this.highlightedIndex();
 
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    this.highlightedIndex.set(
-      currentIndex < cities.length - 1 ? currentIndex + 1 : 0
-    );
-  }
-
-  else if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    this.highlightedIndex.set(
-      currentIndex > 0 ? currentIndex - 1 : cities.length - 1
-    );
-  }
-
-  else if (event.key === 'Enter') {
-    event.preventDefault();
-    if (currentIndex >= 0) {
-      this.selectToCity(cities[currentIndex]);
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.highlightedIndex.set(currentIndex < cities.length - 1 ? currentIndex + 1 : 0);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.highlightedIndex.set(currentIndex > 0 ? currentIndex - 1 : cities.length - 1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (currentIndex >= 0) {
+        this.selectToCity(cities[currentIndex]);
+      }
     }
   }
-}
 
   // Swap cities
   swapCities(): void {
@@ -216,7 +216,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     const sign = offset >= 0 ? '+' : '';
     const hours = Math.floor(Math.abs(offset));
     const minutes = Math.abs((offset % 1) * 60);
-    
+
     if (minutes > 0) {
       return `UTC${sign}${offset}`;
     }

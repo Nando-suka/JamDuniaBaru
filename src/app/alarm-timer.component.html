@@ -4,13 +4,15 @@
     <button
       class="tab-btn"
       [class.active]="activeTab() === 'alarm'"
-      (click)="activeTab.set('alarm')">
+      (click)="activeTab.set('alarm')"
+    >
       🔔 Alarm
     </button>
     <button
       class="tab-btn"
       [class.active]="activeTab() === 'timer'"
-      (click)="activeTab.set('timer')">
+      (click)="activeTab.set('timer')"
+    >
       ⏱️ Timer
     </button>
   </div>
@@ -38,10 +40,7 @@
           <div class="alarm-repeat" *ngIf="alarm.repeat">🔄 Harian</div>
         </div>
         <div class="alarm-controls">
-          <button
-            class="toggle-btn"
-            [class.active]="alarm.enabled"
-            (click)="toggleAlarm(alarm.id)">
+          <button class="toggle-btn" [class.active]="alarm.enabled" (click)="toggleAlarm(alarm.id)">
             {{ alarm.enabled ? 'ON' : 'OFF' }}
           </button>
           <button class="delete-btn" (click)="removeAlarm(alarm.id)">HAPUS</button>
@@ -70,7 +69,8 @@
       <div class="timer-controls">
         <button
           class="btn-secondary"
-          (click)="activeTimer()!.isRunning ? pauseTimer() : resumeTimer()">
+          (click)="activeTimer()!.isRunning ? pauseTimer() : resumeTimer()"
+        >
           {{ activeTimer()!.isRunning ? '⏸️ Pause' : '▶️ Resume' }}
         </button>
         <button class="btn-danger" (click)="stopTimer()">⏹️ Stop</button>
@@ -94,17 +94,12 @@
     <form class="alarm-form" (ngSubmit)="addAlarm()">
       <div class="form-group">
         <label for="alarm-time">Waktu:</label>
-        <input
-          id="alarm-time"
-          type="time"
-          [(ngModel)]="alarmTime"
-          name="alarmTime"
-          required>
+        <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
 
-         <small class="input-helper">
-            Gunakan format waktu standar. Contoh: 07:00 pagi atau 07:00 malam.
-            Tolong menggunakan format manual seperti AM/PM, pilih pada bagian penunjuk waktu gunakan awalan
-            <strong>a</strong> untuk AM dan <strong>p</strong> untuk PM
+        <small class="input-helper">
+          Gunakan format waktu standar. Contoh: 07:00 pagi atau 07:00 malam. Tolong menggunakan
+          format manual seperti AM/PM, pilih pada bagian penunjuk waktu gunakan awalan
+          <strong>a</strong> untuk AM dan <strong>p</strong> untuk PM
         </small>
       </div>
 
@@ -116,15 +111,13 @@
           [(ngModel)]="alarmLabel"
           name="alarmLabel"
           placeholder="Contoh: Bangun Pagi"
-          required>
+          required
+        />
       </div>
 
       <div class="form-group">
         <label class="checkbox-label">
-          <input
-            type="checkbox"
-            [(ngModel)]="alarmRepeat"
-            name="alarmRepeat">
+          <input type="checkbox" [(ngModel)]="alarmRepeat" name="alarmRepeat" />
           Ulangi setiap hari
         </label>
       </div>
@@ -154,7 +147,8 @@
           [(ngModel)]="timerLabel"
           name="timerLabel"
           placeholder="Contoh: Memasak Nasi"
-          required>
+          required
+        />
       </div>
 
       <div class="time-inputs">
@@ -166,7 +160,8 @@
             [(ngModel)]="timerHours"
             name="timerHours"
             min="0"
-            max="23">
+            max="23"
+          />
         </div>
 
         <div class="form-group">
@@ -178,7 +173,8 @@
             name="timerMinutes"
             min="0"
             max="59"
-            required>
+            required
+          />
         </div>
 
         <div class="form-group">
@@ -189,12 +185,16 @@
             [(ngModel)]="timerSeconds"
             name="timerSeconds"
             min="0"
-            max="59">
+            max="59"
+          />
         </div>
       </div>
 
       <div class="time-preview">
-        <p>Durasi: {{ formatTimerDisplay((timerHours() * 3600) + (timerMinutes() * 60) + timerSeconds()) }}</p>
+        <p>
+          Durasi:
+          {{ formatTimerDisplay(timerHours() * 3600 + timerMinutes() * 60 + timerSeconds()) }}
+        </p>
       </div>
 
       <div class="form-actions">

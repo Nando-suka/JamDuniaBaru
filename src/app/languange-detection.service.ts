@@ -32,8 +32,9 @@ export class LanguageDetectionService {
   }
 
   private async getLanguageFromCoordinates(lat: number, lng: number): Promise<string> {
-
-    const response = await fetch(`https://api.geonames.org/countryCodeJSON?lat=${lat}&lng=${lng}&username=demo`);
+    const response = await fetch(
+      `https://api.geonames.org/countryCodeJSON?lat=${lat}&lng=${lng}&username=demo`
+    );
     const data = await response.json();
     const countryCode = data.countryCode;
 

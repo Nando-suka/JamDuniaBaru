@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { map } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AlarmTimerService {
   private document = inject(DOCUMENT);
@@ -53,11 +53,7 @@ export class AlarmTimerService {
     }
   }
 
-  private sendNotification(
-    title: string,
-    body: string,
-    icon?: string
-  ): void {
+  private sendNotification(title: string, body: string, icon?: string): void {
     if (this.notificationPermission() !== 'granted') {
       console.warn('Notification permission not granted');
       return;
@@ -67,7 +63,7 @@ export class AlarmTimerService {
       new Notification(title, {
         body,
         icon: icon || '/favicon.ico',
-        tag: 'jam-dunia-alarm'
+        tag: 'jam-dunia-alarm',
       });
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -78,20 +74,16 @@ export class AlarmTimerService {
   // ===== ALARM METHODS =================================
   // =====================================================
 
-  addAlarm(
-    time: string,
-    label: string = 'Alarm',
-    repeat: boolean = true
-  ): void {
+  addAlarm(time: string, label: string = 'Alarm', repeat: boolean = true): void {
     const alarm: Alarm = {
       id: Date.now().toString(),
       time,
       label,
       repeat,
-      enabled: true
+      enabled: true,
     };
 
-    this.alarms.update(alarms => [...alarms, alarm]);
+    this.alarms.update((alarms) => [...alarms, alarm]);
     this.saveAlarmsToStorage();
     this.scheduleAlarm(alarm);
   }
@@ -102,21 +94,19 @@ export class AlarmTimerService {
       this.alarmTimeouts.delete(id);
     }
 
-    this.alarms.update(alarms =>
-      alarms.filter(a => a.id !== id)
-    );
+    this.alarms.update((alarms) => alarms.filter((a) => a.id !== id));
 
     this.saveAlarmsToStorage();
   }
 
   toggleAlarm(id: string): void {
-    this.alarms.update(alarms =>
-      alarms.map(alarm => {
+    this.alarms.update((alarms) =>
+      alarms.map((alarm) => {
         if (alarm.id !== id) return alarm;
 
         const updatedAlarm = {
           ...alarm,
-          enabled: !alarm.enabled
+          enabled: !alarm.enabled,
         };
 
         if (updatedAlarm.enabled) {
@@ -149,8 +139,7 @@ export class AlarmTimerService {
       alarmTime.setDate(alarmTime.getDate() + 1);
     }
 
-    const timeUntilAlarm =
-      alarmTime.getTime() - now.getTime();
+    const timeUntilAlarm = alarmTime.getTime() - now.getTime();
 
     if (this.alarmTimeouts.has(alarm.id)) {
       clearTimeout(this.alarmTimeouts.get(alarm.id));
@@ -168,40 +157,25 @@ export class AlarmTimerService {
   }
 
   private triggerAlarm(alarm: Alarm): void {
-    this.sendNotification(
-      'Alarm!',
-      `Waktunya: ${alarm.label}`,
-      '/favicon.ico'
-    );
+    this.sendNotification('Alarm!', `Waktunya: ${alarm.label}`, '/favicon.ico');
 
     this.playAlarmSound();
   }
 
   private playAlarmSound(): void {
     if ('AudioContext' in window) {
-      const audioContext = new (
-        window.AudioContext ||
-        (window as any).webkitAudioContext
-      )();
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
 
-      const oscillator =
-        audioContext.createOscillator();
+      const oscillator = audioContext.createOscillator();
 
-      const gainNode =
-        audioContext.createGain();
+      const gainNode = audioContext.createGain();
 
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.frequency.setValueAtTime(
-        800,
-        audioContext.currentTime
-      );
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
 
-      gainNode.gain.setValueAtTime(
-        0.1,
-        audioContext.currentTime
-      );
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
 
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
@@ -212,38 +186,33 @@ export class AlarmTimerService {
   // ===== MULTIPLE TIMER METHODS ========================
   // =====================================================
 
-  startTimer(
-    duration: number,
-    label: string = 'Timer'
-  ): void {
+  startTimer(duration: number, label: string = 'Timer'): void {
     const timer: Timer = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 6),
       duration,
       remaining: duration,
       label,
-      endTime: Date.now() + (duration * 1000),
-      isRunning: true
+      endTime: Date.now() + duration * 1000,
+      isRunning: true,
     };
 
-    this.timers.update(timers => [...timers, timer]);
-    this.activeTimers.update(timers => [...timers, timer]);
+    this.timers.update((timers) => [...timers, timer]);
+    this.activeTimers.update((timers) => [...timers, timer]);
 
     this.runTimer(timer);
   }
 
   stopTimer(id: string): void {
-    this.activeTimers.update(timers =>
-      timers.filter(timer => timer.id !== id)
-    );
+    this.activeTimers.update((timers) => timers.filter((timer) => timer.id !== id));
   }
 
   pauseTimer(id: string): void {
-    this.activeTimers.update(timers =>
-      timers.map(timer =>
+    this.activeTimers.update((timers) =>
+      timers.map((timer) =>
         timer.id === id
           ? {
               ...timer,
-              isRunning: false
+              isRunning: false,
             }
           : timer
       )
@@ -251,46 +220,31 @@ export class AlarmTimerService {
   }
 
   resumeTimer(id: string): void {
-    const timer = this.timers()
-      .find(t => t.id === id);
+    const timer = this.timers().find((t) => t.id === id);
 
     if (!timer) return;
 
     const updatedTimer: Timer = {
       ...timer,
       isRunning: true,
-      endTime:
-        Date.now() + (timer.remaining * 1000)
+      endTime: Date.now() + timer.remaining * 1000,
     };
 
-    this.timers.update(timers =>
-      timers.map(t =>
-        t.id === id
-          ? updatedTimer
-          : t
-      )
-    );
+    this.timers.update((timers) => timers.map((t) => (t.id === id ? updatedTimer : t)));
 
     this.runTimer(updatedTimer);
   }
 
   private runTimer(timer: Timer): void {
     const interval = setInterval(() => {
-      const current =
-        this.activeTimers()
-          .find(t => t.id === timer.id);
+      const current = this.activeTimers().find((t) => t.id === timer.id);
 
       if (!current || !current.isRunning) {
         clearInterval(interval);
         return;
       }
 
-      const remaining = Math.max(
-        0,
-        Math.floor(
-          (current.endTime - Date.now()) / 1000
-        )
-      );
+      const remaining = Math.max(0, Math.floor((current.endTime - Date.now()) / 1000));
 
       if (remaining <= 0) {
         clearInterval(interval);
@@ -298,12 +252,12 @@ export class AlarmTimerService {
         return;
       }
 
-      this.activeTimers.update(timers =>
-        timers.map(t =>
+      this.activeTimers.update((timers) =>
+        timers.map((t) =>
           t.id === timer.id
             ? {
                 ...t,
-                remaining
+                remaining,
               }
             : t
         )
@@ -312,17 +266,11 @@ export class AlarmTimerService {
   }
 
   private triggerTimer(timer: Timer): void {
-    this.sendNotification(
-      'Timer Selesai!',
-      `Timer "${timer.label}" telah selesai`,
-      '/favicon.ico'
-    );
+    this.sendNotification('Timer Selesai!', `Timer "${timer.label}" telah selesai`, '/favicon.ico');
 
     this.playAlarmSound();
 
-    this.activeTimers.update(timers =>
-      timers.filter(t => t.id !== timer.id)
-    );
+    this.activeTimers.update((timers) => timers.filter((t) => t.id !== timer.id));
   }
 
   // =====================================================
@@ -331,42 +279,29 @@ export class AlarmTimerService {
 
   private saveAlarmsToStorage(): void {
     try {
-      localStorage.setItem(
-        'jam-dunia-alarms',
-        JSON.stringify(this.alarms())
-      );
+      localStorage.setItem('jam-dunia-alarms', JSON.stringify(this.alarms()));
     } catch (error) {
-      console.error(
-        'Error saving alarms to storage:',
-        error
-      );
+      console.error('Error saving alarms to storage:', error);
     }
   }
 
   private loadAlarmsFromStorage(): void {
     try {
-      const stored =
-        localStorage.getItem(
-          'jam-dunia-alarms'
-        );
+      const stored = localStorage.getItem('jam-dunia-alarms');
 
       if (stored) {
-        const alarms: Alarm[] =
-          JSON.parse(stored);
+        const alarms: Alarm[] = JSON.parse(stored);
 
         this.alarms.set(alarms);
 
-        alarms.forEach(alarm => {
+        alarms.forEach((alarm) => {
           if (alarm.enabled) {
             this.scheduleAlarm(alarm);
           }
         });
       }
     } catch (error) {
-      console.error(
-        'Error loading alarms from storage:',
-        error
-      );
+      console.error('Error loading alarms from storage:', error);
     }
   }
 
@@ -375,32 +310,19 @@ export class AlarmTimerService {
   // =====================================================
 
   formatTime(seconds: number): string {
-    const hours =
-      Math.floor(seconds / 3600);
+    const hours = Math.floor(seconds / 3600);
 
-    const minutes =
-      Math.floor(
-        (seconds % 3600) / 60
-      );
+    const minutes = Math.floor((seconds % 3600) / 60);
 
-    const secs =
-      seconds % 60;
+    const secs = seconds % 60;
 
     if (hours > 0) {
-      return `${hours
-        .toString()
-        .padStart(2, '0')}:${minutes
-        .toString()
-        .padStart(2, '0')}:${secs
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs
         .toString()
         .padStart(2, '0')}`;
     }
 
-    return `${minutes
-      .toString()
-      .padStart(2, '0')}:${secs
-      .toString()
-      .padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 }
 

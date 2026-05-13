@@ -20,7 +20,7 @@ export const translations = {
     from: 'Dari',
     to: 'Ke',
     selectBothCities: 'Pilih kota asal dan tujuan',
-    reset: 'Reset'
+    reset: 'Reset',
   },
   en: {
     title: 'Modern World Clock',
@@ -40,8 +40,8 @@ export const translations = {
     from: 'From',
     to: 'To',
     selectBothCities: 'Select source and destination cities',
-    reset: 'Reset'
-  }
+    reset: 'Reset',
+  },
 };
 
 @Injectable({ providedIn: 'root' })

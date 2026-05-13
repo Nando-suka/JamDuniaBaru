@@ -2,11 +2,11 @@ import { Injectable, signal } from '@angular/core';
 import { City } from './search.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FavoritesService {
   private readonly STORAGE_KEY = 'jam-dunia-favorites';
-  
+
   // Signal untuk menyimpan daftar favorite cities
   favoritesList = signal<City[]>(this.loadFavoritesFromStorage());
 
@@ -40,7 +40,7 @@ export class FavoritesService {
    * Check apakah city adalah favorite
    */
   isFavorite(city: City): boolean {
-    return this.favoritesList().some(fav => fav.name === city.name);
+    return this.favoritesList().some((fav) => fav.name === city.name);
   }
 
   /**
@@ -58,7 +58,7 @@ export class FavoritesService {
    * Remove city dari favorites
    */
   removeFavorite(city: City): void {
-    const updated = this.favoritesList().filter(fav => fav.name !== city.name);
+    const updated = this.favoritesList().filter((fav) => fav.name !== city.name);
     this.favoritesList.set(updated);
     this.saveFavoritesToStorage(updated);
   }

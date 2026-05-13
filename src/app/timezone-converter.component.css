@@ -87,7 +87,9 @@
   border-radius: 8px;
   font-size: 14px;
   background: white;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .city-search-input:focus {
@@ -158,7 +160,9 @@
   color: white;
   font-size: 20px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -187,7 +191,7 @@
   margin-bottom: 12px;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -209,8 +213,8 @@
   margin-bottom: 4px;
 }
 
-.manual-time-inputs input[type="time"],
-.manual-time-inputs input[type="date"] {
+.manual-time-inputs input[type='time'],
+.manual-time-inputs input[type='date'] {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--border-color, #ddd);
@@ -319,7 +323,9 @@
   color: var(--text-color, #333);
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .reset-btn:hover {
@@ -365,11 +371,11 @@
     flex-direction: column;
   }
 
-    /* Pembatas untuk area tombol Reset */
+  /* Pembatas untuk area tombol Reset */
   .reset-section {
-    margin-top: 28px;           /* jarak dari bagian atas (hasil atau input waktu) */
+    margin-top: 28px; /* jarak dari bagian atas (hasil atau input waktu) */
     border-top: 1px solid var(--border-color, #e0e0e0); /* garis pemisah */
-    padding-top: 20px;          /* ruang antara garis dan tombol */
+    padding-top: 20px; /* ruang antara garis dan tombol */
   }
 
   /* Opsional: jika Anda ingin tombol lebih lebar atau gaya tambahan */

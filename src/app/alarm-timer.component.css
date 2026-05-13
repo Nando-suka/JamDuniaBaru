@@ -234,13 +234,15 @@
 }
 
 /* Empty States */
-.empty-state, .timer-placeholder {
+.empty-state,
+.timer-placeholder {
   text-align: center;
   padding: 40px 20px;
   color: var(--muted-text, #6c757d);
 }
 
-.empty-state p, .timer-placeholder p {
+.empty-state p,
+.timer-placeholder p {
   margin: 0;
   font-size: 16px;
 }
@@ -305,7 +307,8 @@
 }
 
 /* Forms */
-.alarm-form, .timer-form {
+.alarm-form,
+.timer-form {
   padding: 24px;
 }
 
@@ -320,9 +323,9 @@
   color: var(--text-color, #333);
 }
 
-.form-group input[type="time"],
-.form-group input[type="text"],
-.form-group input[type="number"] {
+.form-group input[type='time'],
+.form-group input[type='text'],
+.form-group input[type='number'] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color, #e0e0e0);
@@ -345,7 +348,7 @@
   font-weight: normal !important;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   width: auto;
   margin: 0;
 }
