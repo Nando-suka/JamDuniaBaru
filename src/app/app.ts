@@ -12,7 +12,7 @@ import { TimezoneConverterComponent } from './timezone-converter.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent],
+  imports: [CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -199,6 +199,13 @@ export class App implements OnInit, OnDestroy {
       default:
         return 'view-mode-list';
     }
+  }
+
+  /**
+   * Track items by name to preserve DOM state.
+   */
+  trackByLocationName(_index: number, loc: { name: string }): string {
+    return loc.name;
   }
 
   /**
