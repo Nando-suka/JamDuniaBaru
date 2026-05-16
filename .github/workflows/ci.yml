@@ -31,5 +31,8 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Test
+    - name: Unit tests
       run: npm run test -- --watch=false
+
+    - name: End-to-end tests
+      run: npm run test:e2e

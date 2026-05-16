@@ -1,4 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { map } from 'rxjs';
 
@@ -18,8 +18,8 @@ export class AlarmTimerService {
 
   // SESUDAH:
   timers = signal<Timer[]>([]);
-  activeTimers = signal<Timer[]>([]); // Add this signal
-  private timerIntervals = new Map<string, any>();
+  activeTimers = computed(() => this.timers().filter((timer) => timer.remaining > 0));
+  private timerIntervals = new Map<string, ReturnType<typeof setInterval>>();
   notificationPermission = signal<NotificationPermission>('default');
 
   constructor() {
@@ -197,17 +197,17 @@ export class AlarmTimerService {
     };
 
     this.timers.update((timers) => [...timers, timer]);
-    this.activeTimers.update((timers) => [...timers, timer]);
-
     this.runTimer(timer);
   }
 
   stopTimer(id: string): void {
-    this.activeTimers.update((timers) => timers.filter((timer) => timer.id !== id));
+    this.clearTimerInterval(id);
+    this.timers.update((timers) => timers.filter((timer) => timer.id !== id));
   }
 
   pauseTimer(id: string): void {
-    this.activeTimers.update((timers) =>
+    this.clearTimerInterval(id);
+    this.timers.update((timers) =>
       timers.map((timer) =>
         timer.id === id
           ? {
@@ -231,28 +231,28 @@ export class AlarmTimerService {
     };
 
     this.timers.update((timers) => timers.map((t) => (t.id === id ? updatedTimer : t)));
-
     this.runTimer(updatedTimer);
   }
 
   private runTimer(timer: Timer): void {
-    const interval = setInterval(() => {
-      const current = this.activeTimers().find((t) => t.id === timer.id);
+    this.clearTimerInterval(timer.id);
 
-      if (!current || !current.isRunning) {
-        clearInterval(interval);
+    const interval = setInterval(() => {
+      const existingTimer = this.timers().find((t) => t.id === timer.id);
+      if (!existingTimer || !existingTimer.isRunning) {
+        this.clearTimerInterval(timer.id);
         return;
       }
 
-      const remaining = Math.max(0, Math.floor((current.endTime - Date.now()) / 1000));
+      const remaining = Math.max(0, Math.floor((existingTimer.endTime - Date.now()) / 1000));
 
       if (remaining <= 0) {
-        clearInterval(interval);
-        this.triggerTimer(current);
+        this.clearTimerInterval(timer.id);
+        this.triggerTimer(existingTimer);
         return;
       }
 
-      this.activeTimers.update((timers) =>
+      this.timers.update((timers) =>
         timers.map((t) =>
           t.id === timer.id
             ? {
@@ -263,14 +263,24 @@ export class AlarmTimerService {
         )
       );
     }, 1000);
+
+    this.timerIntervals.set(timer.id, interval);
   }
 
   private triggerTimer(timer: Timer): void {
     this.sendNotification('Timer Selesai!', `Timer "${timer.label}" telah selesai`, '/favicon.ico');
 
     this.playAlarmSound();
+    this.clearTimerInterval(timer.id);
+    this.timers.update((timers) => timers.filter((t) => t.id !== timer.id));
+  }
 
-    this.activeTimers.update((timers) => timers.filter((t) => t.id !== timer.id));
+  private clearTimerInterval(id: string): void {
+    const interval = this.timerIntervals.get(id);
+    if (interval) {
+      clearInterval(interval);
+      this.timerIntervals.delete(id);
+    }
   }
 
   // =====================================================

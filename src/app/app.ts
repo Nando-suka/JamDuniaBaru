@@ -17,7 +17,7 @@ import { TimezoneConverterComponent } from './timezone-converter.component';
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
-  // Pakai Signal! Ini standar Angular masa depan
+  // Pakai Signal
   currentTime = signal(new Date());
   langService = inject(LanguageService); // berhubungan dengan layanan languange
   detectionService = inject(LanguageDetectionService); // untuk deteksi bahasa otomatis
@@ -82,9 +82,7 @@ export class App implements OnInit, OnDestroy {
     return new Date(utc + 3600000 * offset);
   }
 
-  /**
-   * Get formatted time string based on preference
-   */
+  // Get formatted time string based on preference
   getFormattedTime(offset: number): string {
     const timeDate = this.getTimeByOffset(offset);
     const format = this.timeFormat() === '12h' ? 'hh:mm:ss a' : 'HH:mm:ss';
@@ -102,9 +100,7 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Toggle time format between 12h and 24h
-   */
+  // Toggle time format between 12h and 24h
   toggleTimeFormat(): void {
     const newFormat = this.timeFormat() === '24h' ? '12h' : '24h';
     this.timeFormat.set(newFormat);
@@ -115,9 +111,7 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Scroll halus ke atas
-   */
+  // Scroll halus ke atas
   scrollToTop(): void {
     window.scrollTo({
       top: 0,
@@ -125,9 +119,7 @@ export class App implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Toggle antara light/dark theme
-   */
+  // Toggle antara light/dark theme
   toggleTheme(): void {
     this.themeService.toggleTheme();
   }
@@ -139,9 +131,7 @@ export class App implements OnInit, OnDestroy {
     this.showTimezoneConverter.update((v) => !v);
   }
 
-  /**
-   * Cycle through view modes (list -> grid -> compact -> list)
-   */
+  // Cycle through view modes (list -> grid -> compact -> list)
   cycleViewMode(): void {
     const modes: Array<'list' | 'grid' | 'compact'> = ['list', 'grid', 'compact'];
     const currentMode = this.facade.getViewMode()();
