@@ -1,6 +1,8 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { City } from './search.service';
 
+const TIMEZONE_CONVERTER_STORAGE_KEY = 'jam-dunia-timezone-converter';
+
 export interface TimeConversion {
   fromCity: City;
   toCity: City;
@@ -19,6 +21,10 @@ export class TimezoneConverterService {
   inputTime = signal<string>('00:00');
   inputDate = signal<string>(new Date().toISOString().split('T')[0]);
   useCurrentTime = signal<boolean>(true);
+
+  constructor() {
+    this.loadFromStorage();
+  }
 
   // Computed: hasil konversi waktu
   convertedResult = computed(() => {
@@ -61,6 +67,7 @@ export class TimezoneConverterService {
    */
   setFromCity(city: City): void {
     this.selectedFromCity.set(city);
+    this.saveToStorage();
   }
 
   /**
@@ -69,6 +76,7 @@ export class TimezoneConverterService {
    */
   setToCity(city: City): void {
     this.selectedToCity.set(city);
+    this.saveToStorage();
   }
 
   /**
@@ -78,6 +86,7 @@ export class TimezoneConverterService {
   setInputTime(time: string): void {
     this.inputTime.set(time);
     this.useCurrentTime.set(false);
+    this.saveToStorage();
   }
 
   /**
@@ -87,6 +96,7 @@ export class TimezoneConverterService {
   setInputDate(date: string): void {
     this.inputDate.set(date);
     this.useCurrentTime.set(false);
+    this.saveToStorage();
   }
 
   /**
@@ -95,6 +105,7 @@ export class TimezoneConverterService {
    */
   setUseCurrentTime(useCurrent: boolean): void {
     this.useCurrentTime.set(useCurrent);
+    this.saveToStorage();
   }
 
   /**
@@ -105,6 +116,7 @@ export class TimezoneConverterService {
     const to = this.selectedToCity();
     this.selectedFromCity.set(to);
     this.selectedToCity.set(from);
+    this.saveToStorage();
   }
 
   /**
@@ -116,6 +128,7 @@ export class TimezoneConverterService {
     this.inputTime.set('00:00');
     this.inputDate.set(new Date().toISOString().split('T')[0]);
     this.useCurrentTime.set(true);
+    this.saveToStorage();
   }
 
   /**
@@ -125,17 +138,12 @@ export class TimezoneConverterService {
    * @returns String waktu yang diformat
    */
   formatTime(date: Date, format: '12h' | '24h' = '24h'): string {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
-
-    if (format === '12h') {
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const displayHours = hours % 12 || 12;
-      return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
-    }
-
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return new Intl.DateTimeFormat('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: format === '12h',
+      timeZone: 'UTC',
+    }).format(date);
   }
 
   /**
@@ -144,12 +152,13 @@ export class TimezoneConverterService {
    * @returns String tanggal yang diformat
    */
   formatDate(date: Date): string {
-    return date.toLocaleDateString('id-ID', {
+    return new Intl.DateTimeFormat('id-ID', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
+      timeZone: 'UTC',
+    }).format(date);
   }
 
   /**
@@ -170,4 +179,45 @@ export class TimezoneConverterService {
     }
     return `${sign}${diff} jam`;
   }
+
+  private saveToStorage(): void {
+    try {
+      const data: TimezoneConverterStorage = {
+        fromCity: this.selectedFromCity(),
+        toCity: this.selectedToCity(),
+        inputTime: this.inputTime(),
+        inputDate: this.inputDate(),
+        useCurrentTime: this.useCurrentTime(),
+      };
+      localStorage.setItem(TIMEZONE_CONVERTER_STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // ignore storage errors
+    }
+  }
+
+  private loadFromStorage(): void {
+    try {
+      const stored = localStorage.getItem(TIMEZONE_CONVERTER_STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+
+      const data = JSON.parse(stored) as TimezoneConverterStorage;
+      this.selectedFromCity.set(data.fromCity);
+      this.selectedToCity.set(data.toCity);
+      this.inputTime.set(data.inputTime || '00:00');
+      this.inputDate.set(data.inputDate || new Date().toISOString().split('T')[0]);
+      this.useCurrentTime.set(data.useCurrentTime ?? true);
+    } catch {
+      // ignore storage errors
+    }
+  }
+}
+
+interface TimezoneConverterStorage {
+  fromCity: City | null;
+  toCity: City | null;
+  inputTime: string;
+  inputDate: string;
+  useCurrentTime: boolean;
 }

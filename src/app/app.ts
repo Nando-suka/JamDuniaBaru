@@ -68,13 +68,6 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  // mendaptkan function untuk waktu setiap kota
-  getCityTime(offset: number): Date {
-    const now = new Date();
-    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utcTime + offset * 3600000);
-  }
-
   // mendapaktna bagian waktu untuk setiap offset dari angkanya
   getTimeByOffset(offset: number): Date {
     const d = this.currentTime(); // Ambil nilai signal dengan tanda kurung ()
@@ -85,19 +78,15 @@ export class App implements OnInit, OnDestroy {
   // Get formatted time string based on preference
   getFormattedTime(offset: number): string {
     const timeDate = this.getTimeByOffset(offset);
-    const format = this.timeFormat() === '12h' ? 'hh:mm:ss a' : 'HH:mm:ss';
-    // Manual formatting since we need to support both 12h and 24h
-    const hours = timeDate.getHours();
-    const minutes = timeDate.getMinutes();
-    const seconds = timeDate.getSeconds();
+    const locale = this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US';
 
-    if (this.timeFormat() === '12h') {
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const hours12 = hours % 12 || 12;
-      return `${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${ampm}`;
-    } else {
-      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+    return new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: this.timeFormat() === '12h',
+      timeZone: 'UTC',
+    }).format(timeDate);
   }
 
   // Toggle time format between 12h and 24h

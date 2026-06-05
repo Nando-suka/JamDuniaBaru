@@ -1,6 +1,8 @@
 // language.service.ts
 import { Injectable, signal, computed } from '@angular/core';
 
+const LANGUAGE_STORAGE_KEY = 'jam-dunia-language';
+
 export const translations = {
   id: {
     title: 'Jam Dunia Modern',
@@ -47,10 +49,28 @@ export const translations = {
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private browserLang = navigator.language.split('-')[0];
-  currentLang = signal<'id' | 'en'>(this.browserLang === 'id' ? 'id' : 'en');
+  currentLang = signal<'id' | 'en'>(this.getInitialLanguage());
   text = computed(() => translations[this.currentLang()]);
+
+  private getInitialLanguage(): 'id' | 'en' {
+    try {
+      const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY) as 'id' | 'en' | null;
+      if (stored === 'id' || stored === 'en') {
+        return stored;
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+
+    return this.browserLang === 'id' ? 'id' : 'en';
+  }
 
   setLanguage(lang: 'id' | 'en') {
     this.currentLang.set(lang);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    } catch {
+      // ignore storage errors
+    }
   }
 }
