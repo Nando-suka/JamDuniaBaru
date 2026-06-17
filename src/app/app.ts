@@ -28,6 +28,11 @@ export class App implements OnInit, OnDestroy {
   timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
   showAlarmTimer = signal(false); // Toggle untuk panel alarm/timer
   showTimezoneConverter = signal(false); // Toggle untuk panel konverter zona waktu
+  // Visibility of scroll-to-top button
+  scrollVisible = signal(false);
+  private onScroll = () => {
+    this.scrollVisible.set(window.scrollY > 240);
+  };
   private timer: any;
 
   dict = this.langService.text;
@@ -50,6 +55,9 @@ export class App implements OnInit, OnDestroy {
 
     // Deteksi bahasa otomatis berdasarkan lokasi jika browser language adalah default
     this.detectAndSetLanguage();
+
+    // Show/hide scroll-to-top button based on scroll position
+    window.addEventListener('scroll', this.onScroll, { passive: true });
   }
 
   async detectAndSetLanguage() {
@@ -192,5 +200,6 @@ export class App implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     clearInterval(this.timer);
+    window.removeEventListener('scroll', this.onScroll);
   }
 }

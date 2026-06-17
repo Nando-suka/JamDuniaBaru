@@ -135,8 +135,8 @@
 
   </div>
 
-  <!-- Tombol Scroll to Top Lingkaran untuk disesuaikan dengan bagian yang dibagikan dan diminta oleh departemen tersebut. -->
-  <button class="scroll-to-top-btn" (click)="scrollToTop()" title="Kembali ke atas">
+  <!-- Tombol Scroll to Top: hanya tampil saat user menggulir; mobile-position lebih atas agar tidak menutupi center -->
+  <button *ngIf="scrollVisible()" class="scroll-to-top-btn" (click)="scrollToTop()" title="Kembali ke atas" aria-label="Scroll to top">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="18 15 12 9 6 15"></polyline>
       <line x1="12" y1="21" x2="12" y2="9"></line>
