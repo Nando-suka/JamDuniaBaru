@@ -203,7 +203,7 @@
 /* Active Timer */
 .active-timer {
   background: var(--card-bg, #f8f9fa);
-  border: 2px solid var(--primary-color, #181a1d);
+  border: 2px solid var(--primary-color, #007bff);
   border-radius: 12px;
   padding: 24px;
   text-align: center;
@@ -217,7 +217,7 @@
 .timer-time {
   font-size: 48px;
   font-weight: bold;
-  color: var(--primary-color, #181a1d);
+  color: var(--primary-color, #007bff);
   font-family: monospace;
   margin-bottom: 8px;
 }
@@ -254,7 +254,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.85);
+  /* Use overlay variable (dark-friendly) and fall back to a dark translucent shade */
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.6));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -263,7 +264,8 @@
 }
 
 .modal-content {
-  background: #ffffff;
+  /* Use card background variable so it adapts to light/dark themes */
+  background: var(--card-bg, #ffffff);
   border-radius: 12px;
   padding: 0;
   max-width: 500px;
@@ -418,25 +420,25 @@
 }
 
 /* Dark Theme Support */
-@media (prefers-color-scheme: dark) {
-  .alarm-timer-container {
-    --bg-color: #ffffff;
-    --text-color: #3a3535;
-    --border-color: #333;
-    --card-bg: #ffffff;
-    --hover-bg: #333;
-    --primary-color: #4dabf7;
-    --primary-hover: #339af0;
-    --secondary-bg: #495057;
-    --secondary-hover: #343a40;
-    --danger-bg: #fa5252;
-    --danger-hover: #e03131;
-    --warning-bg: #ffd43b;
-    --warning-border: #fab005;
-    --warning-text: #212529;
-    --muted-bg: #495057;
-    --muted-text: #adb5bd;
-    --secondary-text: #adb5bd;
-    --success-bg: #40c057;
-  }
+/* Respect app-level `dark-theme` class applied to `body` by ThemeService */
+.dark-theme .alarm-timer-container {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --border-color: #333333;
+  --card-bg: #1e1e1e;
+  --hover-bg: rgba(255, 255, 255, 0.03);
+  --primary-color: #4dabf7;
+  --primary-hover: #339af0;
+  --secondary-bg: #495057;
+  --secondary-hover: #343a40;
+  --danger-bg: #fa5252;
+  --danger-hover: #e03131;
+  --warning-bg: #ffd43b;
+  --warning-border: #fab005;
+  --warning-text: #212529;
+  --muted-bg: #343a40;
+  --muted-text: #adb5bd;
+  --secondary-text: #adb5bd;
+  --success-bg: #40c057;
+  --overlay-bg: rgba(0, 0, 0, 0.6);
 }
