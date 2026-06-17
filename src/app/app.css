@@ -550,6 +550,33 @@
     bottom: auto;
   }
 
+  .scroll-to-top-label {
+    display: block;
+    position: fixed;
+    right: 14px;
+    top: 56px; /* sits above the button */
+    bottom: auto;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 14px;
+    font-size: 13px;
+    z-index: 889;
+    pointer-events: none;
+    animation: slideFadeIn 180ms ease forwards;
+  }
+
+  @keyframes slideFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .scroll-to-top-btn svg {
     width: 20px;
     height: 20px;

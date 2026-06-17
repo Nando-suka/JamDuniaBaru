@@ -30,6 +30,9 @@ export class App implements OnInit, OnDestroy {
   showTimezoneConverter = signal(false); // Toggle untuk panel konverter zona waktu
   // Visibility of scroll-to-top button
   scrollVisible = signal(false);
+  // Label visibility when the scroll button is clicked (mobile guidance)
+  scrollLabelVisible = signal(false);
+  private scrollLabelTimer: any;
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
   };
@@ -110,10 +113,16 @@ export class App implements OnInit, OnDestroy {
 
   // Scroll halus ke atas
   scrollToTop(): void {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth', // Scroll halus
-    });
+    // show temporary label on mobile to indicate purpose
+    try {
+      this.scrollLabelVisible.set(true);
+      if (this.scrollLabelTimer) {
+        clearTimeout(this.scrollLabelTimer);
+      }
+      this.scrollLabelTimer = setTimeout(() => this.scrollLabelVisible.set(false), 1400);
+    } catch {}
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Toggle antara light/dark theme
@@ -201,5 +210,8 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.timer);
     window.removeEventListener('scroll', this.onScroll);
+    if (this.scrollLabelTimer) {
+      clearTimeout(this.scrollLabelTimer);
+    }
   }
 }
