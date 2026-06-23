@@ -35,6 +35,11 @@
     🔔⏱️
   </button>
 
+  <!-- Analog Clock -->
+  <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" title="Toggle Analog Clock Display">
+    🕐
+  </button>
+
 </div>
 
     <div class="header">
@@ -74,6 +79,22 @@
 
     <!-- Timezone Converter Panel -->
     <app-timezone-converter></app-timezone-converter>
+
+    <!-- Analog Clock Display Panel -->
+    @if (showAnalogClock()) {
+      <div class="analog-clock-section">
+        <h3>Jam Dunia</h3>
+        <div class="analog-clocks-grid">
+          @for (loc of facade.filteredLocations().slice(0, facade.itemsToShow()); track loc.name) {
+            <app-analog-clock
+              [time]="getTimeByOffset(loc.offset)"
+              [timezone]="'UTC' + (loc.offset >= 0 ? '+' : '') + loc.offset"
+              [cityName]="loc.name"
+            ></app-analog-clock>
+          }
+        </div>
+      </div>
+    }
 
     <!-- Display Result or No Results Message -->
     <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">

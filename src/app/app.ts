@@ -8,11 +8,12 @@ import { CommonModule } from '@angular/common';
 import { ClockFacade } from './clock.facade';
 import { AlarmTimerComponent } from './alarm-timer.component';
 import { TimezoneConverterComponent } from './timezone-converter.component';
+import { AnalogClockComponent } from './analog-clock.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent],
+  imports: [CommonModule, AlarmTimerComponent, TimezoneConverterComponent, AnalogClockComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -28,6 +29,7 @@ export class App implements OnInit, OnDestroy {
   timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
   showAlarmTimer = signal(false); // Toggle untuk panel alarm/timer
   showTimezoneConverter = signal(false); // Toggle untuk panel konverter zona waktu
+  showAnalogClock = signal(false); // Toggle untuk mode analog clock
   // Visibility of scroll-to-top button
   scrollVisible = signal(false);
   // Label visibility when the scroll button is clicked (mobile guidance)
@@ -135,6 +137,13 @@ export class App implements OnInit, OnDestroy {
    */
   toggleTimezoneConverter(): void {
     this.showTimezoneConverter.update((v) => !v);
+  }
+
+  /**
+   * Toggle analog clock display
+   */
+  toggleAnalogClock(): void {
+    this.showAnalogClock.update((v) => !v);
   }
 
   // Cycle through view modes (list -> grid -> compact -> list)

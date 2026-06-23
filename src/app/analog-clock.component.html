@@ -1,0 +1,78 @@
+<div class="analog-clock-wrapper">
+  <div
+    class="analog-clock"
+    [ngClass]="[getSizeClass(), getDesignClass()]"
+  >
+    <!-- Center dot -->
+    <div class="clock-center"></div>
+
+    <!-- Hour markers -->
+    <div class="hour-markers">
+      @for (num of hourMarkers; track num) {
+        <div class="marker" [style]="getMarkerStyle($index)">
+          <!-- Thick markers -->
+          <div class="marker-line thick"></div>
+        </div>
+      }
+
+      <!-- Hour labels (for traditional/modern designs) -->
+      @if (clockConfig().showLabels) {
+        @for (numeral of romanNumerals; track numeral) {
+          <div class="hour-label" [style]="getLabelStyle($index)">
+            @switch (clockConfig().design) {
+              @case ('traditional') {
+                <span class="roman">{{ numeral }}</span>
+              }
+              @case ('modern') {
+                <span class="number">{{ $index + 1 === 13 ? 12 : $index + 1 }}</span>
+              }
+              @case ('minimal') {
+                @if ($index === 0 || $index === 3 || $index === 6 || $index === 9) {
+                  <span class="dot"></span>
+                }
+              }
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Hour hand -->
+    <div class="hand hour-hand" [style]="getHourHandStyle()"></div>
+
+    <!-- Minute hand -->
+    <div class="hand minute-hand" [style]="getMinuteHandStyle()"></div>
+
+    <!-- Second hand (conditional) -->
+    @if (clockConfig().showSeconds) {
+      <div class="hand second-hand" [style]="getSecondHandStyle()"></div>
+    }
+  </div>
+
+  <!-- Clock info section -->
+  <div class="clock-info">
+    <div class="time-display">{{ getTimeString() }}</div>
+    <div class="timezone-label">{{ timezone }}</div>
+    @if (cityName) {
+      <div class="city-name">{{ cityName }}</div>
+    }
+  </div>
+
+  <!-- Clock controls -->
+  <div class="clock-controls">
+    <button class="control-btn" (click)="toggleDesign()" [title]="'Current design: ' + clockConfig().design">
+      🎨 Design
+    </button>
+    <button class="control-btn" (click)="toggleSize()" [title]="'Current size: ' + clockConfig().size">
+      📏 Size
+    </button>
+    <button class="control-btn" (click)="toggleSeconds()" [title]="clockConfig().showSeconds ? 'Hide seconds' : 'Show seconds'">
+      @if (clockConfig().showSeconds) { ✓ }
+      Sec
+    </button>
+    <button class="control-btn" (click)="toggleLabels()" [title]="clockConfig().showLabels ? 'Hide labels' : 'Show labels'">
+      @if (clockConfig().showLabels) { ✓ }
+      Labels
+    </button>
+  </div>
+</div>

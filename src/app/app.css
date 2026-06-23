@@ -920,3 +920,61 @@
     height: 45px;
   }
 }
+
+/* ========== ANALOG CLOCK SECTION ========== */
+
+.analog-clock-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  animation: slideIn 0.5s ease-out;
+}
+
+.analog-clock-section h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.analog-clocks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .analog-clocks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analog-clock-section {
+    padding: 1rem;
+    margin: 1.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .analog-clocks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analog-clock-section h3 {
+    font-size: 16px;
+    margin-bottom: 1rem;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
