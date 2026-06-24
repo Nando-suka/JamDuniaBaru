@@ -98,6 +98,11 @@ export class ClockFacade {
     return this.searchService.filterCities(data, this.searchService.searchQuery());
   });
 
+  /** Locations for analog clock view (excludes Honolulu) */
+  analogLocations = computed(() => {
+    return this.filteredLocations().filter(loc => loc.name !== 'Honolulu');
+  });
+
   isAllLoaded = computed(() => {
     return (
       !this.searchService.searchQuery() &&

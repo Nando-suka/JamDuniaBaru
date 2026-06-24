@@ -3,89 +3,55 @@
 
     <!-- Floating Controls -->
 <div class="floating-controls">
+  <ng-container *ngIf="!showAnalogClock()">
+    <!-- Time Format -->
+    <button 
+      class="control-btn"
+      [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
+      (click)="toggleTimeFormat()"
+    >
+      {{ timeFormat() }}
+    </button>
 
-  <!-- Time Format -->
-  <button 
-    class="control-btn"
-    [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
-    (click)="toggleTimeFormat()"
-  >
-    {{ timeFormat() }}
-  </button>
+    <!-- Favorites -->
+    <button 
+      class="control-btn"
+      [class.active]="facade.showFavoritesOnly()"
+      (click)="facade.toggleFavoritesOnly()"
+      [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
+    >
+      ❤️
+      <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
+    </button>
 
-  <!-- Favorites -->
-  <button 
-    class="control-btn"
-    [class.active]="facade.showFavoritesOnly()"
-    (click)="facade.toggleFavoritesOnly()"
-    [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
-  >
-    ❤️
-    <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
-  </button>
+    <!-- Theme -->
+    <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
+      <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
+      <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
+    </button>
 
-  <!-- Theme -->
-  <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
-    <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
-    <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
-  </button>
-
-  <!-- Alarm & Timer -->
-  <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
-    🔔⏱️
-  </button>
+    <!-- Alarm & Timer -->
+    <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
+      🔔⏱️
+    </button>
+  </ng-container>
 
   <!-- Analog Clock -->
-  <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" title="Toggle Analog Clock Display">
+  <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
     🕐
   </button>
 
 </div>
 
     <div class="header">
-      <h1>Jam Dunia Modern</h1>
+      <h1>Jam Dunia</h1>
     </div>
 
-    <!-- Search Input Section -->
-    <div class="search-section">
-      <div class="search-container">
-        <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.35-4.35"></path>
-        </svg>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Cari kota..."
-          [value]="searchService.searchQuery()"
-          (input)="searchService.updateSearchQuery($any($event.target).value)"
-          (keydown.escape)="searchService.clearSearch()"
-        />
-        <button *ngIf="searchService.searchQuery()" class="search-clear-btn" (click)="searchService.clearSearch()" title="Clear search">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      <p *ngIf="searchService.searchQuery()" class="search-results-count">
-        Ditemukan {{ facade.filteredLocations().length }} kota
-      </p>
-    </div>
-
-    <!-- Alarm & Timer Panel -->
-    <app-alarm-timer *ngIf="showAlarmTimer()"></app-alarm-timer>
-
-    <!-- Timezone Converter Panel -->
-    <app-timezone-converter></app-timezone-converter>
-
-    <!-- Analog Clock Display Panel -->
     @if (showAnalogClock()) {
       <div class="analog-clock-section">
         <h3>Jam Dunia</h3>
         <div class="analog-clocks-grid">
-          @for (loc of facade.filteredLocations().slice(0, facade.itemsToShow()); track loc.name) {
+          @for (loc of facade.analogLocations(); track loc.name) {
             <app-analog-clock
               [time]="getTimeByOffset(loc.offset)"
               [timezone]="'UTC' + (loc.offset >= 0 ? '+' : '') + loc.offset"
@@ -94,10 +60,43 @@
           }
         </div>
       </div>
-    }
+    } @else {
+      <!-- Search Input Section -->
+      <div class="search-section">
+        <div class="search-container">
+          <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Cari kota..."
+            [value]="searchService.searchQuery()"
+            (input)="searchService.updateSearchQuery($any($event.target).value)"
+            (keydown.escape)="searchService.clearSearch()"
+          />
+          <button *ngIf="searchService.searchQuery()" class="search-clear-btn" (click)="searchService.clearSearch()" title="Clear search">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
-    <!-- Display Result or No Results Message -->
-    <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">
+        <p *ngIf="searchService.searchQuery()" class="search-results-count">
+          Ditemukan {{ facade.filteredLocations().length }} kota
+        </p>
+      </div>
+
+      <!-- Alarm & Timer Panel -->
+      <app-alarm-timer *ngIf="showAlarmTimer()"></app-alarm-timer>
+
+      <!-- Timezone Converter Panel -->
+      <app-timezone-converter *ngIf="showTimezoneConverter()"></app-timezone-converter>
+
+      <!-- Display Result or No Results Message -->
+      <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">
       <div class="no-results">
         <p>Tidak ada kota yang cocok dengan "<strong>{{ searchService.searchQuery() }}</strong>"</p>
 
@@ -154,7 +153,7 @@
       <p *ngIf="facade.isAllLoaded()" class="all-loaded">✓ Semua kota telah dimuat!</p>
     </ng-template>
 
-  </div>
+    }
 
   <!-- Tombol Scroll to Top: hanya tampil saat user menggulir; mobile-position lebih atas agar tidak menutupi center -->
   <button *ngIf="scrollVisible()" class="scroll-to-top-btn" (click)="scrollToTop()" title="Kembali ke atas" aria-label="Scroll to top">
