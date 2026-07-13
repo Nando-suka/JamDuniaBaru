@@ -1,22 +1,12 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
-import { map } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlarmTimerService {
-  private document = inject(DOCUMENT);
+  private alarmTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-  private alarmTimeouts = new Map<string, any>();
-
-  // ===== STATE =====
   alarms = signal<Alarm[]>([]);
-
-  // SEBELUM:
-  // activeTimer = signal<Timer | null>(null);
-
-  // SESUDAH:
   timers = signal<Timer[]>([]);
   activeTimers = computed(() => this.timers().filter((timer) => timer.remaining > 0));
   private timerIntervals = new Map<string, ReturnType<typeof setInterval>>();
@@ -26,10 +16,6 @@ export class AlarmTimerService {
     this.checkNotificationPermission();
     this.loadAlarmsFromStorage();
   }
-
-  // =====================================================
-  // ===== NOTIFICATION METHODS ==========================
-  // =====================================================
 
   async checkNotificationPermission(): Promise<void> {
     if ('Notification' in window) {
@@ -70,16 +56,22 @@ export class AlarmTimerService {
     }
   }
 
-  // =====================================================
-  // ===== ALARM METHODS =================================
-  // =====================================================
-
-  addAlarm(time: string, label: string = 'Alarm', repeat: boolean = true): void {
+  addAlarm(
+    time: string,
+    label: string = 'Alarm',
+    repeat: boolean = true,
+    repeatDays: AlarmDay[] = [],
+    sound: string = 'chime',
+    snoozeMinutes: number = 5
+  ): void {
     const alarm: Alarm = {
       id: Date.now().toString(),
       time,
       label,
       repeat,
+      repeatDays,
+      sound,
+      snoozeMinutes,
       enabled: true,
     };
 
@@ -95,7 +87,6 @@ export class AlarmTimerService {
     }
 
     this.alarms.update((alarms) => alarms.filter((a) => a.id !== id));
-
     this.saveAlarmsToStorage();
   }
 
@@ -111,11 +102,9 @@ export class AlarmTimerService {
 
         if (updatedAlarm.enabled) {
           this.scheduleAlarm(updatedAlarm);
-        } else {
-          if (this.alarmTimeouts.has(id)) {
-            clearTimeout(this.alarmTimeouts.get(id));
-            this.alarmTimeouts.delete(id);
-          }
+        } else if (this.alarmTimeouts.has(id)) {
+          clearTimeout(this.alarmTimeouts.get(id));
+          this.alarmTimeouts.delete(id);
         }
 
         return updatedAlarm;
@@ -125,66 +114,111 @@ export class AlarmTimerService {
     this.saveAlarmsToStorage();
   }
 
+  snoozeAlarm(id: string, minutes: number = 5): void {
+    const alarm = this.alarms().find((entry) => entry.id === id);
+    if (!alarm) return;
+
+    if (this.alarmTimeouts.has(id)) {
+      clearTimeout(this.alarmTimeouts.get(id));
+      this.alarmTimeouts.delete(id);
+    }
+
+    const timeoutRef = window.setTimeout(() => {
+      this.alarmTimeouts.delete(id);
+      this.triggerAlarm(alarm);
+      if ((alarm.repeat || alarm.repeatDays?.length) && alarm.enabled) {
+        this.scheduleAlarm(alarm);
+      }
+    }, Math.max(60000, minutes * 60 * 1000));
+
+    this.alarmTimeouts.set(id, timeoutRef);
+    this.saveAlarmsToStorage();
+  }
+
   private scheduleAlarm(alarm: Alarm): void {
     if (!alarm.enabled) return;
 
-    const [hours, minutes] = alarm.time.split(':').map(Number);
-
     const now = new Date();
-    const alarmTime = new Date(now);
-
-    alarmTime.setHours(hours, minutes, 0, 0);
-
-    if (alarmTime <= now) {
-      alarmTime.setDate(alarmTime.getDate() + 1);
-    }
-
-    const timeUntilAlarm = alarmTime.getTime() - now.getTime();
+    const nextAlarmTime = this.getNextAlarmTime(alarm, now);
+    const timeUntilAlarm = nextAlarmTime.getTime() - now.getTime();
 
     if (this.alarmTimeouts.has(alarm.id)) {
       clearTimeout(this.alarmTimeouts.get(alarm.id));
     }
 
-    const timeoutRef = setTimeout(() => {
+    const timeoutRef = window.setTimeout(() => {
+      this.alarmTimeouts.delete(alarm.id);
       this.triggerAlarm(alarm);
 
-      if (alarm.repeat && alarm.enabled) {
+      if ((alarm.repeat || alarm.repeatDays?.length) && alarm.enabled) {
         this.scheduleAlarm(alarm);
       }
-    }, timeUntilAlarm);
+    }, Math.max(1000, timeUntilAlarm));
 
     this.alarmTimeouts.set(alarm.id, timeoutRef);
   }
 
+  private getNextAlarmTime(alarm: Alarm, now: Date): Date {
+    const [hours, minutes] = alarm.time.split(':').map(Number);
+    const dayNames: AlarmDay[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const selectedDays = alarm.repeatDays?.length ? alarm.repeatDays : alarm.repeat ? dayNames : [];
+
+    if (selectedDays.length > 0) {
+      for (let offset = 0; offset < 8; offset++) {
+        const candidate = new Date(now);
+        candidate.setDate(now.getDate() + offset);
+        candidate.setHours(hours, minutes, 0, 0);
+
+        if (selectedDays.includes(dayNames[candidate.getDay()]) && candidate > now) {
+          return candidate;
+        }
+      }
+    }
+
+    const nextDay = new Date(now);
+    nextDay.setHours(hours, minutes, 0, 0);
+
+    if (nextDay > now) {
+      return nextDay;
+    }
+
+    nextDay.setDate(nextDay.getDate() + 1);
+    return nextDay;
+  }
+
   private triggerAlarm(alarm: Alarm): void {
     this.sendNotification('Alarm!', `Waktunya: ${alarm.label}`, '/favicon.ico');
-
-    this.playAlarmSound();
+    this.playAlarmSound(alarm.sound);
   }
 
-  private playAlarmSound(): void {
-    if ('AudioContext' in window) {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      const oscillator = audioContext.createOscillator();
-
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
+  private playAlarmSound(sound: string = 'chime'): void {
+    if (!('AudioContext' in window)) {
+      return;
     }
-  }
 
-  // =====================================================
-  // ===== MULTIPLE TIMER METHODS ========================
-  // =====================================================
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const frequencyMap: Record<string, [number, number]> = {
+      chime: [880, 1320],
+      digital: [1046, 783],
+      sunrise: [523, 659],
+      gentle: [440, 554],
+    };
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    const [startFreq, endFreq] = frequencyMap[sound as keyof typeof frequencyMap] || frequencyMap['chime'];
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(startFreq, audioContext.currentTime);
+    oscillator.frequency.linearRampToValueAtTime(endFreq, audioContext.currentTime + 0.7);
+    gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.9);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.9);
+  }
 
   startTimer(duration: number, label: string = 'Timer'): void {
     const timer: Timer = {
@@ -237,7 +271,7 @@ export class AlarmTimerService {
   private runTimer(timer: Timer): void {
     this.clearTimerInterval(timer.id);
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       const existingTimer = this.timers().find((t) => t.id === timer.id);
       if (!existingTimer || !existingTimer.isRunning) {
         this.clearTimerInterval(timer.id);
@@ -269,7 +303,6 @@ export class AlarmTimerService {
 
   private triggerTimer(timer: Timer): void {
     this.sendNotification('Timer Selesai!', `Timer "${timer.label}" telah selesai`, '/favicon.ico');
-
     this.playAlarmSound();
     this.clearTimerInterval(timer.id);
     this.timers.update((timers) => timers.filter((t) => t.id !== timer.id));
@@ -282,10 +315,6 @@ export class AlarmTimerService {
       this.timerIntervals.delete(id);
     }
   }
-
-  // =====================================================
-  // ===== STORAGE METHODS ===============================
-  // =====================================================
 
   private saveAlarmsToStorage(): void {
     try {
@@ -300,11 +329,17 @@ export class AlarmTimerService {
       const stored = localStorage.getItem('jam-dunia-alarms');
 
       if (stored) {
-        const alarms: Alarm[] = JSON.parse(stored);
+        const alarms = JSON.parse(stored) as Alarm[];
+        const normalized = alarms.map((alarm) => ({
+          ...alarm,
+          repeatDays: alarm.repeatDays ?? [],
+          sound: alarm.sound ?? 'chime',
+          snoozeMinutes: alarm.snoozeMinutes ?? 5,
+        }));
 
-        this.alarms.set(alarms);
+        this.alarms.set(normalized);
 
-        alarms.forEach((alarm) => {
+        normalized.forEach((alarm) => {
           if (alarm.enabled) {
             this.scheduleAlarm(alarm);
           }
@@ -315,15 +350,9 @@ export class AlarmTimerService {
     }
   }
 
-  // =====================================================
-  // ===== UTILITY METHODS ===============================
-  // =====================================================
-
   formatTime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
-
     const minutes = Math.floor((seconds % 3600) / 60);
-
     const secs = seconds % 60;
 
     if (hours > 0) {
@@ -336,15 +365,16 @@ export class AlarmTimerService {
   }
 }
 
-// =====================================================
-// ===== INTERFACES =====================================
-// =====================================================
+export type AlarmDay = 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat';
 
 export interface Alarm {
   id: string;
   time: string;
   label: string;
   repeat: boolean;
+  repeatDays?: AlarmDay[];
+  sound?: string;
+  snoozeMinutes?: number;
   enabled: boolean;
 }
 
@@ -355,7 +385,5 @@ export interface Timer {
   label: string;
   endTime: number;
   isRunning: boolean;
-
-  // tambahan untuk multi timer
   intervalRef?: any;
 }

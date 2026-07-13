@@ -1,31 +1,18 @@
 <div class="alarm-timer-container">
-  <!-- Tab Navigation -->
   <div class="tabs">
-    <button
-      class="tab-btn"
-      [class.active]="activeTab() === 'alarm'"
-      (click)="activeTab.set('alarm')"
-    >
+    <button class="tab-btn" [class.active]="activeTab() === 'alarm'" (click)="activeTab.set('alarm')">
       🔔 Alarm
     </button>
-    <button
-      class="tab-btn"
-      [class.active]="activeTab() === 'timer'"
-      (click)="activeTab.set('timer')"
-    >
+    <button class="tab-btn" [class.active]="activeTab() === 'timer'" (click)="activeTab.set('timer')">
       ⏱️ Timer
     </button>
   </div>
 
-  <!-- Notification Permission Banner -->
   <div class="notification-banner" *ngIf="notificationPermission() !== 'granted'">
     <p>Untuk menerima notifikasi alarm dan timer, izinkan akses notifikasi.</p>
-    <button class="btn-primary" (click)="requestNotificationPermission()">
-      Izinkan Notifikasi
-    </button>
+    <button class="btn-primary" (click)="requestNotificationPermission()">Izinkan Notifikasi</button>
   </div>
 
-  <!-- Alarm Section -->
   <div class="alarm-section" *ngIf="activeTab() === 'alarm'">
     <div class="section-header">
       <h3>Alarm Harian</h3>
@@ -37,9 +24,16 @@
         <div class="alarm-info">
           <div class="alarm-time">{{ alarm.time }}</div>
           <div class="alarm-label">{{ alarm.label }}</div>
-          <div class="alarm-repeat" *ngIf="alarm.repeat">🔄 Harian</div>
+          <div class="alarm-meta">
+            <span class="alarm-badge">🔄 {{ formatRepeatDays(alarm.repeatDays) }}</span>
+            <span class="alarm-badge">🔊 {{ alarm.sound || 'chime' }}</span>
+            <span class="alarm-badge">⏰ Snooze {{ alarm.snoozeMinutes || 5 }}m</span>
+          </div>
         </div>
         <div class="alarm-controls">
+          <button class="btn-secondary snooze-btn" (click)="snoozeAlarm(alarm.id, alarm.snoozeMinutes || 5)">
+            💤 Snooze
+          </button>
           <button class="toggle-btn" [class.active]="alarm.enabled" (click)="toggleAlarm(alarm.id)">
             {{ alarm.enabled ? 'ON' : 'OFF' }}
           </button>
@@ -53,24 +47,19 @@
     </div>
   </div>
 
-  <!-- Timer Section -->
   <div class="timer-section" *ngIf="activeTab() === 'timer'">
     <div class="section-header">
       <h3>Timer Countdown</h3>
       <button class="btn-primary" (click)="openTimerModal()">+ Set Timer</button>
     </div>
 
-    <!-- Active Timer Display -->
     <div class="active-timer" *ngIf="activeTimer()">
       <div class="timer-display">
         <div class="timer-time">{{ formatTimerDisplay(activeTimer()!.remaining) }}</div>
         <div class="timer-label">{{ activeTimer()!.label }}</div>
       </div>
       <div class="timer-controls">
-        <button
-          class="btn-secondary"
-          (click)="activeTimer()!.isRunning ? pauseTimer() : resumeTimer()"
-        >
+        <button class="btn-secondary" (click)="activeTimer()!.isRunning ? pauseTimer() : resumeTimer()">
           {{ activeTimer()!.isRunning ? '⏸️ Pause' : '▶️ Resume' }}
         </button>
         <button class="btn-danger" (click)="stopTimer()">⏹️ Stop</button>
@@ -83,7 +72,6 @@
   </div>
 </div>
 
-<!-- Alarm Modal -->
 <div class="modal-overlay" *ngIf="showAlarmModal()" (click)="closeAlarmModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -95,12 +83,6 @@
       <div class="form-group">
         <label for="alarm-time">Waktu:</label>
         <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
-
-        <small class="input-helper">
-          Gunakan format waktu standar. Contoh: 07:00 pagi atau 07:00 malam. Tolong menggunakan
-          format manual seperti AM/PM, pilih pada bagian penunjuk waktu gunakan awalan
-          <strong>a</strong> untuk AM dan <strong>p</strong> untuk PM
-        </small>
       </div>
 
       <div class="form-group">
@@ -113,6 +95,31 @@
           placeholder="Contoh: Bangun Pagi"
           required
         />
+      </div>
+
+      <div class="form-group">
+        <label for="alarm-sound">Suara alarm:</label>
+        <select id="alarm-sound" [(ngModel)]="alarmSound" name="alarmSound">
+          <option value="chime">Chime</option>
+          <option value="digital">Digital</option>
+          <option value="sunrise">Sunrise</option>
+          <option value="gentle">Gentle</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="alarm-snooze">Snooze (menit):</label>
+        <input id="alarm-snooze" type="number" min="1" max="60" [(ngModel)]="snoozeMinutes" name="snoozeMinutes" />
+      </div>
+
+      <div class="form-group">
+        <label>Ulangi pada hari:</label>
+        <div class="day-selector">
+          <label class="day-chip" *ngFor="let day of weekDays">
+            <input type="checkbox" [checked]="isDaySelected(day.value)" (change)="toggleRepeatDay(day.value)" />
+            <span>{{ day.label }}</span>
+          </label>
+        </div>
       </div>
 
       <div class="form-group">
@@ -130,7 +137,6 @@
   </div>
 </div>
 
-<!-- Timer Modal -->
 <div class="modal-overlay" *ngIf="showTimerModal()" (click)="closeTimerModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -151,50 +157,34 @@
         />
       </div>
 
+      <div class="form-group">
+        <label>Preset cepat</label>
+        <div class="preset-buttons">
+          <button type="button" class="preset-btn" *ngFor="let preset of timerPresets" (click)="applyTimerPreset(preset.minutes)">
+            {{ preset.label }}
+          </button>
+        </div>
+      </div>
+
       <div class="time-inputs">
         <div class="form-group">
           <label for="timer-hours">Jam:</label>
-          <input
-            id="timer-hours"
-            type="number"
-            [(ngModel)]="timerHours"
-            name="timerHours"
-            min="0"
-            max="23"
-          />
+          <input id="timer-hours" type="number" [(ngModel)]="timerHours" name="timerHours" min="0" max="23" />
         </div>
 
         <div class="form-group">
           <label for="timer-minutes">Menit:</label>
-          <input
-            id="timer-minutes"
-            type="number"
-            [(ngModel)]="timerMinutes"
-            name="timerMinutes"
-            min="0"
-            max="59"
-            required
-          />
+          <input id="timer-minutes" type="number" [(ngModel)]="timerMinutes" name="timerMinutes" min="0" max="59" required />
         </div>
 
         <div class="form-group">
           <label for="timer-seconds">Detik:</label>
-          <input
-            id="timer-seconds"
-            type="number"
-            [(ngModel)]="timerSeconds"
-            name="timerSeconds"
-            min="0"
-            max="59"
-          />
+          <input id="timer-seconds" type="number" [(ngModel)]="timerSeconds" name="timerSeconds" min="0" max="59" />
         </div>
       </div>
 
       <div class="time-preview">
-        <p>
-          Durasi:
-          {{ formatTimerDisplay(timerHours() * 3600 + timerMinutes() * 60 + timerSeconds()) }}
-        </p>
+        <p>Durasi: {{ formatTimerDisplay(timerHours() * 3600 + timerMinutes() * 60 + timerSeconds()) }}</p>
       </div>
 
       <div class="form-actions">

@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlarmTimerService, Alarm, Timer } from './alarm-timer.service';
+import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
 
 @Component({
   selector: 'app-alarm-timer',
@@ -13,32 +13,58 @@ import { AlarmTimerService, Alarm, Timer } from './alarm-timer.service';
 export class AlarmTimerComponent {
   private alarmTimerService = inject(AlarmTimerService);
 
-  // Signals untuk UI state
   showAlarmModal = signal(false);
   showTimerModal = signal(false);
   activeTab = signal<'alarm' | 'timer'>('alarm');
 
-  // Form data
   alarmTime = signal('07:00');
   alarmLabel = signal('Alarm Pagi');
   alarmRepeat = signal(true);
+  repeatDays = signal<AlarmDay[]>([]);
+  alarmSound = signal('chime');
+  snoozeMinutes = signal(5);
 
   timerHours = signal(0);
   timerMinutes = signal(5);
   timerSeconds = signal(0);
   timerLabel = signal('Timer');
 
-  // Computed signals
+  timerPresets = [
+    { label: '5 min', minutes: 5 },
+    { label: '15 min', minutes: 15 },
+    { label: '25 min', minutes: 25 },
+    { label: '45 min', minutes: 45 },
+    { label: '1 jam', minutes: 60 },
+  ];
+
+  weekDays = [
+    { label: 'Min', value: 'sun' as AlarmDay },
+    { label: 'Sen', value: 'mon' as AlarmDay },
+    { label: 'Sel', value: 'tue' as AlarmDay },
+    { label: 'Rab', value: 'wed' as AlarmDay },
+    { label: 'Kam', value: 'thu' as AlarmDay },
+    { label: 'Jum', value: 'fri' as AlarmDay },
+    { label: 'Sab', value: 'sat' as AlarmDay },
+  ];
+
+  dayLabels: Record<AlarmDay, string> = {
+    sun: 'Minggu',
+    mon: 'Senin',
+    tue: 'Selasa',
+    wed: 'Rabu',
+    thu: 'Kamis',
+    fri: 'Jumat',
+    sat: 'Sabtu',
+  };
+
   alarms = this.alarmTimerService.alarms;
   activeTimers = this.alarmTimerService.activeTimers;
   notificationPermission = this.alarmTimerService.notificationPermission;
 
-  // Helper to get first active timer (for backward compatibility)
   get activeTimer() {
     return () => (this.activeTimers().length > 0 ? this.activeTimers()[0] : null);
   }
 
-  // ===== ALARM METHODS =====
   openAlarmModal(): void {
     this.showAlarmModal.set(true);
   }
@@ -51,7 +77,14 @@ export class AlarmTimerComponent {
   addAlarm(): void {
     if (!this.alarmTime()) return;
 
-    this.alarmTimerService.addAlarm(this.alarmTime(), this.alarmLabel(), this.alarmRepeat());
+    this.alarmTimerService.addAlarm(
+      this.alarmTime(),
+      this.alarmLabel(),
+      this.alarmRepeat(),
+      this.repeatDays(),
+      this.alarmSound(),
+      this.snoozeMinutes()
+    );
     this.closeAlarmModal();
   }
 
@@ -63,13 +96,37 @@ export class AlarmTimerComponent {
     this.alarmTimerService.toggleAlarm(id);
   }
 
+  snoozeAlarm(id: string, minutes: number): void {
+    this.alarmTimerService.snoozeAlarm(id, minutes);
+  }
+
+  toggleRepeatDay(day: AlarmDay): void {
+    this.repeatDays.update((days) =>
+      days.includes(day) ? days.filter((item) => item !== day) : [...days, day]
+    );
+  }
+
+  isDaySelected(day: AlarmDay): boolean {
+    return this.repeatDays().includes(day);
+  }
+
+  formatRepeatDays(days: AlarmDay[] | undefined): string {
+    if (!days?.length) {
+      return 'Setiap hari';
+    }
+
+    return days.map((day) => this.dayLabels[day] || day).join(', ');
+  }
+
   private resetAlarmForm(): void {
     this.alarmTime.set('07:00');
     this.alarmLabel.set('Alarm Pagi');
     this.alarmRepeat.set(true);
+    this.repeatDays.set([]);
+    this.alarmSound.set('chime');
+    this.snoozeMinutes.set(5);
   }
 
-  // ===== TIMER METHODS =====
   openTimerModal(): void {
     this.showTimerModal.set(true);
   }
@@ -85,6 +142,12 @@ export class AlarmTimerComponent {
 
     this.alarmTimerService.startTimer(totalSeconds, this.timerLabel());
     this.closeTimerModal();
+  }
+
+  applyTimerPreset(minutes: number): void {
+    this.timerHours.set(Math.floor(minutes / 60));
+    this.timerMinutes.set(minutes % 60);
+    this.timerSeconds.set(0);
   }
 
   stopTimer(): void {
@@ -115,12 +178,10 @@ export class AlarmTimerComponent {
     this.timerLabel.set('Timer');
   }
 
-  // ===== NOTIFICATION METHODS =====
   async requestNotificationPermission(): Promise<void> {
     await this.alarmTimerService.requestNotificationPermission();
   }
 
-  // ===== UTILITY METHODS =====
   formatTimerDisplay(seconds: number): string {
     return this.alarmTimerService.formatTime(seconds);
   }
