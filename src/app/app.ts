@@ -18,21 +18,19 @@ import { AnalogClockComponent } from './analog-clock.component';
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
-  // Pakai Signal
   currentTime = signal(new Date());
-  langService = inject(LanguageService); // berhubungan dengan layanan languange
-  detectionService = inject(LanguageDetectionService); // untuk deteksi bahasa otomatis
-  themeService = inject(ThemeService); // untuk mengelola tema
-  searchService = inject(SearchService); // untuk search/filter cities
-  favoritesService = inject(FavoritesService); // untuk manage favorites
+  langService = inject(LanguageService);
+  detectionService = inject(LanguageDetectionService);
+  themeService = inject(ThemeService);
+  searchService = inject(SearchService);
+  favoritesService = inject(FavoritesService);
   facade = inject(ClockFacade);
-  timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat()); // Time format preference
-  showAlarmTimer = signal(false); // Toggle untuk panel alarm/timer
-  showTimezoneConverter = signal(false); // Toggle untuk panel konverter zona waktu
-  showAnalogClock = signal(false); // Toggle untuk mode analog clock
-  // Visibility of scroll-to-top button
+  timeFormat = signal<'12h' | '24h'>(this.getStoredTimeFormat());
+  showAlarmTimer = signal(false);
+  showTimezoneConverter = signal(false);
+  showAnalogClock = signal(false);
+  showMapView = signal(false);
   scrollVisible = signal(false);
-  // Label visibility when the scroll button is clicked (mobile guidance)
   scrollLabelVisible = signal(false);
   private scrollLabelTimer: any;
   private onScroll = () => {
@@ -42,7 +40,6 @@ export class App implements OnInit, OnDestroy {
 
   dict = this.langService.text;
 
-  // Retrieve stored time format from localStorage
   private getStoredTimeFormat(): '12h' | '24h' {
     try {
       const stored = localStorage.getItem('jam-dunia-time-format');
@@ -54,14 +51,10 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.timer = setInterval(() => {
-      // Update signal: .set()
       this.currentTime.set(new Date());
     }, 1000);
 
-    // Deteksi bahasa otomatis berdasarkan lokasi jika browser language adalah default
     this.detectAndSetLanguage();
-
-    // Show/hide scroll-to-top button based on scroll position
     window.addEventListener('scroll', this.onScroll, { passive: true });
   }
 
@@ -69,7 +62,6 @@ export class App implements OnInit, OnDestroy {
     try {
       const browserLang = this.detectionService.detectBrowserLanguage();
       if (browserLang === 'en') {
-        // Jika browser adalah English, coba deteksi berdasarkan lokasi
         const locationLang = await this.detectionService.detectLanguageByLocation();
         this.langService.setLanguage(locationLang as 'id' | 'en');
       } else {
@@ -77,18 +69,15 @@ export class App implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error detecting language:', error);
-      // Fallback ke bahasa default
     }
   }
 
-  // mendapaktna bagian waktu untuk setiap offset dari angkanya
   getTimeByOffset(offset: number): Date {
-    const d = this.currentTime(); // Ambil nilai signal dengan tanda kurung ()
+    const d = this.currentTime();
     const utc = d.getTime() + d.getTimezoneOffset() * 60000;
     return new Date(utc + 3600000 * offset);
   }
 
-  // Get formatted time string based on preference
   getFormattedTime(offset: number): string {
     const timeDate = this.getTimeByOffset(offset);
     const locale = this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US';
@@ -102,7 +91,6 @@ export class App implements OnInit, OnDestroy {
     }).format(timeDate);
   }
 
-  // Toggle time format between 12h and 24h
   toggleTimeFormat(): void {
     const newFormat = this.timeFormat() === '24h' ? '12h' : '24h';
     this.timeFormat.set(newFormat);
@@ -113,9 +101,7 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  // Scroll halus ke atas
   scrollToTop(): void {
-    // show temporary label on mobile to indicate purpose
     try {
       this.scrollLabelVisible.set(true);
       if (this.scrollLabelTimer) {
@@ -127,26 +113,22 @@ export class App implements OnInit, OnDestroy {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Toggle antara light/dark theme
   toggleTheme(): void {
     this.themeService.toggleTheme();
   }
 
-  /**
-   * Toggle timezone converter panel
-   */
   toggleTimezoneConverter(): void {
     this.showTimezoneConverter.update((v) => !v);
   }
 
-  /**
-   * Toggle analog clock display
-   */
   toggleAnalogClock(): void {
     this.showAnalogClock.update((v) => !v);
   }
 
-  // Cycle through view modes (list -> grid -> compact -> list)
+  toggleMapView(): void {
+    this.showMapView.update((v) => !v);
+  }
+
   cycleViewMode(): void {
     const modes: Array<'list' | 'grid' | 'compact'> = ['list', 'grid', 'compact'];
     const currentMode = this.facade.getViewMode()();
@@ -155,9 +137,6 @@ export class App implements OnInit, OnDestroy {
     this.facade.setViewMode(modes[nextIndex]);
   }
 
-  /**
-   * Get icon for current view mode
-   */
   getViewModeIcon(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
@@ -172,9 +151,6 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get title for current view mode
-   */
   getViewModeTitle(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
@@ -189,9 +165,6 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get CSS classes for current view mode
-   */
   getViewModeClass(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {
@@ -206,16 +179,25 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Track items by name to preserve DOM state.
-   */
   trackByLocationName(_index: number, loc: { name: string }): string {
     return loc.name;
   }
 
-  /**
-   * Cleanup ketika component destroy
-   */
+  selectCityOnMap(cityName: string): void {
+    this.searchService.updateSearchQuery(cityName);
+    if (!this.showMapView()) {
+      this.showMapView.set(true);
+    }
+  }
+
+  getLongitudePercent(lon: number): number {
+    return ((lon + 180) / 360) * 100;
+  }
+
+  getLatitudePercent(lat: number): number {
+    return ((90 - lat) / 180) * 100;
+  }
+
   ngOnDestroy(): void {
     clearInterval(this.timer);
     window.removeEventListener('scroll', this.onScroll);
@@ -223,4 +205,4 @@ export class App implements OnInit, OnDestroy {
       clearTimeout(this.scrollLabelTimer);
     }
   }
-}
+

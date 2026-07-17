@@ -434,6 +434,101 @@
   }
 }
 
+/* World Map View */
+.map-view-section {
+  animation: fadeIn 0.3s ease-out;
+  margin-bottom: 1.5rem;
+}
+
+.map-view-header {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.map-view-header h3 {
+  margin: 0 0 6px;
+  color: var(--text-color);
+}
+
+.map-view-header p {
+  margin: 0;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+.world-map-container {
+  width: 100%;
+  min-height: 320px;
+  position: relative;
+  background: radial-gradient(circle at center, rgba(102, 126, 234, 0.15), transparent 35%),
+    linear-gradient(180deg, #8ec5fc 0%, #e0c3fc 100%);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.world-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 20% 10%, rgba(255,255,255,0.35), transparent 12%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.25), transparent 10%),
+    linear-gradient(0deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05));
+  overflow: hidden;
+}
+
+.world-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.18), transparent 12%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.14), transparent 12%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04), transparent 40%, rgba(0, 0, 0, 0.04));
+  pointer-events: none;
+}
+
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background: rgba(244, 67, 54, 0.85);
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.map-pin:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+}
+
+.map-pin span {
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .world-map-container {
+    min-height: 280px;
+  }
+
+  .map-pin {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+}
+
 /* Main Wrapper untuk layout */
 .main-wrapper {
   display: flex;

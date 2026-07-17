@@ -2,65 +2,92 @@
   <div class="container">
 
     <!-- Floating Controls -->
-<div class="floating-controls">
-  <ng-container *ngIf="!showAnalogClock()">
-    <!-- Time Format -->
-    <button 
-      class="control-btn"
-      [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
-      (click)="toggleTimeFormat()"
-    >
-      {{ timeFormat() }}
-    </button>
+    <div class="floating-controls">
+      <ng-container *ngIf="!showAnalogClock()">
+        <!-- Time Format -->
+        <button
+          class="control-btn"
+          [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
+          (click)="toggleTimeFormat()"
+        >
+          {{ timeFormat() }}
+        </button>
 
-    <!-- Favorites -->
-    <button 
-      class="control-btn"
-      [class.active]="facade.showFavoritesOnly()"
-      (click)="facade.toggleFavoritesOnly()"
-      [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
-    >
-      ❤️
-      <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
-    </button>
+        <!-- Favorites -->
+        <button
+          class="control-btn"
+          [class.active]="facade.showFavoritesOnly()"
+          (click)="facade.toggleFavoritesOnly()"
+          [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
+        >
+          ❤️
+          <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
+        </button>
 
-    <!-- Theme -->
-    <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
-      <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
-      <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
-    </button>
+        <!-- Theme -->
+        <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
+          <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
+          <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
+        </button>
 
-    <!-- Alarm & Timer -->
-    <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
-      🔔⏱️
-    </button>
-  </ng-container>
+        <!-- Alarm & Timer -->
+        <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
+          🔔⏱️
+        </button>
+      </ng-container>
 
-  <!-- Analog Clock -->
-  <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
-    🕐
-  </button>
+      <!-- Analog Clock -->
+      <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
+        🕐
+      </button>
 
-</div>
-
-    <div class="header">
-      <h1>Jam Dunia</h1>
+      <!-- World Map View -->
+      <button class="control-btn" (click)="toggleMapView()" [class.active]="showMapView()" [title]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'">
+        🌍
+      </button>
     </div>
 
-    @if (showAnalogClock()) {
+    <ng-container *ngIf="showAnalogClock(); else nonAnalogMode">
       <div class="analog-clock-section">
         <h3>Jam Dunia</h3>
         <div class="analog-clocks-grid">
-          @for (loc of facade.analogLocations(); track loc.name) {
-            <app-analog-clock
-              [time]="getTimeByOffset(loc.offset)"
-              [timezone]="'UTC' + (loc.offset >= 0 ? '+' : '') + loc.offset"
-              [cityName]="loc.name"
-            ></app-analog-clock>
-          }
+          <app-analog-clock
+            *ngFor="let loc of facade.analogLocations(); trackBy: trackByLocationName"
+            [time]="getTimeByOffset(loc.offset)"
+            [timezone]="'UTC' + (loc.offset >= 0 ? '+' : '') + loc.offset"
+            [cityName]="loc.name"
+          ></app-analog-clock>
         </div>
       </div>
-    } @else {
+    </ng-container>
+
+    <ng-template #nonAnalogMode>
+      <ng-container *ngIf="showMapView(); else listMode">
+        <div class="map-view-section">
+          <div class="map-view-header">
+            <h3>Peta Kota</h3>
+            <p>Pilih kota pada peta untuk melihat waktu lokalnya.</p>
+          </div>
+          <div class="world-map-container">
+            <div class="world-map">
+              <button
+                *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
+                type="button"
+                class="map-pin"
+                [style.left.%]="getLongitudePercent(city.lon)"
+                [style.top.%]="getLatitudePercent(city.lat)"
+                (click)="selectCityOnMap(city.name)"
+                [title]="city.name"
+              >
+                <span>{{ city.name[0] }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-template>
+
+    <ng-template #listMode>
       <!-- Search Input Section -->
       <div class="search-section">
         <div class="search-container">
@@ -97,73 +124,72 @@
 
       <!-- Display Result or No Results Message -->
       <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">
-      <div class="no-results">
-        <p>Tidak ada kota yang cocok dengan "<strong>{{ searchService.searchQuery() }}</strong>"</p>
+        <div class="no-results">
+          <p>Tidak ada kota yang cocok dengan "<strong>{{ searchService.searchQuery() }}</strong>"</p>
 
-        <button class="reset-search-btn" (click)="searchService.clearSearch()">
-          Coba Cari Lagi
-        </button>
-      </div>
-    </ng-container>
-
-    <ng-template #clockList>
-      <div class="clock-list" [ngClass]="getViewModeClass()">
-        <div
-          *ngFor="let loc of facade.filteredLocations().slice(0, facade.itemsToShow()); trackBy: trackByLocationName"
-          class="location"
-          [class.fade-in]="facade.getRecentlyAdded()() === loc.name"
-          [class.fade-out]="facade.getRecentlyRemoved()() === loc.name"
-          [class.theme-transition]="facade.getRecentlyToggledTheme()()"
-        >
-          <div class="location-info">
-            <p class="city-name">{{ loc.name }}</p>
-            <p class="time-box">
-              {{ getFormattedTime(loc.offset) }}
-            </p>
-          </div>
-
-          <button
-            class="favorite-btn"
-            [class.favorited]="favoritesService.isFavorite(loc)"
-            (click)="favoritesService.toggleFavorite(loc)"
-            [title]="favoritesService.isFavorite(loc) ? 'Remove from favorites' : 'Add to favorites'"
-          >
-            <svg *ngIf="favoritesService.isFavorite(loc)" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
-            <svg *ngIf="!favoritesService.isFavorite(loc)" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-            </svg>
+          <button class="reset-search-btn" (click)="searchService.clearSearch()">
+            Coba Cari Lagi
           </button>
         </div>
-      </div>
+      </ng-container>
 
-      <!-- Loading State -->
-      <div *ngIf="facade.isLoading()" class="loading-container">
-        <div class="spinner"></div>
-        <p class="loading-text">Sedang memuat...</p>
-      </div>
+      <ng-template #clockList>
+        <div class="clock-list" [ngClass]="getViewModeClass()">
+          <div
+            *ngFor="let loc of facade.filteredLocations().slice(0, facade.itemsToShow()); trackBy: trackByLocationName"
+            class="location"
+            [class.fade-in]="facade.getRecentlyAdded()() === loc.name"
+            [class.fade-out]="facade.getRecentlyRemoved()() === loc.name"
+            [class.theme-transition]="facade.getRecentlyToggledTheme()()"
+          >
+            <div class="location-info">
+              <p class="city-name">{{ loc.name }}</p>
+              <p class="time-box">
+                {{ getFormattedTime(loc.offset) }}
+              </p>
+            </div>
 
-      <!-- Load More Button -->
-      <button *ngIf="!facade.isLoading() && facade.itemsToShow() < facade.filteredLocations().length" class="load-more-btn" (click)="facade.loadMore()" [disabled]="facade.isLoading()">
-        <span>⧬ Muat Lebih Banyak</span>
-      </button>
+            <button
+              class="favorite-btn"
+              [class.favorited]="favoritesService.isFavorite(loc)"
+              (click)="favoritesService.toggleFavorite(loc)"
+              [title]="favoritesService.isFavorite(loc) ? 'Remove from favorites' : 'Add to favorites'"
+            >
+              <svg *ngIf="favoritesService.isFavorite(loc)" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <svg *ngIf="!favoritesService.isFavorite(loc)" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
 
-      <!-- All Loaded Message -->
-      <p *ngIf="facade.isAllLoaded()" class="all-loaded">✓ Semua kota telah dimuat!</p>
+        <!-- Loading State -->
+        <div *ngIf="facade.isLoading()" class="loading-container">
+          <div class="spinner"></div>
+          <p class="loading-text">Sedang memuat...</p>
+        </div>
+
+        <!-- Load More Button -->
+        <button *ngIf="!facade.isLoading() && facade.itemsToShow() < facade.filteredLocations().length" class="load-more-btn" (click)="facade.loadMore()" [disabled]="facade.isLoading()">
+          <span>⧬ Muat Lebih Banyak</span>
+        </button>
+
+        <!-- All Loaded Message -->
+        <p *ngIf="facade.isAllLoaded()" class="all-loaded">✓ Semua kota telah dimuat!</p>
+      </ng-template>
     </ng-template>
 
-    }
+    <!-- Tombol Scroll to Top: hanya tampil saat user menggulir; mobile-position lebih atas agar tidak menutupi center -->
+    <button *ngIf="scrollVisible()" class="scroll-to-top-btn" (click)="scrollToTop()" title="Kembali ke atas" aria-label="Scroll to top">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+        <line x1="12" y1="21" x2="12" y2="9"></line>
+      </svg>
+    </button>
 
-  <!-- Tombol Scroll to Top: hanya tampil saat user menggulir; mobile-position lebih atas agar tidak menutupi center -->
-  <button *ngIf="scrollVisible()" class="scroll-to-top-btn" (click)="scrollToTop()" title="Kembali ke atas" aria-label="Scroll to top">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="18 15 12 9 6 15"></polyline>
-      <line x1="12" y1="21" x2="12" y2="9"></line>
-    </svg>
-  </button>
-
-  <!-- Mobile helper label that appears briefly after tapping the button -->
-  <span *ngIf="scrollLabelVisible()" class="scroll-to-top-label" aria-hidden="true">Scroll to top</span>
-
+    <!-- Mobile helper label that appears briefly after tapping the button -->
+    <span *ngIf="scrollLabelVisible()" class="scroll-to-top-label" aria-hidden="true">Scroll to top</span>
+  </div>
 </div>
