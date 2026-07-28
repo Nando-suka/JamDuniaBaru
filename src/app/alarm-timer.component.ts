@@ -165,7 +165,7 @@ export class AlarmTimerComponent {
   }
 
   resumeTimer(): void {
-    const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
+    const timer = this.activeTimer();
     if (timer) {
       this.alarmTimerService.resumeTimer(timer.id);
     }

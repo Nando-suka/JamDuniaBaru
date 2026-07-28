@@ -205,4 +205,4 @@ export class App implements OnInit, OnDestroy {
       clearTimeout(this.scrollLabelTimer);
     }
   }
-
+}
