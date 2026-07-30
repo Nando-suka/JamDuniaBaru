@@ -19,25 +19,22 @@
       <button class="btn-primary" (click)="openAlarmModal()">+ Tambah Alarm</button>
     </div>
 
-    <div class="alarms-list">
+      <div class="alarms-list">
       <div class="alarm-item" *ngFor="let alarm of alarms()">
-        <div class="alarm-info">
-          <div class="alarm-time">{{ alarm.time }}</div>
-          <div class="alarm-label">{{ alarm.label }}</div>
-          <div class="alarm-meta">
-            <span class="alarm-badge">🔄 {{ formatRepeatDays(alarm.repeatDays) }}</span>
-            <span class="alarm-badge">🔊 {{ alarm.sound || 'chime' }}</span>
-            <span class="alarm-badge">⏰ Snooze {{ alarm.snoozeMinutes || 5 }}m</span>
-          </div>
+        <div class="alarm-time-big">{{ alarm.time }}</div>
+        <div class="alarm-label-center">{{ alarm.label }}</div>
+        <div class="alarm-meta-center">
+          <span>🔄 {{ formatRepeatDays(alarm.repeatDays) }}</span>
+          <span>🔊 {{ alarm.sound || 'chime' }}</span>
+          <span>⏰ {{ alarm.snoozeMinutes || 5 }}m</span>
         </div>
-        <div class="alarm-controls">
-          <button class="btn-secondary snooze-btn" (click)="snoozeAlarm(alarm.id, alarm.snoozeMinutes || 5)">
-            💤 Snooze
-          </button>
+        <div class="alarm-controls-bottom">
+          <button class="btn-sm" (click)="editAlarm(alarm.id)" title="Edit">✏️</button>
+          <button class="btn-sm" (click)="snoozeAlarm(alarm.id, alarm.snoozeMinutes || 5)" title="Snooze">💤</button>
           <button class="toggle-btn" [class.active]="alarm.enabled" (click)="toggleAlarm(alarm.id)">
             {{ alarm.enabled ? 'ON' : 'OFF' }}
           </button>
-          <button class="delete-btn" (click)="removeAlarm(alarm.id)">HAPUS</button>
+          <button class="btn-sm btn-sm-danger" (click)="removeAlarm(alarm.id)" title="Hapus">🗑️</button>
         </div>
       </div>
 
@@ -75,11 +72,11 @@
 <div class="modal-overlay" *ngIf="showAlarmModal()" (click)="closeAlarmModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Tambah Alarm Baru</h3>
+      <h3>{{ isEditing() ? 'Edit Alarm' : 'Tambah Alarm Baru' }}</h3>
       <button class="close-btn" (click)="closeAlarmModal()">×</button>
     </div>
 
-    <form class="alarm-form" (ngSubmit)="addAlarm()">
+    <form class="alarm-form" (ngSubmit)="addOrUpdateAlarm()">
       <div class="form-group">
         <label for="alarm-time">Waktu:</label>
         <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
@@ -115,8 +112,8 @@
       <div class="form-group">
         <label>Ulangi pada hari:</label>
         <div class="day-selector">
-          <label class="day-chip" *ngFor="let day of weekDays">
-            <input type="checkbox" [checked]="isDaySelected(day.value)" (change)="toggleRepeatDay(day.value)" />
+          <label class="day-chip" *ngFor="let day of weekDays" [class.chip-disabled]="alarmRepeat()">
+            <input type="checkbox" [checked]="isDaySelected(day.value)" [disabled]="alarmRepeat()" (change)="onDayToggle(day.value)" />
             <span>{{ day.label }}</span>
           </label>
         </div>
@@ -124,14 +121,14 @@
 
       <div class="form-group">
         <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="alarmRepeat" name="alarmRepeat" />
+          <input type="checkbox" [ngModel]="alarmRepeat()" [disabled]="hasSelectedDays()" (ngModelChange)="alarmRepeat.set($event); onRepeatChange()" name="alarmRepeat" />
           Ulangi setiap hari
         </label>
       </div>
 
       <div class="form-actions">
         <button type="button" class="btn-secondary" (click)="closeAlarmModal()">Batal</button>
-        <button type="submit" class="btn-primary">Tambah Alarm</button>
+        <button type="submit" class="btn-primary">{{ isEditing() ? 'Simpan Perubahan' : 'Tambah Alarm' }}</button>
       </div>
     </form>
   </div>

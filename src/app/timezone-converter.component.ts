@@ -215,11 +215,11 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   getOffsetString(offset: number): string {
     const sign = offset >= 0 ? '+' : '';
     const hours = Math.floor(Math.abs(offset));
-    const minutes = Math.abs((offset % 1) * 60);
+    const minutes = Math.abs(((offset % 1) * 60));
 
     if (minutes > 0) {
-      return `UTC${sign}${offset}`;
+      return `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
     }
-    return `UTC${sign}${offset}`;
+    return `UTC${sign}${hours}`;
   }
 }

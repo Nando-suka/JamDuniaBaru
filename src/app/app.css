@@ -368,10 +368,10 @@
   font-weight: 600;
   font-size: 15px;
   margin: 0;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse-loading 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes pulse-loading {
   0%,
   100% {
     opacity: 1;

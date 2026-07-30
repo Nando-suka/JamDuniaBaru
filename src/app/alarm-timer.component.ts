@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
@@ -17,12 +17,17 @@ export class AlarmTimerComponent {
   showTimerModal = signal(false);
   activeTab = signal<'alarm' | 'timer'>('alarm');
 
+  editingAlarmId = signal<string | null>(null);
+  isEditing = computed(() => this.editingAlarmId() !== null);
+
   alarmTime = signal('07:00');
   alarmLabel = signal('Alarm Pagi');
   alarmRepeat = signal(true);
   repeatDays = signal<AlarmDay[]>([]);
   alarmSound = signal('chime');
   snoozeMinutes = signal(5);
+
+  hasSelectedDays = computed(() => this.repeatDays().length > 0);
 
   timerHours = signal(0);
   timerMinutes = signal(5);
@@ -66,26 +71,71 @@ export class AlarmTimerComponent {
   }
 
   openAlarmModal(): void {
+    this.editingAlarmId.set(null);
+    this.resetAlarmForm();
+    this.showAlarmModal.set(true);
+  }
+
+  editAlarm(id: string): void {
+    const alarm = this.alarms().find((a) => a.id === id);
+    if (!alarm) return;
+
+    this.editingAlarmId.set(id);
+    this.alarmTime.set(alarm.time);
+    this.alarmLabel.set(alarm.label);
+    this.alarmRepeat.set(alarm.repeat);
+    this.repeatDays.set(alarm.repeatDays ?? []);
+    this.alarmSound.set(alarm.sound ?? 'chime');
+    this.snoozeMinutes.set(alarm.snoozeMinutes ?? 5);
     this.showAlarmModal.set(true);
   }
 
   closeAlarmModal(): void {
     this.showAlarmModal.set(false);
+    this.editingAlarmId.set(null);
     this.resetAlarmForm();
   }
 
-  addAlarm(): void {
+  addOrUpdateAlarm(): void {
     if (!this.alarmTime()) return;
 
-    this.alarmTimerService.addAlarm(
-      this.alarmTime(),
-      this.alarmLabel(),
-      this.alarmRepeat(),
-      this.repeatDays(),
-      this.alarmSound(),
-      this.snoozeMinutes()
-    );
+    const editingId = this.editingAlarmId();
+    if (editingId) {
+      this.alarmTimerService.updateAlarm(
+        editingId,
+        this.alarmTime(),
+        this.alarmLabel(),
+        this.alarmRepeat(),
+        this.repeatDays(),
+        this.alarmSound(),
+        this.snoozeMinutes()
+      );
+    } else {
+      this.alarmTimerService.addAlarm(
+        this.alarmTime(),
+        this.alarmLabel(),
+        this.alarmRepeat(),
+        this.repeatDays(),
+        this.alarmSound(),
+        this.snoozeMinutes()
+      );
+    }
     this.closeAlarmModal();
+  }
+
+  onRepeatChange(): void {
+    if (this.alarmRepeat()) {
+      this.repeatDays.set([]);
+    }
+  }
+
+  onDayToggle(day: AlarmDay): void {
+    this.repeatDays.update((days) =>
+      days.includes(day) ? days.filter((item) => item !== day) : [...days, day]
+    );
+    if (this.repeatDays().length > 0) {
+      this.alarmRepeat.set(false);
+    }
   }
 
   removeAlarm(id: string): void {
@@ -98,12 +148,6 @@ export class AlarmTimerComponent {
 
   snoozeAlarm(id: string, minutes: number): void {
     this.alarmTimerService.snoozeAlarm(id, minutes);
-  }
-
-  toggleRepeatDay(day: AlarmDay): void {
-    this.repeatDays.update((days) =>
-      days.includes(day) ? days.filter((item) => item !== day) : [...days, day]
-    );
   }
 
   isDaySelected(day: AlarmDay): boolean {

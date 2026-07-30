@@ -33,6 +33,10 @@ describe('AlarmTimerService', () => {
     service = new AlarmTimerService();
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('stores custom alarm preferences including repeat days, sound, and snooze', () => {
     service.addAlarm('07:30', 'Wake up', true, ['mon', 'wed'], 'chime', 10);
 

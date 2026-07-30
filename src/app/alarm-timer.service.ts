@@ -80,6 +80,36 @@ export class AlarmTimerService {
     this.scheduleAlarm(alarm);
   }
 
+  updateAlarm(
+    id: string,
+    time: string,
+    label: string,
+    repeat: boolean,
+    repeatDays: AlarmDay[],
+    sound: string,
+    snoozeMinutes: number
+  ): void {
+    if (this.alarmTimeouts.has(id)) {
+      clearTimeout(this.alarmTimeouts.get(id));
+      this.alarmTimeouts.delete(id);
+    }
+
+    this.alarms.update((alarms) =>
+      alarms.map((a) =>
+        a.id === id
+          ? { ...a, time, label, repeat, repeatDays, sound, snoozeMinutes, enabled: true }
+          : a
+      )
+    );
+
+    this.saveAlarmsToStorage();
+
+    const updated = this.alarms().find((a) => a.id === id);
+    if (updated?.enabled) {
+      this.scheduleAlarm(updated);
+    }
+  }
+
   removeAlarm(id: string): void {
     if (this.alarmTimeouts.has(id)) {
       clearTimeout(this.alarmTimeouts.get(id));

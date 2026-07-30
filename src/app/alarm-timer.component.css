@@ -118,66 +118,80 @@
 
 .alarm-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 16px;
+  padding: 20px 16px;
   background: var(--card-bg, #f8f9fa);
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--border-color, #e0e0e0);
-  gap: 12px;
+  gap: 8px;
 }
 
-.alarm-info {
-  flex: 1;
-}
-
-.alarm-time {
-  font-size: 24px;
-  font-weight: bold;
+.alarm-time-big {
+  font-size: 42px;
+  font-weight: 300;
   color: var(--primary-color, #007bff);
-  margin-bottom: 4px;
+  letter-spacing: 2px;
+  line-height: 1.1;
 }
 
-.alarm-label {
-  font-size: 16px;
+.alarm-label-center {
+  font-size: 15px;
   color: var(--text-color, #333);
-  margin-bottom: 6px;
+  margin-top: -2px;
 }
 
-.alarm-meta {
+.alarm-meta-center {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.alarm-badge {
-  font-size: 12px;
+  justify-content: center;
+  gap: 16px;
+  font-size: 13px;
   color: var(--secondary-text, #666);
-  background: var(--hover-bg, #eef2f7);
-  border-radius: 999px;
-  padding: 4px 8px;
+  margin-top: 4px;
 }
 
-.alarm-controls {
+.alarm-controls-bottom {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  width: 100%;
 }
 
-.snooze-btn {
-  padding: 6px 12px;
-  font-size: 12px;
+.btn-sm {
+  background: transparent;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease;
+}
+
+.btn-sm:hover {
+  background: var(--hover-bg, #eef2f7);
+}
+
+.btn-sm-danger:hover {
+  background: var(--danger-bg, #dc3545);
+  border-color: var(--danger-bg, #dc3545);
 }
 
 .toggle-btn {
-  padding: 6px 12px;
+  padding: 6px 16px;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  min-width: 48px;
+  transition: all 0.2s ease;
 }
 
 .toggle-btn.active {
@@ -375,6 +389,15 @@
   background: var(--card-bg, #f8f9fa);
 }
 
+.chip-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chip-disabled input {
+  pointer-events: none;
+}
+
 .preset-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -429,14 +452,13 @@
     align-items: stretch;
   }
 
-  .alarm-item {
-    flex-direction: column;
+  .alarm-meta-center {
     gap: 12px;
-    align-items: stretch;
+    flex-wrap: wrap;
   }
 
-  .alarm-controls {
-    justify-content: space-between;
+  .alarm-controls-bottom {
+    flex-wrap: wrap;
   }
 
   .timer-controls {
