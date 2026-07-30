@@ -14,10 +14,12 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render search input with correct placeholder', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Jam Dunia Modern');
+    const input = compiled.querySelector('.search-input') as HTMLInputElement;
+    expect(input).toBeTruthy();
+    expect(input.placeholder).toContain('Cari');
   });
 });
