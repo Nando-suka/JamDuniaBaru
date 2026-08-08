@@ -35,21 +35,18 @@ export class TimezoneConverterService {
       return null;
     }
 
-    let sourceDate: Date;
+    const sourceDate = this.useCurrentTime()
+      ? this.getCurrentTimeForOffset(from.offset)
+      : this.createDateFromInputs(from.offset);
 
-    if (this.useCurrentTime()) {
-      sourceDate = new Date();
-    } else {
-      // Parse input time dan date
-      const [hours, minutes] = this.inputTime().split(':').map(Number);
-      sourceDate = new Date(this.inputDate());
-      sourceDate.setHours(hours, minutes, 0, 0);
+    if (!sourceDate || isNaN(sourceDate.getTime())) {
+      return null;
     }
 
     // Hitung perbedaan offset
     const offsetDiff = to.offset - from.offset;
 
-    // Konversi waktu
+    // Konversi waktu berdasarkan selisih offset
     const convertedDate = new Date(sourceDate.getTime() + offsetDiff * 60 * 60 * 1000);
 
     return {
@@ -117,6 +114,41 @@ export class TimezoneConverterService {
     this.selectedFromCity.set(to);
     this.selectedToCity.set(from);
     this.saveToStorage();
+  }
+
+  private getCurrentTimeForOffset(offset: number): Date {
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcMs + offset * 3600000);
+  }
+
+  private createDateFromInputs(offset: number): Date | null {
+    const timeValue = this.inputTime();
+    const dateValue = this.inputDate();
+
+    if (!this.isValidTime(timeValue) || !this.isValidDate(dateValue)) {
+      return null;
+    }
+
+    const [hours, minutes] = timeValue.split(':').map(Number);
+    const date = new Date(dateValue);
+
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    date.setUTCHours(hours - offset, minutes, 0, 0);
+    return date;
+  }
+
+  private isValidTime(value: string): boolean {
+    const match = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(value);
+    return match !== null;
+  }
+
+  private isValidDate(value: string): boolean {
+    const date = new Date(value);
+    return !Number.isNaN(date.getTime()) && /^\d{4}-\d{2}-\d{2}$/.test(value);
   }
 
   /**
@@ -202,15 +234,48 @@ export class TimezoneConverterService {
         return;
       }
 
-      const data = JSON.parse(stored) as TimezoneConverterStorage;
-      this.selectedFromCity.set(data.fromCity);
-      this.selectedToCity.set(data.toCity);
-      this.inputTime.set(data.inputTime || '00:00');
-      this.inputDate.set(data.inputDate || new Date().toISOString().split('T')[0]);
-      this.useCurrentTime.set(data.useCurrentTime ?? true);
+      const parsed = JSON.parse(stored);
+      if (!this.isValidStorage(parsed)) {
+        return;
+      }
+
+      this.selectedFromCity.set(parsed.fromCity);
+      this.selectedToCity.set(parsed.toCity);
+      this.inputTime.set(parsed.inputTime || '00:00');
+      this.inputDate.set(parsed.inputDate || new Date().toISOString().split('T')[0]);
+      this.useCurrentTime.set(parsed.useCurrentTime ?? true);
     } catch {
       // ignore storage errors
     }
+  }
+
+  private isValidStorage(candidate: unknown): candidate is TimezoneConverterStorage {
+    if (typeof candidate !== 'object' || candidate === null) {
+      return false;
+    }
+
+    const value = candidate as Record<string, unknown>;
+    const fromCity = value['fromCity'];
+    const toCity = value['toCity'];
+    const inputTime = value['inputTime'];
+    const inputDate = value['inputDate'];
+    const useCurrentTime = value['useCurrentTime'];
+
+    const isCity = (item: unknown): item is City =>
+      typeof item === 'object' &&
+      item !== null &&
+      typeof (item as any).name === 'string' &&
+      typeof (item as any).offset === 'number' &&
+      typeof (item as any).lat === 'number' &&
+      typeof (item as any).lon === 'number';
+
+    return (
+      (fromCity === null || isCity(fromCity)) &&
+      (toCity === null || isCity(toCity)) &&
+      typeof inputTime === 'string' &&
+      typeof inputDate === 'string' &&
+      typeof useCurrentTime === 'boolean'
+    );
   }
 }
 
