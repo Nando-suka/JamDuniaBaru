@@ -125,25 +125,26 @@ export class TimezoneConverterService {
   private createDateFromInputs(offset: number): Date | null {
     const timeValue = this.inputTime();
     const dateValue = this.inputDate();
+    const timeMatch = /^(\d{1,2}):(\d{2})$/.exec(timeValue);
 
-    if (!this.isValidTime(timeValue) || !this.isValidDate(dateValue)) {
+    if (!timeMatch || !this.isValidDate(dateValue)) {
       return null;
     }
 
-    const [hours, minutes] = timeValue.split(':').map(Number);
+    const hours = Number(timeMatch[1]);
+    const minutes = Number(timeMatch[2]);
+    if (hours > 23 || minutes > 59) {
+      return null;
+    }
+
     const date = new Date(dateValue);
 
-    if (isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
       return null;
     }
 
     date.setUTCHours(hours - offset, minutes, 0, 0);
     return date;
-  }
-
-  private isValidTime(value: string): boolean {
-    const match = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(value);
-    return match !== null;
   }
 
   private isValidDate(value: string): boolean {
@@ -262,12 +263,11 @@ export class TimezoneConverterService {
     const useCurrentTime = value['useCurrentTime'];
 
     const isCity = (item: unknown): item is City =>
-      typeof item === 'object' &&
-      item !== null &&
-      typeof (item as any).name === 'string' &&
-      typeof (item as any).offset === 'number' &&
-      typeof (item as any).lat === 'number' &&
-      typeof (item as any).lon === 'number';
+      this.hasCityShape(item) &&
+      typeof item.name === 'string' &&
+      typeof item.offset === 'number' &&
+      typeof item.lat === 'number' &&
+      typeof item.lon === 'number';
 
     return (
       (fromCity === null || isCity(fromCity)) &&
@@ -276,6 +276,10 @@ export class TimezoneConverterService {
       typeof inputDate === 'string' &&
       typeof useCurrentTime === 'boolean'
     );
+  }
+
+  private hasCityShape(value: unknown): value is Partial<City> {
+    return typeof value === 'object' && value !== null;
   }
 }
 
