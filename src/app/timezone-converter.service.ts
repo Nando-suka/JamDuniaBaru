@@ -21,6 +21,7 @@ export class TimezoneConverterService {
   inputTime = signal<string>('00:00');
   inputDate = signal<string>(new Date().toISOString().split('T')[0]);
   useCurrentTime = signal<boolean>(true);
+  currentTime = signal(new Date());
 
   constructor() {
     this.loadFromStorage();
@@ -36,7 +37,7 @@ export class TimezoneConverterService {
     }
 
     const sourceDate = this.useCurrentTime()
-      ? this.getCurrentTimeForOffset(from.offset)
+      ? this.getCurrentTimeForOffset(from.offset, this.currentTime())
       : this.createDateFromInputs(from.offset);
 
     if (!sourceDate || isNaN(sourceDate.getTime())) {
@@ -105,6 +106,10 @@ export class TimezoneConverterService {
     this.saveToStorage();
   }
 
+  refreshCurrentTime(): void {
+    this.currentTime.set(new Date());
+  }
+
   /**
    * Tukar posisi kota asal dan tujuan
    */
@@ -116,8 +121,7 @@ export class TimezoneConverterService {
     this.saveToStorage();
   }
 
-  private getCurrentTimeForOffset(offset: number): Date {
-    const now = new Date();
+  private getCurrentTimeForOffset(offset: number, now: Date): Date {
     const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
     return new Date(utcMs + offset * 3600000);
   }

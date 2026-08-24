@@ -34,6 +34,16 @@
         <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
           🔔⏱️
         </button>
+
+        <!-- Timezone Converter -->
+        <button
+          class="control-btn converter-toggle"
+          (click)="toggleTimezoneConverter()"
+          [class.active]="showTimezoneConverter()"
+          [title]="showTimezoneConverter() ? 'Sembunyikan konverter zona waktu' : 'Tampilkan konverter zona waktu'"
+        >
+          🌐
+        </button>
       </ng-container>
 
       <!-- Analog Clock -->

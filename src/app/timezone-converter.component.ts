@@ -19,7 +19,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   private langService = inject(LanguageService);
 
   // State
-  isExpanded = signal(false);
+  isExpanded = signal(true);
   searchFromQuery = signal('');
   searchToQuery = signal('');
   showFromDropdown = signal(false);
@@ -88,8 +88,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     // Update waktu setiap detik jika menggunakan waktu saat ini
     this.timer = setInterval(() => {
       if (this.useCurrentTime()) {
-        // Trigger recompute
-        this.converterService.setUseCurrentTime(true);
+        this.converterService.refreshCurrentTime();
       }
     }, 1000);
   }
