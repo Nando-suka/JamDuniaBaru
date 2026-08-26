@@ -110,25 +110,63 @@
       </div>
 
       <div class="form-group">
-        <label>Ulangi pada hari:</label>
-        <div class="day-selector">
-          <label class="day-chip" *ngFor="let day of weekDays" [class.chip-disabled]="alarmRepeat()">
-            <input type="checkbox" [checked]="isDaySelected(day.value)" [disabled]="alarmRepeat()" (change)="onDayToggle(day.value)" />
-            <span>{{ day.label }}</span>
-          </label>
+        <span class="form-label">Ulangi alarm?</span>
+        <div class="repeat-segmented" role="group" aria-label="Pilihan pengulangan alarm">
+          <button
+            type="button"
+            class="repeat-option"
+            [class.active]="repeatMode() === 'never'"
+            [attr.aria-pressed]="repeatMode() === 'never'"
+            (click)="onRepeatModeChange('never')"
+          >
+            Tidak pernah
+          </button>
+          <button
+            type="button"
+            class="repeat-option"
+            [class.active]="repeatMode() === 'daily'"
+            [attr.aria-pressed]="repeatMode() === 'daily'"
+            (click)="onRepeatModeChange('daily')"
+          >
+            Setiap hari
+          </button>
+          <button
+            type="button"
+            class="repeat-option"
+            [class.active]="repeatMode() === 'custom'"
+            [attr.aria-pressed]="repeatMode() === 'custom'"
+            (click)="onRepeatModeChange('custom')"
+          >
+            Hari tertentu
+          </button>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input type="checkbox" [ngModel]="alarmRepeat()" [disabled]="hasSelectedDays()" (ngModelChange)="alarmRepeat.set($event); onRepeatChange()" name="alarmRepeat" />
-          Ulangi setiap hari
-        </label>
+      <div class="form-group" *ngIf="repeatMode() === 'custom'">
+        <span class="form-label">Pilih hari</span>
+        <div class="day-selector">
+          <label class="day-chip" *ngFor="let day of weekDays">
+            <input type="checkbox" [checked]="isDaySelected(day.value)" (change)="onDayToggle(day.value)" />
+            <span>{{ day.label }}</span>
+          </label>
+        </div>
+        <p class="field-hint" *ngIf="!hasSelectedDays()">Pilih setidaknya satu hari.</p>
+      </div>
+
+      <div class="schedule-summary" aria-live="polite">
+        <span class="summary-label">Ringkasan</span>
+        <strong>{{ scheduleSummary() }}</strong>
       </div>
 
       <div class="form-actions">
         <button type="button" class="btn-secondary" (click)="closeAlarmModal()">Batal</button>
-        <button type="submit" class="btn-primary">{{ isEditing() ? 'Simpan Perubahan' : 'Tambah Alarm' }}</button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="!alarmTime() || (repeatMode() === 'custom' && !hasSelectedDays())"
+        >
+          {{ isEditing() ? 'Simpan Perubahan' : 'Tambah Alarm' }}
+        </button>
       </div>
     </form>
   </div>

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
 
+type AlarmRepeatMode = 'never' | 'daily' | 'custom';
+
 @Component({
   selector: 'app-alarm-timer',
   standalone: true,
@@ -22,12 +24,30 @@ export class AlarmTimerComponent {
 
   alarmTime = signal('07:00');
   alarmLabel = signal('Alarm Pagi');
-  alarmRepeat = signal(true);
+  repeatMode = signal<AlarmRepeatMode>('daily');
   repeatDays = signal<AlarmDay[]>([]);
   alarmSound = signal('chime');
   snoozeMinutes = signal(5);
 
   hasSelectedDays = computed(() => this.repeatDays().length > 0);
+  scheduleSummary = computed(() => {
+    const label = this.alarmLabel().trim() || 'Alarm';
+    const time = this.alarmTime() || '--:--';
+
+    if (this.repeatMode() === 'never') {
+      return `"${label}" pukul ${time}, sekali saja`;
+    }
+
+    if (this.repeatMode() === 'daily') {
+      return `"${label}" pukul ${time}, setiap hari`;
+    }
+
+    if (!this.repeatDays().length) {
+      return `"${label}" pukul ${time}, pilih hari pengulangan`;
+    }
+
+    return `"${label}" pukul ${time}, setiap ${this.formatDayList(this.repeatDays())}`;
+  });
 
   timerHours = signal(0);
   timerMinutes = signal(5);
@@ -83,8 +103,10 @@ export class AlarmTimerComponent {
     this.editingAlarmId.set(id);
     this.alarmTime.set(alarm.time);
     this.alarmLabel.set(alarm.label);
-    this.alarmRepeat.set(alarm.repeat);
     this.repeatDays.set(alarm.repeatDays ?? []);
+    this.repeatMode.set(
+      alarm.repeatDays?.length ? 'custom' : alarm.repeat ? 'daily' : 'never'
+    );
     this.alarmSound.set(alarm.sound ?? 'chime');
     this.snoozeMinutes.set(alarm.snoozeMinutes ?? 5);
     this.showAlarmModal.set(true);
@@ -97,16 +119,18 @@ export class AlarmTimerComponent {
   }
 
   addOrUpdateAlarm(): void {
-    if (!this.alarmTime()) return;
+    if (!this.alarmTime() || (this.repeatMode() === 'custom' && !this.hasSelectedDays())) return;
 
     const editingId = this.editingAlarmId();
+    const repeat = this.repeatMode() === 'daily';
+    const repeatDays = this.repeatMode() === 'custom' ? this.repeatDays() : [];
     if (editingId) {
       this.alarmTimerService.updateAlarm(
         editingId,
         this.alarmTime(),
         this.alarmLabel(),
-        this.alarmRepeat(),
-        this.repeatDays(),
+        repeat,
+        repeatDays,
         this.alarmSound(),
         this.snoozeMinutes()
       );
@@ -114,8 +138,8 @@ export class AlarmTimerComponent {
       this.alarmTimerService.addAlarm(
         this.alarmTime(),
         this.alarmLabel(),
-        this.alarmRepeat(),
-        this.repeatDays(),
+        repeat,
+        repeatDays,
         this.alarmSound(),
         this.snoozeMinutes()
       );
@@ -123,8 +147,9 @@ export class AlarmTimerComponent {
     this.closeAlarmModal();
   }
 
-  onRepeatChange(): void {
-    if (this.alarmRepeat()) {
+  onRepeatModeChange(mode: AlarmRepeatMode): void {
+    this.repeatMode.set(mode);
+    if (mode !== 'custom') {
       this.repeatDays.set([]);
     }
   }
@@ -133,9 +158,6 @@ export class AlarmTimerComponent {
     this.repeatDays.update((days) =>
       days.includes(day) ? days.filter((item) => item !== day) : [...days, day]
     );
-    if (this.repeatDays().length > 0) {
-      this.alarmRepeat.set(false);
-    }
   }
 
   removeAlarm(id: string): void {
@@ -165,7 +187,7 @@ export class AlarmTimerComponent {
   private resetAlarmForm(): void {
     this.alarmTime.set('07:00');
     this.alarmLabel.set('Alarm Pagi');
-    this.alarmRepeat.set(true);
+    this.repeatMode.set('daily');
     this.repeatDays.set([]);
     this.alarmSound.set('chime');
     this.snoozeMinutes.set(5);
@@ -220,6 +242,13 @@ export class AlarmTimerComponent {
     this.timerMinutes.set(5);
     this.timerSeconds.set(0);
     this.timerLabel.set('Timer');
+  }
+
+  private formatDayList(days: AlarmDay[]): string {
+    const labels = days.map((day) => this.dayLabels[day] || day);
+    if (labels.length === 1) return labels[0];
+    if (labels.length === 2) return `${labels[0]} dan ${labels[1]}`;
+    return `${labels.slice(0, -1).join(', ')}, dan ${labels[labels.length - 1]}`;
   }
 
   async requestNotificationPermission(): Promise<void> {
