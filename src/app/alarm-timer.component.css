@@ -340,6 +340,7 @@
 .form-group input[type='time'],
 .form-group input[type='text'],
 .form-group input[type='number'],
+.form-group input[type='date'],
 .form-group select {
   width: 100%;
   padding: 10px 12px;
@@ -351,11 +352,75 @@
   color: var(--text-color, #333);
 }
 
+.time-picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 10px;
+  background: var(--card-bg, #f8f9fa);
+}
+
+.large-time-display {
+  color: var(--primary-color, #007bff);
+  font-family: monospace;
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.device-timezone {
+  color: var(--muted-text, #6c757d);
+  font-size: 12px;
+}
+
+.time-picker-card input[type='time'] {
+  width: auto;
+  min-width: 150px;
+  padding: 8px 10px;
+}
+
+.quick-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -8px 0 20px;
+}
+
+.suggestions-label {
+  width: 100%;
+  color: var(--muted-text, #6c757d);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.suggestion-btn {
+  border: 1px solid var(--primary-color, #007bff);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: transparent;
+  color: var(--primary-color, #007bff);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.suggestion-btn:hover {
+  background: var(--hover-bg, #eef2f7);
+}
+
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
   border-color: var(--primary-color, #007bff);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.error-hint {
+  margin-bottom: 0;
 }
 
 .checkbox-label {
@@ -402,6 +467,11 @@
   background: var(--primary-color, #007bff);
   color: #fff;
   font-weight: 600;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .field-hint {

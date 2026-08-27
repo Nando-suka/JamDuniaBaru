@@ -62,7 +62,8 @@ export class AlarmTimerService {
     repeat: boolean = true,
     repeatDays: AlarmDay[] = [],
     sound: string = 'chime',
-    snoozeMinutes: number = 5
+    snoozeMinutes: number = 5,
+    date?: string
   ): void {
     const alarm: Alarm = {
       id: Date.now().toString(),
@@ -72,6 +73,7 @@ export class AlarmTimerService {
       repeatDays,
       sound,
       snoozeMinutes,
+      date,
       enabled: true,
     };
 
@@ -87,7 +89,8 @@ export class AlarmTimerService {
     repeat: boolean,
     repeatDays: AlarmDay[],
     sound: string,
-    snoozeMinutes: number
+    snoozeMinutes: number,
+    date?: string
   ): void {
     if (this.alarmTimeouts.has(id)) {
       clearTimeout(this.alarmTimeouts.get(id));
@@ -97,7 +100,7 @@ export class AlarmTimerService {
     this.alarms.update((alarms) =>
       alarms.map((a) =>
         a.id === id
-          ? { ...a, time, label, repeat, repeatDays, sound, snoozeMinutes, enabled: true }
+          ? { ...a, time, label, repeat, repeatDays, sound, snoozeMinutes, date, enabled: true }
           : a
       )
     );
@@ -192,6 +195,12 @@ export class AlarmTimerService {
     const [hours, minutes] = alarm.time.split(':').map(Number);
     const dayNames: AlarmDay[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const selectedDays = alarm.repeatDays?.length ? alarm.repeatDays : alarm.repeat ? dayNames : [];
+
+    if (!selectedDays.length && alarm.date) {
+      const candidate = new Date(`${alarm.date}T00:00:00`);
+      candidate.setHours(hours, minutes, 0, 0);
+      return candidate;
+    }
 
     if (selectedDays.length > 0) {
       for (let offset = 0; offset < 8; offset++) {
@@ -405,6 +414,7 @@ export interface Alarm {
   repeatDays?: AlarmDay[];
   sound?: string;
   snoozeMinutes?: number;
+  date?: string;
   enabled: boolean;
 }
 

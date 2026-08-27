@@ -79,7 +79,19 @@
     <form class="alarm-form" (ngSubmit)="addOrUpdateAlarm()">
       <div class="form-group">
         <label for="alarm-time">Waktu:</label>
-        <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
+        <div class="time-picker-card">
+          <div class="large-time-display" aria-live="polite">{{ alarmTime() || '--:--' }}</div>
+          <span class="device-timezone">Waktu perangkat: {{ getDeviceTimeZone() }}</span>
+          <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
+        </div>
+        <p class="field-hint error-hint" *ngIf="alarmTimeError()">{{ alarmTimeError() }}</p>
+      </div>
+
+      <div class="quick-suggestions" aria-label="Saran waktu cepat">
+        <span class="suggestions-label">Atur cepat</span>
+        <button type="button" class="suggestion-btn" (click)="applyAlarmSuggestion('in-5-minutes')">Dalam 5 menit</button>
+        <button type="button" class="suggestion-btn" (click)="applyAlarmSuggestion('tomorrow-morning')">Besok pagi</button>
+        <button type="button" class="suggestion-btn" (click)="applyAlarmSuggestion('next-weekday')">Hari kerja berikutnya</button>
       </div>
 
       <div class="form-group">
@@ -90,8 +102,10 @@
           [(ngModel)]="alarmLabel"
           name="alarmLabel"
           placeholder="Contoh: Bangun Pagi"
+          maxlength="60"
           required
         />
+        <p class="field-hint error-hint" *ngIf="alarmLabelError()">{{ alarmLabelError() }}</p>
       </div>
 
       <div class="form-group">
@@ -106,7 +120,8 @@
 
       <div class="form-group">
         <label for="alarm-snooze">Snooze (menit):</label>
-        <input id="alarm-snooze" type="number" min="1" max="60" [(ngModel)]="snoozeMinutes" name="snoozeMinutes" />
+        <input id="alarm-snooze" type="number" min="1" max="60" step="1" [(ngModel)]="snoozeMinutes" name="snoozeMinutes" />
+        <p class="field-hint error-hint" *ngIf="snoozeError()">{{ snoozeError() }}</p>
       </div>
 
       <div class="form-group">
@@ -153,6 +168,12 @@
         <p class="field-hint" *ngIf="!hasSelectedDays()">Pilih setidaknya satu hari.</p>
       </div>
 
+      <div class="form-group" *ngIf="repeatMode() === 'never'">
+        <label for="alarm-date">Tanggal alarm:</label>
+        <input id="alarm-date" type="date" [min]="alarmDate()" [(ngModel)]="alarmDate" name="alarmDate" required />
+        <p class="field-hint error-hint" *ngIf="alarmDateError()">{{ alarmDateError() }}</p>
+      </div>
+
       <div class="schedule-summary" aria-live="polite">
         <span class="summary-label">Ringkasan</span>
         <strong>{{ scheduleSummary() }}</strong>
@@ -163,7 +184,7 @@
         <button
           type="submit"
           class="btn-primary"
-          [disabled]="!alarmTime() || (repeatMode() === 'custom' && !hasSelectedDays())"
+          [disabled]="alarmFormInvalid()"
         >
           {{ isEditing() ? 'Simpan Perubahan' : 'Tambah Alarm' }}
         </button>
@@ -188,8 +209,10 @@
           [(ngModel)]="timerLabel"
           name="timerLabel"
           placeholder="Contoh: Memasak Nasi"
+          maxlength="60"
           required
         />
+        <p class="field-hint error-hint" *ngIf="timerLabelError()">{{ timerLabelError() }}</p>
       </div>
 
       <div class="form-group">
@@ -219,12 +242,14 @@
       </div>
 
       <div class="time-preview">
-        <p>Durasi: {{ formatTimerDisplay(timerHours() * 3600 + timerMinutes() * 60 + timerSeconds()) }}</p>
+        <p>Durasi: {{ formatTimerDisplay(timerDuration()) }}</p>
+        <p class="field-hint error-hint" *ngIf="timerInputError()">{{ timerInputError() }}</p>
+        <p class="field-hint error-hint" *ngIf="!timerInputError() && timerDurationError()">{{ timerDurationError() }}</p>
       </div>
 
       <div class="form-actions">
         <button type="button" class="btn-secondary" (click)="closeTimerModal()">Batal</button>
-        <button type="submit" class="btn-primary">Start Timer</button>
+        <button type="submit" class="btn-primary" [disabled]="timerFormInvalid()">Start Timer</button>
       </div>
     </form>
   </div>

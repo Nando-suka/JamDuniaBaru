@@ -23,6 +23,7 @@ export class AlarmTimerComponent {
   isEditing = computed(() => this.editingAlarmId() !== null);
 
   alarmTime = signal('07:00');
+  alarmDate = signal(this.getTodayDate());
   alarmLabel = signal('Alarm Pagi');
   repeatMode = signal<AlarmRepeatMode>('daily');
   repeatDays = signal<AlarmDay[]>([]);
@@ -30,12 +31,39 @@ export class AlarmTimerComponent {
   snoozeMinutes = signal(5);
 
   hasSelectedDays = computed(() => this.repeatDays().length > 0);
+  alarmTimeError = computed(() => (this.alarmTime() ? '' : 'Pilih waktu alarm.'));
+  alarmLabelError = computed(() => {
+    const label = this.alarmLabel().trim();
+    if (!label) return 'Masukkan nama alarm.';
+    if (label.length > 60) return 'Nama alarm maksimal 60 karakter.';
+    return '';
+  });
+  alarmDateError = computed(() => {
+    if (this.repeatMode() !== 'never') return '';
+    if (!this.alarmDate()) return 'Pilih tanggal alarm.';
+    return this.alarmDate() < this.getTodayDate() ? 'Tanggal tidak boleh sebelum hari ini.' : '';
+  });
+  snoozeError = computed(() =>
+    Number.isInteger(this.snoozeMinutes()) &&
+    this.snoozeMinutes() >= 1 &&
+    this.snoozeMinutes() <= 60
+      ? ''
+      : 'Snooze harus antara 1 dan 60 menit.'
+  );
+  alarmFormInvalid = computed(
+    () =>
+      !!this.alarmTimeError() ||
+      !!this.alarmLabelError() ||
+      !!this.alarmDateError() ||
+      !!this.snoozeError() ||
+      (this.repeatMode() === 'custom' && !this.hasSelectedDays())
+  );
   scheduleSummary = computed(() => {
     const label = this.alarmLabel().trim() || 'Alarm';
     const time = this.alarmTime() || '--:--';
 
     if (this.repeatMode() === 'never') {
-      return `"${label}" pukul ${time}, sekali saja`;
+      return `"${label}" pukul ${time}, ${this.formatDateSummary(this.alarmDate())}`;
     }
 
     if (this.repeatMode() === 'daily') {
@@ -53,6 +81,31 @@ export class AlarmTimerComponent {
   timerMinutes = signal(5);
   timerSeconds = signal(0);
   timerLabel = signal('Timer');
+  timerDuration = computed(
+    () => this.timerHours() * 3600 + this.timerMinutes() * 60 + this.timerSeconds()
+  );
+  timerLabelError = computed(() => {
+    const label = this.timerLabel().trim();
+    if (!label) return 'Masukkan nama timer.';
+    if (label.length > 60) return 'Nama timer maksimal 60 karakter.';
+    return '';
+  });
+  timerDurationError = computed(() =>
+    this.timerDuration() > 0 ? '' : 'Durasi timer harus lebih dari 0 detik.'
+  );
+  timerInputError = computed(() =>
+    [this.timerHours(), this.timerMinutes(), this.timerSeconds()].some(
+      (value) => !Number.isInteger(value) || value < 0
+    ) ||
+    this.timerHours() > 23 ||
+    this.timerMinutes() > 59 ||
+    this.timerSeconds() > 59
+      ? 'Masukkan jam, menit, dan detik yang valid.'
+      : ''
+  );
+  timerFormInvalid = computed(
+    () => !!this.timerLabelError() || !!this.timerDurationError() || !!this.timerInputError()
+  );
 
   timerPresets = [
     { label: '5 min', minutes: 5 },
@@ -102,11 +155,10 @@ export class AlarmTimerComponent {
 
     this.editingAlarmId.set(id);
     this.alarmTime.set(alarm.time);
+    this.alarmDate.set(alarm.date ?? this.getTodayDate());
     this.alarmLabel.set(alarm.label);
     this.repeatDays.set(alarm.repeatDays ?? []);
-    this.repeatMode.set(
-      alarm.repeatDays?.length ? 'custom' : alarm.repeat ? 'daily' : 'never'
-    );
+    this.repeatMode.set(alarm.repeatDays?.length ? 'custom' : alarm.repeat ? 'daily' : 'never');
     this.alarmSound.set(alarm.sound ?? 'chime');
     this.snoozeMinutes.set(alarm.snoozeMinutes ?? 5);
     this.showAlarmModal.set(true);
@@ -119,7 +171,7 @@ export class AlarmTimerComponent {
   }
 
   addOrUpdateAlarm(): void {
-    if (!this.alarmTime() || (this.repeatMode() === 'custom' && !this.hasSelectedDays())) return;
+    if (this.alarmFormInvalid()) return;
 
     const editingId = this.editingAlarmId();
     const repeat = this.repeatMode() === 'daily';
@@ -132,7 +184,8 @@ export class AlarmTimerComponent {
         repeat,
         repeatDays,
         this.alarmSound(),
-        this.snoozeMinutes()
+        this.snoozeMinutes(),
+        this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
     } else {
       this.alarmTimerService.addAlarm(
@@ -141,7 +194,8 @@ export class AlarmTimerComponent {
         repeat,
         repeatDays,
         this.alarmSound(),
-        this.snoozeMinutes()
+        this.snoozeMinutes(),
+        this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
     }
     this.closeAlarmModal();
@@ -152,6 +206,34 @@ export class AlarmTimerComponent {
     if (mode !== 'custom') {
       this.repeatDays.set([]);
     }
+  }
+
+  applyAlarmSuggestion(suggestion: 'in-5-minutes' | 'tomorrow-morning' | 'next-weekday'): void {
+    const now = new Date();
+    const target = new Date(now);
+
+    if (suggestion === 'in-5-minutes') {
+      target.setMinutes(target.getMinutes() + 5);
+      if (target.getSeconds() > 0) target.setMinutes(target.getMinutes() + 1);
+      this.alarmLabel.set('Pengingat singkat');
+    } else if (suggestion === 'tomorrow-morning') {
+      target.setDate(target.getDate() + 1);
+      target.setHours(7, 0, 0, 0);
+      this.alarmLabel.set('Pagi hari');
+    } else {
+      target.setDate(target.getDate() + 1);
+      while (target.getDay() === 0 || target.getDay() === 6) {
+        target.setDate(target.getDate() + 1);
+      }
+      target.setHours(9, 0, 0, 0);
+      this.alarmLabel.set('Hari kerja');
+    }
+
+    this.alarmTime.set(
+      `${String(target.getHours()).padStart(2, '0')}:${String(target.getMinutes()).padStart(2, '0')}`
+    );
+    this.alarmDate.set(this.formatDateInput(target));
+    this.onRepeatModeChange('never');
   }
 
   onDayToggle(day: AlarmDay): void {
@@ -186,6 +268,7 @@ export class AlarmTimerComponent {
 
   private resetAlarmForm(): void {
     this.alarmTime.set('07:00');
+    this.alarmDate.set(this.getTodayDate());
     this.alarmLabel.set('Alarm Pagi');
     this.repeatMode.set('daily');
     this.repeatDays.set([]);
@@ -203,10 +286,9 @@ export class AlarmTimerComponent {
   }
 
   startTimer(): void {
-    const totalSeconds = this.timerHours() * 3600 + this.timerMinutes() * 60 + this.timerSeconds();
-    if (totalSeconds <= 0) return;
+    if (this.timerFormInvalid()) return;
 
-    this.alarmTimerService.startTimer(totalSeconds, this.timerLabel());
+    this.alarmTimerService.startTimer(this.timerDuration(), this.timerLabel().trim());
     this.closeTimerModal();
   }
 
@@ -251,6 +333,23 @@ export class AlarmTimerComponent {
     return `${labels.slice(0, -1).join(', ')}, dan ${labels[labels.length - 1]}`;
   }
 
+  private getTodayDate(): string {
+    return this.formatDateInput(new Date());
+  }
+
+  private formatDateInput(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  private formatDateSummary(date: string): string {
+    if (!date) return 'pilih tanggal';
+    return `pada ${new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(`${date}T00:00:00`))}`;
+  }
+
   async requestNotificationPermission(): Promise<void> {
     await this.alarmTimerService.requestNotificationPermission();
   }
@@ -264,5 +363,9 @@ export class AlarmTimerComponent {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  getDeviceTimeZone(): string {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Zona waktu perangkat';
   }
 }
