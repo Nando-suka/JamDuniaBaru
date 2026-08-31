@@ -2,59 +2,105 @@
   <div class="container">
 
     <!-- Floating Controls -->
-    <div class="floating-controls">
-      <ng-container *ngIf="!showAnalogClock()">
-        <!-- Time Format -->
-        <button
-          class="control-btn"
-          [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
-          (click)="toggleTimeFormat()"
-        >
-          {{ timeFormat() }}
+    <div class="floating-controls" [class.mobile-tools-shell]="isMobileView()">
+      <button
+        *ngIf="isMobileView()"
+        type="button"
+        class="tools-trigger"
+        (click)="toggleToolsSheet()"
+        [attr.aria-expanded]="showToolsSheet()"
+        aria-controls="mobile-tools-sheet"
+      >
+        Tools
+      </button>
+
+      <ng-container *ngIf="!isMobileView()">
+        <ng-container *ngIf="!showAnalogClock()">
+          <!-- Time Format -->
+          <button
+            class="control-btn"
+            [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
+            (click)="toggleTimeFormat()"
+          >
+            {{ timeFormat() }}
+          </button>
+
+          <!-- Favorites -->
+          <button
+            class="control-btn"
+            [class.active]="facade.showFavoritesOnly()"
+            (click)="facade.toggleFavoritesOnly()"
+            [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
+          >
+            ❤️
+            <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
+          </button>
+
+          <!-- Theme -->
+          <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
+            <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
+            <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
+          </button>
+
+          <!-- Alarm & Timer -->
+          <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
+            🔔⏱️
+          </button>
+
+          <!-- Timezone Converter -->
+          <button
+            class="control-btn converter-toggle"
+            (click)="toggleTimezoneConverter()"
+            [class.active]="showTimezoneConverter()"
+            [title]="showTimezoneConverter() ? 'Sembunyikan konverter zona waktu' : 'Tampilkan konverter zona waktu'"
+          >
+            🌐
+          </button>
+        </ng-container>
+
+        <!-- Analog Clock -->
+        <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
+          🕐
         </button>
 
-        <!-- Favorites -->
-        <button
-          class="control-btn"
-          [class.active]="facade.showFavoritesOnly()"
-          (click)="facade.toggleFavoritesOnly()"
-          [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
-        >
-          ❤️
-          <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
-        </button>
-
-        <!-- Theme -->
-        <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
-          <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
-          <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
-        </button>
-
-        <!-- Alarm & Timer -->
-        <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
-          🔔⏱️
-        </button>
-
-        <!-- Timezone Converter -->
-        <button
-          class="control-btn converter-toggle"
-          (click)="toggleTimezoneConverter()"
-          [class.active]="showTimezoneConverter()"
-          [title]="showTimezoneConverter() ? 'Sembunyikan konverter zona waktu' : 'Tampilkan konverter zona waktu'"
-        >
-          🌐
+        <!-- World Map View -->
+        <button class="control-btn" (click)="toggleMapView()" [class.active]="showMapView()" [title]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'">
+          🌍
         </button>
       </ng-container>
+    </div>
 
-      <!-- Analog Clock -->
-      <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
-        🕐
-      </button>
-
-      <!-- World Map View -->
-      <button class="control-btn" (click)="toggleMapView()" [class.active]="showMapView()" [title]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'">
-        🌍
-      </button>
+    <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu">
+      <div class="mobile-tools-grid">
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('format')">
+          <span class="tool-icon">⏰</span>
+          <span>Format</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('favorites')">
+          <span class="tool-icon">❤️</span>
+          <span>Favorites</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('theme')">
+          <span class="tool-icon">🌙</span>
+          <span>Theme</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('alarm')">
+          <span class="tool-icon">🔔</span>
+          <span>Alarm</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('converter')">
+          <span class="tool-icon">🌐</span>
+          <span>Converter</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('map')">
+          <span class="tool-icon">🌍</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('view')">
+          <span class="tool-icon">🕐</span>
+          <span>View</span>
+        </button>
+      </div>
     </div>
 
     <ng-container *ngIf="showAnalogClock(); else nonAnalogMode">

@@ -30,11 +30,19 @@ export class App implements OnInit, OnDestroy {
   showTimezoneConverter = signal(false);
   showAnalogClock = signal(false);
   showMapView = signal(false);
+  showToolsSheet = signal(false);
+  isMobileView = signal(false);
   scrollVisible = signal(false);
   scrollLabelVisible = signal(false);
   private scrollLabelTimer: any;
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
+  };
+  private onResize = () => {
+    this.isMobileView.set(window.innerWidth <= 767);
+    if (!this.isMobileView()) {
+      this.showToolsSheet.set(false);
+    }
   };
   private timer: any;
 
@@ -54,8 +62,10 @@ export class App implements OnInit, OnDestroy {
       this.currentTime.set(new Date());
     }, 1000);
 
+    this.onResize();
     this.detectAndSetLanguage();
     window.addEventListener('scroll', this.onScroll, { passive: true });
+    window.addEventListener('resize', this.onResize, { passive: true });
   }
 
   async detectAndSetLanguage() {
@@ -115,6 +125,44 @@ export class App implements OnInit, OnDestroy {
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  toggleToolsSheet(): void {
+    this.showToolsSheet.update((v) => !v);
+  }
+
+  closeToolsSheet(): void {
+    this.showToolsSheet.set(false);
+  }
+
+  handleToolAction(action: 'format' | 'favorites' | 'theme' | 'alarm' | 'converter' | 'map' | 'view'): void {
+    switch (action) {
+      case 'format':
+        this.toggleTimeFormat();
+        break;
+      case 'favorites':
+        this.facade.toggleFavoritesOnly();
+        break;
+      case 'theme':
+        this.toggleTheme();
+        break;
+      case 'alarm':
+        this.showAlarmTimer.update((v) => !v);
+        break;
+      case 'converter':
+        this.toggleTimezoneConverter();
+        break;
+      case 'map':
+        this.toggleMapView();
+        break;
+      case 'view':
+        this.toggleAnalogClock();
+        break;
+      default:
+        break;
+    }
+
+    this.closeToolsSheet();
   }
 
   toggleTimezoneConverter(): void {
@@ -201,6 +249,7 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.timer);
     window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onResize);
     if (this.scrollLabelTimer) {
       clearTimeout(this.scrollLabelTimer);
     }

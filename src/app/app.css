@@ -1002,6 +1002,75 @@
   justify-content: center;
 }
 
+.mobile-tools-shell {
+  right: 16px;
+  bottom: 20px;
+  top: auto;
+  transform: none;
+  padding: 10px 12px;
+}
+
+.tools-trigger,
+.mobile-tool-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tools-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 110px;
+  padding: 0 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.mobile-tools-sheet {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 84px;
+  z-index: 1001;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
+.mobile-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mobile-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
 @media (max-width: 767px) {
   .floating-controls {
     flex-direction: row;
