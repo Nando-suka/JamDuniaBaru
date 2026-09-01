@@ -437,7 +437,8 @@
 /* World Map View */
 .map-view-section {
   animation: fadeIn 0.3s ease-out;
-  margin-bottom: 1.5rem;
+  margin: 0 auto 1.5rem;
+  width: min(100%, 1100px);
 }
 
 .map-view-header {
@@ -459,23 +460,29 @@
 
 .world-map-container {
   width: 100%;
-  min-height: 320px;
+  height: clamp(300px, 52vw, 560px);
+  max-height: 560px;
+  min-height: 260px;
   position: relative;
-  background: radial-gradient(circle at center, rgba(102, 126, 234, 0.15), transparent 35%),
-    linear-gradient(180deg, #8ec5fc 0%, #e0c3fc 100%);
+  background: linear-gradient(180deg, rgba(142, 197, 252, 0.9), rgba(224, 195, 252, 0.95));
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid var(--card-border);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .world-map {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(circle at 20% 10%, rgba(255,255,255,0.35), transparent 12%),
-    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.25), transparent 10%),
+  min-height: 260px;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+    radial-gradient(circle at 20% 10%, rgba(255,255,255,0.40), transparent 12%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.27), transparent 10%),
     linear-gradient(0deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05));
+  background-size: 44px 44px, 44px 44px, auto, auto, auto;
   overflow: hidden;
 }
 
@@ -483,17 +490,17 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.18), transparent 12%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.14), transparent 12%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.04), transparent 40%, rgba(0, 0, 0, 0.04));
+  background: radial-gradient(ellipse at 22% 28%, rgba(16, 76, 130, 0.14), transparent 26%),
+    radial-gradient(ellipse at 54% 48%, rgba(16, 76, 130, 0.12), transparent 24%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03), transparent 40%, rgba(0, 0, 0, 0.03));
   pointer-events: none;
 }
 
 .map-pin {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 999px;
   border: 2px solid rgba(255, 255, 255, 0.95);
   background: rgba(244, 67, 54, 0.85);
@@ -506,26 +513,63 @@
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2;
+  touch-action: manipulation;
 }
 
-.map-pin:hover {
+.map-pin:hover,
+.map-pin:focus-visible,
+.map-pin.selected {
   transform: translate(-50%, -50%) scale(1.08);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
 
-.map-pin span {
+.map-pin-letter,
+.map-pin-label {
   pointer-events: none;
+}
+
+.map-pin-label {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.82);
+  color: #fff;
+  font-size: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease;
+}
+
+.map-pin:hover .map-pin-label,
+.map-pin:focus-visible .map-pin-label,
+.map-pin.selected .map-pin-label {
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (max-width: 768px) {
   .world-map-container {
-    min-height: 280px;
+    height: clamp(260px, 68vw, 420px);
+    min-height: 240px;
+  }
+
+  .world-map {
+    min-height: 240px;
   }
 
   .map-pin {
-    width: 30px;
-    height: 30px;
+    width: 42px;
+    height: 42px;
     font-size: 11px;
+  }
+
+  .map-pin-label {
+    font-size: 9px;
   }
 }
 

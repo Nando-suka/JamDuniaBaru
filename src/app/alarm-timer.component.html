@@ -1,4 +1,11 @@
 <div class="alarm-timer-container">
+  <!-- Toast Container -->
+  <div class="toast-container" role="region" aria-label="Notifications" aria-live="polite" aria-atomic="false">
+    <div *ngFor="let toast of toasts()" [class]="'toast toast-' + toast.type" [@fadeInOut]>
+      {{ toast.message }}
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tab-btn" [class.active]="activeTab() === 'alarm'" (click)="activeTab.set('alarm')">
       🔔 Alarm
@@ -23,6 +30,12 @@
       <div class="alarm-item" *ngFor="let alarm of alarms()">
         <div class="alarm-time-big">{{ alarm.time }}</div>
         <div class="alarm-label-center">{{ alarm.label }}</div>
+        <div class="alarm-next-occurrence" [class.paused]="!alarm.enabled">
+          {{ getAlarmNextOccurrence(alarm).message }}
+          <span class="time-until" *ngIf="getAlarmNextOccurrence(alarm).timeUntil">
+            • {{ getAlarmNextOccurrence(alarm).timeUntil }}
+          </span>
+        </div>
         <div class="alarm-meta-center">
           <span>🔄 {{ formatRepeatDays(alarm.repeatDays) }}</span>
           <span>🔊 {{ alarm.sound || 'chime' }}</span>

@@ -30,6 +30,7 @@ export class App implements OnInit, OnDestroy {
   showTimezoneConverter = signal(false);
   showAnalogClock = signal(false);
   showMapView = signal(false);
+  activeMapCity = signal<string | null>(null);
   showToolsSheet = signal(false);
   isMobileView = signal(false);
   scrollVisible = signal(false);
@@ -232,10 +233,21 @@ export class App implements OnInit, OnDestroy {
   }
 
   selectCityOnMap(cityName: string): void {
+    if (this.activeMapCity() === cityName) {
+      this.clearMapSelection();
+      return;
+    }
+
     this.searchService.updateSearchQuery(cityName);
+    this.activeMapCity.set(cityName);
     if (!this.showMapView()) {
       this.showMapView.set(true);
     }
+  }
+
+  clearMapSelection(): void {
+    this.searchService.clearSearch();
+    this.activeMapCity.set(null);
   }
 
   getLongitudePercent(lon: number): number {

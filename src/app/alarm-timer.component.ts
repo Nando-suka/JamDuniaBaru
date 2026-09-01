@@ -2,7 +2,10 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
+import { ToastService } from './toast.service';
+import { AlarmNextOccurrenceService } from './alarm-next-occurrence.service';
 
+// Type of alarm
 type AlarmRepeatMode = 'never' | 'daily' | 'custom';
 
 @Component({
@@ -14,6 +17,8 @@ type AlarmRepeatMode = 'never' | 'daily' | 'custom';
 })
 export class AlarmTimerComponent {
   private alarmTimerService = inject(AlarmTimerService);
+  private toastService = inject(ToastService);
+  private nextOccurrenceService = inject(AlarmNextOccurrenceService);
 
   showAlarmModal = signal(false);
   showTimerModal = signal(false);
@@ -111,7 +116,7 @@ export class AlarmTimerComponent {
     { label: '5 min', minutes: 5 },
     { label: '15 min', minutes: 15 },
     { label: '25 min', minutes: 25 },
-    { label: '45 min', minutes: 45 },
+    { label: '30 min', minutes: 30 },
     { label: '1 jam', minutes: 60 },
   ];
 
@@ -138,6 +143,17 @@ export class AlarmTimerComponent {
   alarms = this.alarmTimerService.alarms;
   activeTimers = this.alarmTimerService.activeTimers;
   notificationPermission = this.alarmTimerService.notificationPermission;
+  toasts = this.toastService.toasts;
+
+  getAlarmNextOccurrence = (alarm: any) => {
+    return this.nextOccurrenceService.calculateNextOccurrence(
+      alarm.time,
+      alarm.enabled,
+      alarm.repeat ? 'daily' : alarm.repeatDays?.length ? 'custom' : 'never',
+      alarm.repeatDays || [],
+      alarm.date
+    );
+  };
 
   get activeTimer() {
     return () => (this.activeTimers().length > 0 ? this.activeTimers()[0] : null);
@@ -176,27 +192,32 @@ export class AlarmTimerComponent {
     const editingId = this.editingAlarmId();
     const repeat = this.repeatMode() === 'daily';
     const repeatDays = this.repeatMode() === 'custom' ? this.repeatDays() : [];
+    const label = this.alarmLabel().trim();
+    const time = this.alarmTime();
+
     if (editingId) {
       this.alarmTimerService.updateAlarm(
         editingId,
-        this.alarmTime(),
-        this.alarmLabel(),
+        time,
+        label,
         repeat,
         repeatDays,
         this.alarmSound(),
         this.snoozeMinutes(),
         this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
+      this.toastService.success(`Alarm updated for ${time}`);
     } else {
       this.alarmTimerService.addAlarm(
-        this.alarmTime(),
-        this.alarmLabel(),
+        time,
+        label,
         repeat,
         repeatDays,
         this.alarmSound(),
         this.snoozeMinutes(),
         this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
+      this.toastService.success(`Alarm added for ${time}`);
     }
     this.closeAlarmModal();
   }
@@ -244,14 +265,24 @@ export class AlarmTimerComponent {
 
   removeAlarm(id: string): void {
     this.alarmTimerService.removeAlarm(id);
+    this.toastService.success('Alarm deleted');
   }
 
   toggleAlarm(id: string): void {
+    const alarm = this.alarms().find((a) => a.id === id);
+    if (!alarm) return;
+
     this.alarmTimerService.toggleAlarm(id);
+    if (alarm.enabled) {
+      this.toastService.info(`Alarm paused`);
+    } else {
+      this.toastService.info(`Alarm enabled`);
+    }
   }
 
   snoozeAlarm(id: string, minutes: number): void {
     this.alarmTimerService.snoozeAlarm(id, minutes);
+    this.toastService.info(`Snoozed for ${minutes} minutes`);
   }
 
   isDaySelected(day: AlarmDay): boolean {
@@ -289,6 +320,7 @@ export class AlarmTimerComponent {
     if (this.timerFormInvalid()) return;
 
     this.alarmTimerService.startTimer(this.timerDuration(), this.timerLabel().trim());
+    this.toastService.success(`Timer started for ${this.timerLabel().trim()}`);
     this.closeTimerModal();
   }
 
@@ -302,6 +334,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
     if (timer) {
       this.alarmTimerService.stopTimer(timer.id);
+      this.toastService.info('Timer stopped');
     }
   }
 
@@ -309,6 +342,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
     if (timer) {
       this.alarmTimerService.pauseTimer(timer.id);
+      this.toastService.info('Timer paused');
     }
   }
 
@@ -316,6 +350,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimer();
     if (timer) {
       this.alarmTimerService.resumeTimer(timer.id);
+      this.toastService.info('Timer resumed');
     }
   }
 
@@ -351,7 +386,12 @@ export class AlarmTimerComponent {
   }
 
   async requestNotificationPermission(): Promise<void> {
-    await this.alarmTimerService.requestNotificationPermission();
+    const granted = await this.alarmTimerService.requestNotificationPermission();
+    if (granted) {
+      this.toastService.success('Notifications enabled');
+    } else if (this.notificationPermission() === 'denied') {
+      this.toastService.warning('Notifications blocked. Enable them in browser settings.');
+    }
   }
 
   formatTimerDisplay(seconds: number): string {

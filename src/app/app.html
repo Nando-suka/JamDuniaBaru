@@ -125,17 +125,20 @@
             <p>Pilih kota pada peta untuk melihat waktu lokalnya.</p>
           </div>
           <div class="world-map-container">
-            <div class="world-map">
+            <div class="world-map" (click)="clearMapSelection()">
               <button
                 *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
                 type="button"
                 class="map-pin"
+                [class.selected]="activeMapCity() === city.name"
                 [style.left.%]="getLongitudePercent(city.lon)"
                 [style.top.%]="getLatitudePercent(city.lat)"
-                (click)="selectCityOnMap(city.name)"
+                (click)="$event.stopPropagation(); selectCityOnMap(city.name)"
                 [title]="city.name"
+                [attr.aria-label]="city.name"
               >
-                <span>{{ city.name[0] }}</span>
+                <span class="map-pin-letter">{{ city.name[0] }}</span>
+                <span class="map-pin-label">{{ city.name }}</span>
               </button>
             </div>
           </div>
