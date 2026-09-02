@@ -158,9 +158,14 @@ export class AlarmTimerService {
 
     const timeoutRef = window.setTimeout(() => {
       this.alarmTimeouts.delete(id);
-      this.triggerAlarm(alarm);
-      if ((alarm.repeat || alarm.repeatDays?.length) && alarm.enabled) {
-        this.scheduleAlarm(alarm);
+      const currentAlarm = this.alarms().find((entry) => entry.id === id);
+      if (!currentAlarm?.enabled) {
+        return;
+      }
+
+      this.triggerAlarm(currentAlarm);
+      if (currentAlarm.repeat || currentAlarm.repeatDays?.length) {
+        this.scheduleAlarm(currentAlarm);
       }
     }, Math.max(60000, minutes * 60 * 1000));
 
