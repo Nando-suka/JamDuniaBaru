@@ -105,6 +105,10 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.selected-city-chip button {
+  cursor: pointer;
+}
+
 .search-container {
   display: flex;
   align-items: center;
@@ -151,6 +155,8 @@
 .search-clear-btn {
   position: absolute;
   right: 12px;
+  width: 44px;
+  height: 44px;
   background: transparent;
   border: none;
   cursor: pointer;

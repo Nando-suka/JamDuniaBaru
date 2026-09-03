@@ -33,6 +33,7 @@ export class AlarmTimerComponent {
   repeatMode = signal<AlarmRepeatMode>('daily');
   repeatDays = signal<AlarmDay[]>([]);
   alarmSound = signal('chime');
+  alarmContrib = signal('broku');
   snoozeMinutes = signal(5);
 
   hasSelectedDays = computed(() => this.repeatDays().length > 0);

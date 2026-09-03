@@ -250,6 +250,18 @@ export class App implements OnInit, OnDestroy {
     this.activeMapCity.set(null);
   }
 
+  updateSearchQuery(query: string): void {
+    if (this.activeMapCity()) {
+      this.activeMapCity.set(null);
+    }
+    this.searchService.updateSearchQuery(query);
+  }
+
+  clearSearch(): void {
+    this.searchService.clearSearch();
+    this.activeMapCity.set(null);
+  }
+
   getLongitudePercent(lon: number): number {
     return ((lon + 180) / 360) * 100;
   }
