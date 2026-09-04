@@ -93,9 +93,13 @@
 }
 
 .city-search-input:focus {
-  outline: none;
   border-color: var(--primary-color, #4a90d9);
   box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+}
+
+.city-search-input:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
 }
 
 .offset-badge {
@@ -224,8 +228,12 @@
 }
 
 .manual-time-inputs input:focus {
-  outline: none;
   border-color: var(--primary-color, #4a90d9);
+}
+
+.manual-time-inputs input:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
 }
 
 /* Result Section */

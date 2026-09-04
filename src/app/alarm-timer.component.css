@@ -486,9 +486,14 @@
 
 .form-group input:focus,
 .form-group select:focus {
-  outline: none;
   border-color: var(--primary-color, #007bff);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group input:focus-visible,
+.form-group select:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
 }
 
 .error-hint {

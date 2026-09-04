@@ -98,8 +98,6 @@
   background: var(--button-hover);
 }
 
-/* ========== SEARCH SECTION ========== */
-
 .search-section {
   margin-bottom: 1.5rem;
   animation: fadeIn 0.3s ease-out;
@@ -146,10 +144,7 @@
 .search-input:focus {
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.search-input:focus-visible {
-  outline: none;
+  outline: 3px solid #1d4ed8;
 }
 
 .search-clear-btn {
@@ -687,21 +682,21 @@
     height: 18px;
   }
 
-  /* On small screens, move the button higher (near header) so it doesn't obstruct central content */
+  /* On small screens, keep the button anchored to the bottom-right for easier thumb access */
   .scroll-to-top-btn {
     width: 50px;
     height: 50px;
     right: 14px;
-    top: 96px; /* positioned below the header area */
-    bottom: auto;
+    bottom: 22px;
+    top: auto;
   }
 
   .scroll-to-top-label {
     display: block;
     position: fixed;
     right: 14px;
-    top: 56px; /* sits above the button */
-    bottom: auto;
+    bottom: 82px;
+    top: auto;
     background: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     padding: 6px 10px;

@@ -24,7 +24,7 @@
                 <span class="roman">{{ numeral }}</span>
               }
               @case ('modern') {
-                <span class="number">{{ $index + 1 === 13 ? 12 : $index + 1 }}</span>
+                <span class="number">{{ $index === 0 ? 12 : $index }}</span>
               }
               @case ('minimal') {
                 @if ($index === 0 || $index === 3 || $index === 6 || $index === 9) {
