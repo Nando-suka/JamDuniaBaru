@@ -358,6 +358,7 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -396,6 +397,12 @@
 .alarm-form,
 .timer-form {
   padding: 24px;
+  min-width: 0;
+}
+
+.alarm-form *,
+.timer-form * {
+  box-sizing: border-box;
 }
 
 .form-group {
@@ -671,6 +678,68 @@
 
   .time-inputs {
     grid-template-columns: 1fr;
+  }
+
+  .modal-overlay {
+    align-items: stretch;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    height: 100dvh;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    flex: 0 0 auto;
+    padding: 16px;
+  }
+
+  .alarm-form,
+  .timer-form {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: 92px;
+  }
+
+  .day-selector {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+  }
+
+  .day-chip {
+    min-width: 0;
+    justify-content: center;
+    padding: 8px 2px;
+    gap: 2px;
+    font-size: 12px;
+  }
+
+  .day-chip input {
+    margin: 0;
+  }
+
+  .form-actions {
+    position: sticky;
+    bottom: -1px;
+    z-index: 1;
+    margin: 24px -16px -16px;
+    padding: 12px 16px;
+    background: var(--card-bg, #ffffff);
+    border-top: 1px solid var(--border-color, #e0e0e0);
+  }
+
+  .form-actions button {
+    flex: 1;
+    min-width: 0;
   }
 
   .notification-banner {
