@@ -145,6 +145,7 @@ export class AlarmTimerComponent {
   activeTimers = this.alarmTimerService.activeTimers;
   notificationPermission = this.alarmTimerService.notificationPermission;
   toasts = this.toastService.toasts;
+  private focusReturnTarget: HTMLElement | null = null;
 
   getAlarmNextOccurrence = (alarm: any) => {
     return this.nextOccurrenceService.calculateNextOccurrence(
@@ -161,15 +162,18 @@ export class AlarmTimerComponent {
   }
 
   openAlarmModal(): void {
+    this.focusReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.editingAlarmId.set(null);
     this.resetAlarmForm();
     this.showAlarmModal.set(true);
+    setTimeout(() => this.focusFirstModalField('alarm-time'));
   }
 
   editAlarm(id: string): void {
     const alarm = this.alarms().find((a) => a.id === id);
     if (!alarm) return;
 
+    this.focusReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.editingAlarmId.set(id);
     this.alarmTime.set(alarm.time);
     this.alarmDate.set(alarm.date ?? this.getTodayDate());
@@ -179,12 +183,14 @@ export class AlarmTimerComponent {
     this.alarmSound.set(alarm.sound ?? 'chime');
     this.snoozeMinutes.set(alarm.snoozeMinutes ?? 5);
     this.showAlarmModal.set(true);
+    setTimeout(() => this.focusFirstModalField('alarm-time'));
   }
 
   closeAlarmModal(): void {
     this.showAlarmModal.set(false);
     this.editingAlarmId.set(null);
     this.resetAlarmForm();
+    this.restoreFocus();
   }
 
   addOrUpdateAlarm(): void {
@@ -309,12 +315,60 @@ export class AlarmTimerComponent {
   }
 
   openTimerModal(): void {
+    this.focusReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.showTimerModal.set(true);
+    setTimeout(() => this.focusFirstModalField('timer-label'));
   }
 
   closeTimerModal(): void {
     this.showTimerModal.set(false);
     this.resetTimerForm();
+    this.restoreFocus();
+  }
+
+  handleModalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (this.showAlarmModal()) {
+        this.closeAlarmModal();
+      } else if (this.showTimerModal()) {
+        this.closeTimerModal();
+      }
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const modal = event.currentTarget as HTMLElement;
+    const focusableElements = Array.from(
+      modal.querySelectorAll<HTMLElement>('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')
+    ).filter((element) => !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true');
+
+    if (!focusableElements.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  private focusFirstModalField(fieldId: string): void {
+    const field = document.getElementById(fieldId);
+    field?.focus();
+  }
+
+  private restoreFocus(): void {
+    const target = this.focusReturnTarget;
+    this.focusReturnTarget = null;
+    target?.focus();
   }
 
   startTimer(): void {

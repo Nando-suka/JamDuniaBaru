@@ -31,20 +31,21 @@
             [class.active]="facade.showFavoritesOnly()"
             (click)="facade.toggleFavoritesOnly()"
             [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
+            [attr.aria-label]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
           >
-            ❤️
+            <span aria-hidden="true">❤️</span>
             <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
           </button>
 
           <!-- Theme -->
-          <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
-            <span *ngIf="themeService.currentTheme() === 'light'">🌙</span>
-            <span *ngIf="themeService.currentTheme() === 'dark'">☀️</span>
+          <button class="control-btn" (click)="toggleTheme()" [title]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'" [attr.aria-label]="themeService.currentTheme() === 'light' ? 'Aktifkan Dark Mode' : 'Aktifkan Light Mode'">
+            <span *ngIf="themeService.currentTheme() === 'light'" aria-hidden="true">🌙</span>
+            <span *ngIf="themeService.currentTheme() === 'dark'" aria-hidden="true">☀️</span>
           </button>
 
           <!-- Alarm & Timer -->
-          <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer">
-            🔔⏱️
+          <button class="control-btn" (click)="showAlarmTimer.set(!showAlarmTimer())" title="Alarm & Timer" aria-label="Open alarm and timer">
+            <span aria-hidden="true">🔔⏱️</span>
           </button>
 
           <!-- Timezone Converter -->
@@ -53,19 +54,20 @@
             (click)="toggleTimezoneConverter()"
             [class.active]="showTimezoneConverter()"
             [title]="showTimezoneConverter() ? 'Sembunyikan konverter zona waktu' : 'Tampilkan konverter zona waktu'"
+            [attr.aria-label]="showTimezoneConverter() ? 'Sembunyikan konverter zona waktu' : 'Tampilkan konverter zona waktu'"
           >
-            🌐
+            <span aria-hidden="true">🌐</span>
           </button>
         </ng-container>
 
         <!-- Analog Clock -->
-        <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
-          🕐
+        <button class="control-btn" (click)="toggleAnalogClock()" [class.active]="showAnalogClock()" [title]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'" [attr.aria-label]="showAnalogClock() ? 'Kembali ke daftar' : 'Tampilkan jam analog'">
+          <span aria-hidden="true">🕐</span>
         </button>
 
         <!-- World Map View -->
-        <button class="control-btn" (click)="toggleMapView()" [class.active]="showMapView()" [title]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'">
-          🌍
+        <button class="control-btn" (click)="toggleMapView()" [class.active]="showMapView()" [title]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'" [attr.aria-label]="showMapView() ? 'Kembali ke daftar' : 'Tampilkan peta dunia'">
+          <span aria-hidden="true">🌍</span>
         </button>
       </ng-container>
     </div>

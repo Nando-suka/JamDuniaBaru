@@ -42,12 +42,24 @@
           <span>⏰ {{ alarm.snoozeMinutes || 5 }}m</span>
         </div>
         <div class="alarm-controls-bottom">
-          <button class="btn-sm" (click)="editAlarm(alarm.id)" title="Edit">✏️</button>
-          <button class="btn-sm" (click)="snoozeAlarm(alarm.id, alarm.snoozeMinutes || 5)" title="Snooze">💤</button>
-          <button class="toggle-btn" [class.active]="alarm.enabled" (click)="toggleAlarm(alarm.id)">
+          <button class="btn-sm" (click)="editAlarm(alarm.id)" title="Edit alarm" aria-label="Edit alarm">
+            <span aria-hidden="true">✏️</span>
+          </button>
+          <button class="btn-sm" (click)="snoozeAlarm(alarm.id, alarm.snoozeMinutes || 5)" title="Snooze alarm" aria-label="Snooze alarm">
+            <span aria-hidden="true">💤</span>
+          </button>
+          <button
+            class="toggle-btn"
+            [class.active]="alarm.enabled"
+            (click)="toggleAlarm(alarm.id)"
+            [attr.aria-label]="alarm.enabled ? 'Pause alarm' : 'Enable alarm'"
+            [title]="alarm.enabled ? 'Pause alarm' : 'Enable alarm'"
+          >
             {{ alarm.enabled ? 'ON' : 'OFF' }}
           </button>
-          <button class="btn-sm btn-sm-danger" (click)="removeAlarm(alarm.id)" title="Hapus">🗑️</button>
+          <button class="btn-sm btn-sm-danger" (click)="removeAlarm(alarm.id)" title="Delete alarm" aria-label="Delete alarm">
+            <span aria-hidden="true">🗑️</span>
+          </button>
         </div>
       </div>
 
@@ -83,10 +95,10 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showAlarmModal()" (click)="closeAlarmModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="alarm-modal-title" tabindex="-1" (keydown)="handleModalKeydown($event)" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>{{ isEditing() ? 'Edit Alarm' : 'Tambah Alarm Baru' }}</h3>
-      <button class="close-btn" (click)="closeAlarmModal()">×</button>
+      <h3 id="alarm-modal-title">{{ isEditing() ? 'Edit Alarm' : 'Tambah Alarm Baru' }}</h3>
+      <button type="button" class="close-btn" (click)="closeAlarmModal()" title="Close alarm dialog" aria-label="Close alarm dialog">×</button>
     </div>
 
     <form class="alarm-form" (ngSubmit)="addOrUpdateAlarm()">
@@ -207,10 +219,10 @@
 </div>
 
 <div class="modal-overlay" *ngIf="showTimerModal()" (click)="closeTimerModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="timer-modal-title" tabindex="-1" (keydown)="handleModalKeydown($event)" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Set Timer Baru</h3>
-      <button class="close-btn" (click)="closeTimerModal()">×</button>
+      <h3 id="timer-modal-title">Set Timer Baru</h3>
+      <button type="button" class="close-btn" (click)="closeTimerModal()" title="Close timer dialog" aria-label="Close timer dialog">×</button>
     </div>
 
     <form class="timer-form" (ngSubmit)="startTimer()">
