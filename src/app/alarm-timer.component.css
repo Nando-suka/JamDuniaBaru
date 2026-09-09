@@ -4,8 +4,6 @@
   margin: 0 auto;
   padding: 20px;
   background: var(--bg-color, #ffffff);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -93,7 +91,6 @@
 .notification-banner {
   background: var(--warning-bg, #eed06e);
   border: 1px solid var(--warning-border, #f7f1de);
-  border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 20px;
   display: flex;
@@ -351,13 +348,12 @@
 
 .modal-content {
   background: var(--card-bg, #ffffff);
-  border-radius: 12px;
   padding: 0;
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
   box-sizing: border-box;
 }
 
@@ -438,8 +434,8 @@
   gap: 6px;
   padding: 14px;
   border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 10px;
-  background: var(--card-bg, #f8f9fa);
+  border-width: 1px 0;
+  background: transparent;
 }
 
 .large-time-display {
@@ -531,10 +527,9 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
-  padding: 3px;
+  padding: 0;
   gap: 3px;
-  background: var(--card-bg, #f8f9fa);
+  background: transparent;
 }
 
 .repeat-option {
@@ -571,7 +566,9 @@
   margin: 8px 0 20px;
   padding: 12px 14px;
   border-left: 3px solid var(--primary-color, #007bff);
-  background: var(--card-bg, #f8f9fa);
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  background: transparent;
   color: var(--text-color, #333);
 }
 

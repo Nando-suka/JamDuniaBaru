@@ -2,8 +2,6 @@
 
 .timezone-converter {
   background: var(--card-bg, #fff);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 16px;
 }
@@ -43,7 +41,8 @@
 /* Converter Panel */
 .converter-panel {
   padding: 20px;
-  background: var(--bg-color, #f8f9fa);
+  background: transparent;
+  border-top: 1px solid var(--border-color, #ddd);
 }
 
 /* City Selection Row */
@@ -125,8 +124,7 @@
   overflow-y: auto;
   background: white;
   border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
   z-index: 100;
   margin-top: 4px;
 }
@@ -183,6 +181,8 @@
 /* Time Input Section */
 .time-input-section {
   margin-bottom: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color, #ddd);
 }
 
 .checkbox-label {
@@ -239,9 +239,10 @@
 /* Result Section */
 .result-section {
   background: white;
-  border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
+  border-top: 1px solid var(--border-color, #ddd);
+  border-bottom: 1px solid var(--border-color, #ddd);
 }
 
 .offset-info {
@@ -317,17 +318,18 @@
   padding: 24px;
   color: var(--secondary-text, #666);
   font-size: 14px;
-  background: white;
-  border-radius: 0px;
+  border-top: 1px solid var(--border-color, #ddd);
+  border-bottom: 1px solid var(--border-color, #ddd);
 }
 
 /* Reset Button */
 .reset-btn {
   width: 100%;
   padding: 10px;
-  border: 0px solid var(--border-color, #ddd);
-  border-radius: 0px;
-  background: white;
+  border: 0;
+  border-top: 1px solid var(--border-color, #ddd);
+  border-radius: 0;
+  background: transparent;
   color: var(--text-color, #333);
   font-size: 14px;
   cursor: pointer;
