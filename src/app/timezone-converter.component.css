@@ -97,7 +97,7 @@
 }
 
 .city-search-input:focus-visible {
-  outline: 3px solid #005fcc;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -232,7 +232,7 @@
 }
 
 .manual-time-inputs input:focus-visible {
-  outline: 3px solid #005fcc;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 

@@ -495,7 +495,7 @@
 
 .form-group input:focus-visible,
 .form-group select:focus-visible {
-  outline: 3px solid #005fcc;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -749,26 +749,3 @@
   }
 }
 
-/* Dark Theme Support */
-/* Respect app-level `dark-theme` class applied to `body` by ThemeService */
-.dark-theme .alarm-timer-container {
-  --bg-color: #121212;
-  --text-color: #e0e0e0;
-  --border-color: #333333;
-  --card-bg: #1e1e1e;
-  --hover-bg: rgba(255, 255, 255, 0.03);
-  --primary-color: #4dabf7;
-  --primary-hover: #339af0;
-  --secondary-bg: #495057;
-  --secondary-hover: #343a40;
-  --danger-bg: #fa5252;
-  --danger-hover: #e03131;
-  --warning-bg: #ffd43b;
-  --warning-border: #fab005;
-  --warning-text: #212529;
-  --muted-bg: #343a40;
-  --muted-text: #adb5bd;
-  --secondary-text: #adb5bd;
-  --success-bg: #40c057;
-  --overlay-bg: rgba(0, 0, 0, 0.6);
-}

@@ -263,11 +263,11 @@ export class App implements OnInit, OnDestroy {
   }
 
   getLongitudePercent(lon: number): number {
-    return ((lon + 180) / 360) * 100;
+    return Math.min(97.5, Math.max(2.5, ((lon + 180) / 360) * 100));
   }
 
   getLatitudePercent(lat: number): number {
-    return ((90 - lat) / 180) * 100;
+    return Math.min(95, Math.max(5, ((90 - lat) / 180) * 100));
   }
 
   ngOnDestroy(): void {
