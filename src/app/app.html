@@ -10,6 +10,8 @@
         (click)="toggleToolsSheet()"
         [attr.aria-expanded]="showToolsSheet()"
         aria-controls="mobile-tools-sheet"
+        aria-label="Open tools menu"
+        title="Open tools menu"
       >
         Tools
       </button>
@@ -72,7 +74,8 @@
       </ng-container>
     </div>
 
-    <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu">
+    <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu" aria-labelledby="mobile-tools-title" tabindex="-1" (keydown)="handleToolsSheetKeydown($event)">
+      <div class="mobile-tools-header" id="mobile-tools-title">Quick tools</div>
       <div class="mobile-tools-grid">
         <button type="button" class="mobile-tool-btn" (click)="handleToolAction('format')">
           <span class="tool-icon">⏰</span>
@@ -128,6 +131,14 @@
           </div>
           <div class="world-map-container">
             <div class="world-map" (click)="clearMapSelection()">
+              <svg class="world-map-land" viewBox="0 0 1000 500" aria-hidden="true" focusable="false" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72" fill="rgba(31,104,87,.48)" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linejoin="round">
+                <path d="M80 118 126 82 194 72 245 96 270 139 245 164 208 155 184 181 145 170 117 194 84 176 57 145Z" />
+                <path d="M258 206 304 216 331 256 327 298 300 336 278 390 248 414 232 383 246 337 229 301 241 264Z" />
+                <path d="M439 111 493 82 554 88 579 113 622 119 641 146 607 165 565 158 538 179 493 166 458 183 426 158Z" />
+                <path d="M474 195 517 190 548 216 567 263 553 305 524 326 504 365 478 345 469 303 447 270 455 226Z" />
+                <path d="M624 191 676 169 725 178 749 207 798 207 836 235 871 278 849 306 805 296 773 316 729 296 699 310 669 284 634 271 611 235Z" />
+                <path d="M852 362 899 349 937 369 944 399 912 418 870 408 844 389Z" />
+              </svg>
               <button
                 *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
                 type="button"

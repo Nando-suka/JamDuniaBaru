@@ -25,7 +25,8 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   showFromDropdown = signal(false);
   showToDropdown = signal(false);
   private timer: any;
-  highlightedIndex = signal<number>(-1);
+  highlightedFromIndex = signal(-1);
+  highlightedToIndex = signal(-1);
 
   // Dictionary untuk terjemahan
   dict = this.langService.text;
@@ -109,40 +110,68 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     this.converterService.setFromCity(city);
     this.showFromDropdown.set(false);
     this.searchFromQuery.set('');
+    this.highlightedFromIndex.set(-1);
+  }
+
+  clearFromSelection(): void {
+    this.converterService.clearFromCity();
+    this.searchFromQuery.set('');
+    this.showFromDropdown.set(false);
+    this.highlightedFromIndex.set(-1);
   }
 
   selectToCity(city: City): void {
     this.converterService.setToCity(city);
     this.showToDropdown.set(false);
     this.searchToQuery.set('');
+    this.highlightedToIndex.set(-1);
+  }
+
+  clearToSelection(): void {
+    this.converterService.clearToCity();
+    this.searchToQuery.set('');
+    this.showToDropdown.set(false);
+    this.highlightedToIndex.set(-1);
   }
 
   // Toggle dropdowns
   toggleFromDropdown(): void {
     this.showFromDropdown.update((v) => !v);
     this.showToDropdown.set(false);
+    this.highlightedFromIndex.set(-1);
   }
 
   toggleToDropdown(): void {
     this.showToDropdown.update((v) => !v);
     this.showFromDropdown.set(false);
+    this.highlightedToIndex.set(-1);
   }
 
   // Close dropdowns when clicking outside
   closeDropdowns(): void {
     this.showFromDropdown.set(false);
     this.showToDropdown.set(false);
+    this.highlightedFromIndex.set(-1);
+    this.highlightedToIndex.set(-1);
   }
 
   // Update search queries
   onFromSearchChange(query: string): void {
+    if (this.selectedFromCity() && query !== this.selectedFromCity()?.name) {
+      this.converterService.clearFromCity();
+    }
     this.searchFromQuery.set(query);
     this.showFromDropdown.set(true);
+    this.highlightedFromIndex.set(-1);
   }
 
   onToSearchChange(query: string): void {
+    if (this.selectedToCity() && query !== this.selectedToCity()?.name) {
+      this.converterService.clearToCity();
+    }
     this.searchToQuery.set(query);
     this.showToDropdown.set(true);
+    this.highlightedToIndex.set(-1);
   }
 
   // Update time/date inputs
@@ -161,27 +190,46 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     this.converterService.setUseCurrentTime(checked);
   }
 
-  updateSearch(query: string) {
-    this.searchToQuery.set(query);
-    this.highlightedIndex.set(-1);
+  handleFromKeydown(event: KeyboardEvent): void {
+    this.handleCityKeydown(event, this.filteredFromCities, 'from');
   }
 
-  handleKeydown(event: KeyboardEvent, cities: City[]): void {
+  handleToKeydown(event: KeyboardEvent): void {
+    this.handleCityKeydown(event, this.filteredToCities, 'to');
+  }
+
+  private handleCityKeydown(event: KeyboardEvent, cities: City[], direction: 'from' | 'to'): void {
     if (!cities || cities.length === 0) return;
 
-    const currentIndex = this.highlightedIndex();
+    const currentIndex = direction === 'from' ? this.highlightedFromIndex() : this.highlightedToIndex();
+    const setIndex = (index: number) => {
+      if (direction === 'from') {
+        this.highlightedFromIndex.set(index);
+      } else {
+        this.highlightedToIndex.set(index);
+      }
+    };
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      this.highlightedIndex.set(currentIndex < cities.length - 1 ? currentIndex + 1 : 0);
+      setIndex(currentIndex < cities.length - 1 ? currentIndex + 1 : 0);
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
-      this.highlightedIndex.set(currentIndex > 0 ? currentIndex - 1 : cities.length - 1);
+      setIndex(currentIndex > 0 ? currentIndex - 1 : cities.length - 1);
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      setIndex(0);
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      setIndex(cities.length - 1);
     } else if (event.key === 'Enter') {
       event.preventDefault();
       if (currentIndex >= 0) {
-        this.selectToCity(cities[currentIndex]);
+        direction === 'from' ? this.selectFromCity(cities[currentIndex]) : this.selectToCity(cities[currentIndex]);
       }
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeDropdowns();
     }
   }
 
@@ -195,6 +243,8 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     this.converterService.reset();
     this.searchFromQuery.set('');
     this.searchToQuery.set('');
+    this.highlightedFromIndex.set(-1);
+    this.highlightedToIndex.set(-1);
   }
 
   // Format helpers

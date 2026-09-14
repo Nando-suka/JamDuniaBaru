@@ -12,26 +12,37 @@
       <div class="city-selection">
         <!-- From City -->
         <div class="city-input-group">
-          <label>{{ dict().fromCity || 'Dari Kota' }}</label>
+          <label for="from-city-input">{{ dict().fromCity || 'Dari Kota' }}</label>
           <div class="dropdown-container">
             <input
+              id="from-city-input"
               type="text"
               class="city-search-input"
+              role="combobox"
+              aria-label="Search from city"
+              aria-autocomplete="list"
+              [attr.aria-expanded]="showFromDropdown()"
+              aria-controls="from-city-listbox"
+              [attr.aria-activedescendant]="highlightedFromIndex() >= 0 ? 'from-city-option-' + highlightedFromIndex() : null"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
-              [value]="selectedFromCity()?.name || ''"
+              [value]="searchFromQuery() || selectedFromCity()?.name || ''"
               (input)="onFromSearchChange($any($event.target).value)"
               (focus)="toggleFromDropdown()"
+              (keydown)="handleFromKeydown($event)"
             />
+            @if (searchFromQuery() || selectedFromCity()) {
+              <button type="button" class="clear-selection-btn" aria-label="Clear from city" (click)="clearFromSelection()">×</button>
+            }
             @if (selectedFromCity()) {
               <span class="offset-badge">{{ getOffsetString(selectedFromCity()!.offset) }}</span>
             }
             @if (showFromDropdown()) {
-              <div class="dropdown-list">
-                @for (city of filteredFromCities; track city.name) {
-                  <div class="dropdown-item" (click)="selectFromCity(city)">
+              <div id="from-city-listbox" class="dropdown-list" role="listbox" aria-label="From city options">
+                @for (city of filteredFromCities; track city.name; let index = $index) {
+                  <button type="button" class="dropdown-item" role="option" [id]="'from-city-option-' + index" [class.highlighted]="highlightedFromIndex() === index" [attr.aria-selected]="selectedFromCity()?.name === city.name" (click)="selectFromCity(city)">
                     <span class="city-name">{{ city.name }}</span>
                     <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
-                  </div>
+                  </button>
                 }
               </div>
             }
@@ -43,32 +54,46 @@
           class="swap-btn"
           (click)="swapCities()"
           [disabled]="!selectedFromCity() || !selectedToCity()"
+          type="button"
+          aria-label="Swap cities"
+          title="Swap cities"
         >
           ⇄
         </button>
 
         <!-- To City -->
         <div class="city-input-group">
-          <label>{{ dict().toCity || 'Ke Kota' }}</label>
+          <label for="to-city-input">{{ dict().toCity || 'Ke Kota' }}</label>
           <div class="dropdown-container">
             <input
+              id="to-city-input"
               type="text"
               class="city-search-input"
+              role="combobox"
+              aria-label="Search to city"
+              aria-autocomplete="list"
+              [attr.aria-expanded]="showToDropdown()"
+              aria-controls="to-city-listbox"
+              [attr.aria-activedescendant]="highlightedToIndex() >= 0 ? 'to-city-option-' + highlightedToIndex() : null"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
-              [value]="selectedToCity()?.name || ''"
+              [value]="searchToQuery() || selectedToCity()?.name || ''"
               (input)="onToSearchChange($any($event.target).value)"
               (focus)="toggleToDropdown()"
+              (keydown)="handleToKeydown($event)"
             />
+            @if (searchToQuery() || selectedToCity()) {
+              <button type="button" class="clear-selection-btn" aria-label="Clear to city" (click)="clearToSelection()">×</button>
+            }
             @if (selectedToCity()) {
               <span class="offset-badge">{{ getOffsetString(selectedToCity()!.offset) }}</span>
             }
             @if (showToDropdown()) {
-              <div class="dropdown-list">
-                @for (city of filteredToCities; track city.name) {
-                  <div class="dropdown-item" (click)="selectToCity(city)">
+              <div id="to-city-listbox" class="dropdown-list" role="listbox" aria-label="To city options">
+                @for (city of filteredToCities; track city.name; let index = $index) {
+                  <button type="button" class="dropdown-item" role="option" [id]="'to-city-option-' + index" [class.highlighted]="highlightedToIndex() === index" [attr.aria-selected]="selectedToCity()?.name === city.name" (click)="selectToCity(city)">
                     <span class="city-name">{{ city.name }}</span>
                     <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
-                  </div>
+                  </button>
                 }
               </div>
             }

@@ -35,6 +35,7 @@ export class App implements OnInit, OnDestroy {
   isMobileView = signal(false);
   scrollVisible = signal(false);
   scrollLabelVisible = signal(false);
+  private focusReturnTarget: HTMLElement | null = null;
   private scrollLabelTimer: any;
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
@@ -129,11 +130,63 @@ export class App implements OnInit, OnDestroy {
   }
 
   toggleToolsSheet(): void {
-    this.showToolsSheet.update((v) => !v);
+    const willOpen = !this.showToolsSheet();
+    if (willOpen) {
+      this.focusReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+    this.showToolsSheet.set(willOpen);
+
+    if (willOpen) {
+      setTimeout(() => this.focusFirstToolButton());
+    } else {
+      this.restoreToolsFocus();
+    }
   }
 
   closeToolsSheet(): void {
     this.showToolsSheet.set(false);
+    this.restoreToolsFocus();
+  }
+
+  handleToolsSheetKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeToolsSheet();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const modal = event.currentTarget as HTMLElement;
+    const focusable = Array.from(
+      modal.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    ).filter((element) => !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true');
+
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  private focusFirstToolButton(): void {
+    const button = document.querySelector<HTMLButtonElement>('#mobile-tools-sheet .mobile-tool-btn');
+    button?.focus();
+  }
+
+  private restoreToolsFocus(): void {
+    const target = this.focusReturnTarget;
+    this.focusReturnTarget = null;
+    target?.focus();
   }
 
   handleToolAction(action: 'format' | 'favorites' | 'theme' | 'alarm' | 'converter' | 'map' | 'view'): void {

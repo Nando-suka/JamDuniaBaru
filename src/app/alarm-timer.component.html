@@ -28,9 +28,14 @@
 
       <div class="alarms-list">
       <div class="alarm-item" *ngFor="let alarm of alarms()">
-        <div class="alarm-time-big">{{ alarm.time }}</div>
-        <div class="alarm-label-center">{{ alarm.label }}</div>
+        <div class="alarm-time-big alarm-time">{{ alarm.time }}</div>
+        <div class="alarm-label-center alarm-label">{{ alarm.label }}</div>
         <div class="alarm-next-occurrence" [class.paused]="!alarm.enabled">
+          <span class="status-label">Status:</span>
+          <strong class="status-value" [class.enabled]="alarm.enabled" [class.paused]="!alarm.enabled" aria-live="polite">
+            {{ alarm.enabled ? 'Enabled' : 'Paused' }}
+          </strong>
+          <span class="status-separator">•</span>
           {{ getAlarmNextOccurrence(alarm).message }}
           <span class="time-until" *ngIf="getAlarmNextOccurrence(alarm).timeUntil">
             • {{ getAlarmNextOccurrence(alarm).timeUntil }}

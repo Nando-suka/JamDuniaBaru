@@ -101,9 +101,33 @@
   outline-offset: 2px;
 }
 
+.clear-selection-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-color, #333);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-selection-btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .offset-badge {
   position: absolute;
-  right: 10px;
+  right: 42px;
   top: 50%;
   transform: translateY(-50%);
   background: var(--primary-color, #4a90d9);
@@ -130,6 +154,11 @@
 }
 
 .dropdown-item {
+  width: 100%;
+  border: 0;
+  background: white;
+  color: inherit;
+  text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -140,6 +169,13 @@
 
 .dropdown-item:hover {
   background: var(--hover-bg, #f0f4f8);
+}
+
+.dropdown-item.highlighted,
+.dropdown-item:focus-visible {
+  background: var(--hover-bg, #f0f4f8);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
 }
 
 .dropdown-item .city-name {

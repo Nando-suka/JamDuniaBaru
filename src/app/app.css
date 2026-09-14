@@ -1068,6 +1068,21 @@
   cursor: pointer;
 }
 
+.tools-trigger:focus-visible,
+.mobile-tool-btn:focus-visible,
+.control-btn:focus-visible,
+.tab-btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-danger:focus-visible,
+.close-btn:focus-visible,
+.suggestion-btn:focus-visible,
+.repeat-option:focus-visible,
+.preset-btn:focus-visible {
+  outline: 3px solid var(--focus-ring, #2563eb);
+  outline-offset: 2px;
+}
+
 .tools-trigger {
   display: inline-flex;
   align-items: center;
@@ -1090,6 +1105,15 @@
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
+.mobile-tools-header {
+  margin: 0 0 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-text, #64748b);
 }
 
 .mobile-tools-grid {

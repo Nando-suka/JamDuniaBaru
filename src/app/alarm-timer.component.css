@@ -200,6 +200,28 @@
   margin-top: 2px;
 }
 
+.status-label {
+  font-weight: 600;
+  color: var(--muted-text, #6c757d);
+}
+
+.status-value {
+  color: var(--success-color, #10b981);
+  margin-left: 4px;
+}
+
+.status-value.enabled {
+  color: var(--success-color, #10b981);
+}
+
+.status-value.paused {
+  color: var(--warning-color, #f59e0b);
+}
+
+.status-separator {
+  margin: 0 6px;
+}
+
 .alarm-next-occurrence.paused {
   color: var(--warning-color, #f59e0b);
 }

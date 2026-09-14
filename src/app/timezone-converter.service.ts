@@ -68,12 +68,22 @@ export class TimezoneConverterService {
     this.saveToStorage();
   }
 
+  clearFromCity(): void {
+    this.selectedFromCity.set(null);
+    this.saveToStorage();
+  }
+
   /**
    * Set kota tujuan untuk konversi
    * @param city Kota tujuan
    */
   setToCity(city: City): void {
     this.selectedToCity.set(city);
+    this.saveToStorage();
+  }
+
+  clearToCity(): void {
+    this.selectedToCity.set(null);
     this.saveToStorage();
   }
 
