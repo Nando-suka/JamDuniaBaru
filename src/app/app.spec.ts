@@ -29,6 +29,30 @@ describe('App', () => {
     expect(input.placeholder).toContain('Cari');
   });
 
+  it('should associate the city search input with a label', async () => {
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const input = compiled.querySelector('#city-search-input') as HTMLInputElement;
+    const label = compiled.querySelector('label[for="city-search-input"]');
+
+    expect(input).toBeTruthy();
+    expect(label?.textContent).toContain('Search cities');
+  });
+
+  it('should announce the selected city in the map status region', async () => {
+    const app = fixture.componentInstance;
+    app.showMapView.set(true);
+    app.selectCityOnMap('Jakarta');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const status = fixture.nativeElement.querySelector('.map-selection-status') as HTMLElement;
+    expect(status.getAttribute('role')).toBe('status');
+    expect(status.getAttribute('aria-live')).toBe('polite');
+    expect(status.textContent).toContain('Selected city: Jakarta');
+  });
+
   it('should label the mobile tools trigger for assistive technology', async () => {
     const app = fixture.componentInstance as any;
     Object.defineProperty(window, 'innerWidth', {

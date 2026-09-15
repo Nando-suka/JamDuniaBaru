@@ -126,10 +126,17 @@
       <ng-container *ngIf="showMapView(); else listMode">
         <div class="map-view-section">
           <div class="map-view-header">
-            <h3>Peta Kota</h3>
+            <h3 id="world-map-title">Peta Kota</h3>
             <p>Pilih kota pada peta untuk melihat waktu lokalnya.</p>
+            <p class="map-selection-status" role="status" aria-live="polite">
+              @if (activeMapCity()) {
+                Selected city: {{ activeMapCity() }}
+              } @else {
+                No city selected
+              }
+            </p>
           </div>
-          <div class="world-map-container">
+          <div class="world-map-container" role="region" aria-labelledby="world-map-title">
             <div class="world-map" (click)="clearMapSelection()">
               <svg class="world-map-land" viewBox="0 0 1000 500" aria-hidden="true" focusable="false" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72" fill="rgba(31,104,87,.48)" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linejoin="round">
                 <path d="M80 118 126 82 194 72 245 96 270 139 245 164 208 155 184 181 145 170 117 194 84 176 57 145Z" />
@@ -162,6 +169,7 @@
     <ng-template #listMode>
       <!-- Search Input Section -->
       <div class="search-section">
+        <label class="visually-hidden" for="city-search-input">Search cities</label>
         <div *ngIf="activeMapCity()" class="selected-city-chip" aria-live="polite">
           <span>Selected city: {{ activeMapCity() }}</span>
           <button type="button" (click)="clearSearch()" aria-label="Remove selected city">×</button>
@@ -172,6 +180,7 @@
             <path d="m21 21-4.35-4.35"></path>
           </svg>
           <input
+            id="city-search-input"
             type="text"
             class="search-input"
             placeholder="Cari kota..."
