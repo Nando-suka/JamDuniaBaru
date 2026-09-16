@@ -1,5 +1,11 @@
 ﻿<div class="main-wrapper">
-  <div class="container" [class.map-mode-container]="showMapView()">
+  <div
+    class="container"
+    [class.map-mode-container]="showMapView()"
+    [class.analog-mode-container]="showAnalogClock()"
+    [class.alarm-mode-container]="showAlarmTimer()"
+    [class.converter-mode-container]="showTimezoneConverter()"
+  >
 
     <!-- Floating Controls -->
     <div class="floating-controls" [class.mobile-tools-shell]="isMobileView()">
