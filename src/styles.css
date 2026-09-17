@@ -85,7 +85,32 @@ h1 {
   margin-bottom: 2rem;
 }
 
-/* 5. Smooth Transitions */
-* {
-  transition: all 0.3s ease;
+/* 5. Scoped motion defaults */
+button,
+a,
+input,
+select,
+textarea,
+.location,
+.control-btn,
+.map-pin,
+.mobile-tools-sheet {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    opacity 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

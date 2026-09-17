@@ -103,6 +103,22 @@ export class App implements OnInit, OnDestroy {
     }).format(timeDate);
   }
 
+  getLocalTime(): string {
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }).format(this.currentTime());
+  }
+
+  getLastUpdatedTime(): string {
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }).format(this.currentTime());
+  }
+
   toggleTimeFormat(): void {
     const newFormat = this.timeFormat() === '24h' ? '12h' : '24h';
     this.timeFormat.set(newFormat);
@@ -229,6 +245,11 @@ export class App implements OnInit, OnDestroy {
 
   toggleMapView(): void {
     this.showMapView.update((v) => !v);
+  }
+
+  showAllCities(): void {
+    this.facade.showFavoritesOnly.set(false);
+    this.facade.resetPagination();
   }
 
   cycleViewMode(): void {

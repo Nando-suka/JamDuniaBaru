@@ -80,6 +80,11 @@
       </ng-container>
     </div>
 
+    <div class="clock-status" role="status" aria-live="polite">
+      <span>Local time now: {{ getLocalTime() }}</span>
+      <span>Last updated: {{ getLastUpdatedTime() }}</span>
+    </div>
+
     <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu" aria-labelledby="mobile-tools-title" tabindex="-1" (keydown)="handleToolsSheetKeydown($event)">
       <div class="mobile-tools-header" id="mobile-tools-title">Quick tools</div>
       <div class="mobile-tools-grid">
@@ -214,7 +219,17 @@
       <app-timezone-converter *ngIf="showTimezoneConverter()"></app-timezone-converter>
 
       <!-- Display Result or No Results Message -->
-      <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">
+      <ng-container *ngIf="facade.showFavoritesOnly() && facade.filteredLocations().length === 0; else searchOrClockList">
+        <div class="empty-state favorites-empty-state">
+          <p>No favorite cities yet.</p>
+          <button class="reset-search-btn" type="button" (click)="showAllCities()">
+            Show all cities
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #searchOrClockList>
+        <ng-container *ngIf="facade.filteredLocations().length === 0 && searchService.searchQuery(); else clockList">
         <div class="no-results">
           <p>Tidak ada kota yang cocok dengan "<strong>{{ searchService.searchQuery() }}</strong>"</p>
 
@@ -222,7 +237,8 @@
             Coba Cari Lagi
           </button>
         </div>
-      </ng-container>
+        </ng-container>
+      </ng-template>
 
       <ng-template #clockList>
         <div class="clock-list" [ngClass]="getViewModeClass()">

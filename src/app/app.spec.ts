@@ -40,6 +40,30 @@ describe('App', () => {
     expect(label?.textContent).toContain('Search cities');
   });
 
+  it('should render local time and last-updated indicators', async () => {
+    await fixture.whenStable();
+
+    const status = fixture.nativeElement.querySelector('.clock-status') as HTMLElement;
+    expect(status.textContent).toContain('Local time now:');
+    expect(status.textContent).toContain('Last updated:');
+  });
+
+  it('should offer a show-all action when favorites are empty', async () => {
+    const app = fixture.componentInstance;
+    app.facade.showFavoritesOnly.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const emptyState = fixture.nativeElement.querySelector('.favorites-empty-state') as HTMLElement;
+    const showAllButton = emptyState.querySelector('button') as HTMLButtonElement;
+    expect(emptyState).toBeTruthy();
+    expect(showAllButton.textContent).toContain('Show all cities');
+
+    showAllButton.click();
+    fixture.detectChanges();
+    expect(app.facade.showFavoritesOnly()).toBe(false);
+  });
+
   it('should announce the selected city in the map status region', async () => {
     const app = fixture.componentInstance;
     app.showMapView.set(true);
