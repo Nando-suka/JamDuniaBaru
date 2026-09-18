@@ -109,4 +109,22 @@ describe('App', () => {
 
     expect(statusText).toBe(true);
   });
+
+  it('should show a paused status label when an alarm is disabled', async () => {
+    const alarmService = TestBed.inject(AlarmTimerService);
+    alarmService.addAlarm('07:00', 'Paused alarm', true, [], 'chime', 5);
+    const alarm = alarmService.alarms()[0];
+    alarmService.toggleAlarm(alarm.id);
+
+    fixture.componentInstance.showAlarmTimer.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const statusText = Array.from(root.querySelectorAll('.status-value')).some((node) =>
+      node.textContent?.includes('Paused')
+    );
+
+    expect(statusText).toBe(true);
+  });
 });
