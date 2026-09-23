@@ -19,6 +19,8 @@ export class SearchService {
    * @param query Search query string
    * @returns Filtered cities array
    */
+
+  // filter cities and make it searchable and don't forget the string is needed.
   filterCities(cities: City[], query: string): City[] {
     if (!query.trim()) {
       return cities;

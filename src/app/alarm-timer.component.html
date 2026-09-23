@@ -18,6 +18,15 @@
   <div class="notification-banner" *ngIf="notificationPermission() !== 'granted'">
     <p>Untuk menerima notifikasi alarm dan timer, izinkan akses notifikasi.</p>
     <button class="btn-primary" (click)="requestNotificationPermission()">Izinkan Notifikasi</button>
+    <a
+      *ngIf="notificationPermission() === 'denied'"
+      class="notification-help-link"
+      href="https://support.google.com/chrome/answer/3220216"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Notifications blocked: how to allow them
+    </a>
   </div>
 
   <div class="alarm-section" *ngIf="activeTab() === 'alarm'">

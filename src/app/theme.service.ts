@@ -34,12 +34,14 @@ export class ThemeService {
     this.setTheme(newTheme);
   }
 
+  // setting the theme is always scuh lie taht.
   setTheme(theme: 'light' | 'dark'): void {
     this.currentTheme.set(theme);
     this.applyTheme(theme);
     localStorage.setItem(this.THEME_KEY, theme);
   }
 
+  // a;ways the private theme and apply the theme with adjusting the path.
   private applyTheme(theme: 'light' | 'dark'): void {
     const body = document.body;
     if (theme === 'dark') {

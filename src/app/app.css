@@ -131,6 +131,15 @@
   font-size: 0.78rem;
 }
 
+.action-feedback {
+  min-height: 1.25rem;
+  margin: -0.75rem 0 0.75rem;
+  color: var(--success-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .clock-status span + span {
   padding-left: 1rem;
   border-left: 1px solid var(--card-border);
@@ -404,6 +413,58 @@
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
   border-radius: 15px;
   border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.skeleton-list {
+  width: 100%;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.skeleton-location {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.5rem;
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.skeleton-line,
+.skeleton-circle {
+  display: block;
+  background: linear-gradient(90deg, var(--muted-bg) 25%, var(--hover-bg) 50%, var(--muted-bg) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line {
+  height: 0.8rem;
+  border-radius: 999px;
+}
+
+.skeleton-city {
+  width: 34%;
+}
+
+.skeleton-time {
+  width: 22%;
+  margin-left: auto;
+}
+
+.skeleton-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
 }
 
 /* Spinner Animation */

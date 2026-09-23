@@ -104,6 +104,13 @@
   color: var(--warning-text, #fcfbfa);
 }
 
+.notification-help-link {
+  color: var(--warning-text, #664d03);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;

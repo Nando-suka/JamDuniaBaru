@@ -80,6 +80,10 @@
       </ng-container>
     </div>
 
+    <div class="action-feedback" role="status" aria-live="polite" aria-atomic="true">
+      {{ actionFeedback() }}
+    </div>
+
     <div class="clock-status" role="status" aria-live="polite">
       <span>Local time now: {{ getLocalTime() }}</span>
       <span>Last updated: {{ getLastUpdatedTime() }}</span>
@@ -259,7 +263,7 @@
             <button
               class="favorite-btn"
               [class.favorited]="favoritesService.isFavorite(loc)"
-              (click)="favoritesService.toggleFavorite(loc)"
+              (click)="toggleFavorite(loc)"
               [title]="favoritesService.isFavorite(loc) ? 'Remove from favorites' : 'Add to favorites'"
             >
               <svg *ngIf="favoritesService.isFavorite(loc)" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -273,9 +277,15 @@
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="facade.isLoading()" class="loading-container">
-          <div class="spinner"></div>
-          <p class="loading-text">Sedang memuat...</p>
+        <div *ngIf="facade.isLoading()" class="loading-container" role="status" aria-live="polite" aria-label="Loading cities">
+          <div class="skeleton-list" aria-hidden="true">
+            <div class="skeleton-location" *ngFor="let skeleton of [1, 2, 3, 4]">
+              <span class="skeleton-line skeleton-city"></span>
+              <span class="skeleton-line skeleton-time"></span>
+              <span class="skeleton-circle"></span>
+            </div>
+          </div>
+          <p class="loading-text">Sedang memuat kota...</p>
         </div>
 
         <!-- Load More Button -->

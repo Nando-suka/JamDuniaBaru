@@ -202,6 +202,7 @@ export class ClockFacade {
     }
   }
 
+  // Getting private and make it bring a good list.
   private getStoredViewMode(): 'list' | 'grid' | 'compact' {
     try {
       const stored = localStorage.getItem('jam-dunia-view-mode');

@@ -53,6 +53,14 @@
   margin-bottom: 20px;
 }
 
+.converter-feedback {
+  min-height: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--success-color, #198754);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .city-input-group {
   flex: 1;
   min-width: 0;

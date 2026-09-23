@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, signal, inject, computed } from '@angular
 import { LanguageService } from './languange.service';
 import { LanguageDetectionService } from './languange-detection.service';
 import { ThemeService } from './theme.service';
-import { SearchService } from './search.service';
+import { SearchService, City } from './search.service';
 import { FavoritesService } from './favorites.service';
 import { CommonModule } from '@angular/common';
 import { ClockFacade } from './clock.facade';
@@ -10,6 +10,8 @@ import { AlarmTimerComponent } from './alarm-timer.component';
 import { TimezoneConverterComponent } from './timezone-converter.component';
 import { AnalogClockComponent } from './analog-clock.component';
 
+
+// com[nent intialixe and simple app]
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -17,6 +19,8 @@ import { AnalogClockComponent } from './analog-clock.component';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
+
+// impmlemtn the detdo nad inti on ghe export pasth and dont implmen the class the other side.
 export class App implements OnInit, OnDestroy {
   currentTime = signal(new Date());
   langService = inject(LanguageService);
@@ -35,6 +39,7 @@ export class App implements OnInit, OnDestroy {
   isMobileView = signal(false);
   scrollVisible = signal(false);
   scrollLabelVisible = signal(false);
+  actionFeedback = signal('');
   private focusReturnTarget: HTMLElement | null = null;
   private scrollLabelTimer: any;
   private onScroll = () => {
@@ -143,6 +148,14 @@ export class App implements OnInit, OnDestroy {
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  toggleFavorite(city: City): void {
+    const wasFavorite = this.favoritesService.isFavorite(city);
+    this.favoritesService.toggleFavorite(city);
+    this.actionFeedback.set(
+      wasFavorite ? `${city.name} removed from favorites` : `${city.name} added to favorites`
+    );
   }
 
   toggleToolsSheet(): void {
@@ -274,6 +287,7 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
+  // get vie mode title and mode get pushed toward the imporvement road.
   getViewModeTitle(): string {
     const mode = this.facade.getViewMode()();
     switch (mode) {

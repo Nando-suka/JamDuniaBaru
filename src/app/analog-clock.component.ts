@@ -9,6 +9,8 @@ import { AnalogClockService, ClockHandAngles } from './analog-clock.service';
   templateUrl: './analog-clock.component.html',
   styleUrl: './analog-clock.component.css'
 })
+
+// clsss of anaalog componwnt
 export class AnalogClockComponent implements OnInit, OnDestroy {
   @Input() time: Date = new Date();
   @Input() timezone: string = 'UTC';
@@ -22,11 +24,14 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
   hourMarkers = this.analogClockService.getHourMarkers();
   romanNumerals = this.analogClockService.getRomanNumerals();
 
+  // Initialize the ng on making animation and update of the clockked hands. using another hand angles.
   ngOnInit(): void {
     this.updateClockHands();
     this.startAnimation();
   }
 
+
+  // Destroy the ng on cancek animation on the following option that givenn.
   ngOnDestroy(): void {
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);

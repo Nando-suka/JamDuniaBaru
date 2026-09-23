@@ -9,6 +9,9 @@
   @if (isExpanded()) {
     <div class="converter-panel">
       <!-- City Selection Row -->
+      <div class="converter-feedback" role="status" aria-live="polite" aria-atomic="true">
+        {{ actionFeedback() }}
+      </div>
       <div class="city-selection">
         <!-- From City -->
         <div class="city-input-group">

@@ -5,6 +5,7 @@ import { TimezoneConverterService } from './timezone-converter.service';
 import { ClockFacade } from './clock.facade';
 import { LanguageService } from './languange.service';
 import { City } from './search.service';
+import { ToastService } from './toast.service';
 
 @Component({
   selector: 'app-timezone-converter',
@@ -17,6 +18,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   private converterService = inject(TimezoneConverterService);
   private facade = inject(ClockFacade);
   private langService = inject(LanguageService);
+  private toastService = inject(ToastService);
 
   // State
   isExpanded = signal(true);
@@ -27,6 +29,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   private timer: any;
   highlightedFromIndex = signal(-1);
   highlightedToIndex = signal(-1);
+  actionFeedback = signal('');
 
   // Dictionary untuk terjemahan
   dict = this.langService.text;
@@ -108,11 +111,13 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   // Select city from dropdown
   selectFromCity(city: City): void {
     this.converterService.setFromCity(city);
+    this.confirmAction(`From city set to ${city.name}`);
     this.showFromDropdown.set(false);
     this.searchFromQuery.set('');
     this.highlightedFromIndex.set(-1);
   }
 
+  // Clear from selection to city getting advanced.
   clearFromSelection(): void {
     this.converterService.clearFromCity();
     this.searchFromQuery.set('');
@@ -122,6 +127,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   selectToCity(city: City): void {
     this.converterService.setToCity(city);
+    this.confirmAction(`To city set to ${city.name}`);
     this.showToDropdown.set(false);
     this.searchToQuery.set('');
     this.highlightedToIndex.set(-1);
@@ -236,11 +242,13 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
   // Swap cities
   swapCities(): void {
     this.converterService.swapCities();
+    this.confirmAction('Cities swapped');
   }
 
   // Reset
   reset(): void {
     this.converterService.reset();
+    this.confirmAction('Timezone converter reset');
     this.searchFromQuery.set('');
     this.searchToQuery.set('');
     this.highlightedFromIndex.set(-1);
@@ -270,5 +278,10 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
       return `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
     }
     return `UTC${sign}${hours}`;
+  }
+
+  private confirmAction(message: string): void {
+    this.actionFeedback.set(message);
+    this.toastService.success(message);
   }
 }
