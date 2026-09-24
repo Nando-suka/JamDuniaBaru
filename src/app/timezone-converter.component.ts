@@ -257,11 +257,11 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   // Format helpers
   formatTime(date: Date): string {
-    return this.converterService.formatTime(date, '24h');
+    return this.converterService.formatTime(date, '24h', this.converterService.getCityTimeZone(this.convertedResult()!.fromCity));
   }
 
   formatDate(date: Date): string {
-    return this.converterService.formatDate(date);
+    return this.converterService.formatDate(date, this.converterService.getCityTimeZone(this.convertedResult()!.fromCity));
   }
 
   getOffsetInfo(): string {
@@ -270,14 +270,27 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
 
   // Get offset string for a city
   getOffsetString(offset: number): string {
-    const sign = offset >= 0 ? '+' : '';
-    const hours = Math.floor(Math.abs(offset));
-    const minutes = Math.abs(((offset % 1) * 60));
+    const sign = offset >= 0 ? '+' : '-';
+    const absoluteOffset = Math.abs(offset);
+    const hours = Math.floor(absoluteOffset);
+    const minutes = Math.round((absoluteOffset % 1) * 60);
 
     if (minutes > 0) {
       return `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
     }
     return `UTC${sign}${hours}`;
+  }
+
+  getCityOffsetString(city: City): string {
+    return this.getOffsetString(this.converterService.getCityOffset(city));
+  }
+
+  getCityTime(date: Date, city: City): string {
+    return this.converterService.formatTime(date, '24h', this.converterService.getCityTimeZone(city));
+  }
+
+  getCityDate(date: Date, city: City): string {
+    return this.converterService.formatDate(date, this.converterService.getCityTimeZone(city));
   }
 
   private confirmAction(message: string): void {

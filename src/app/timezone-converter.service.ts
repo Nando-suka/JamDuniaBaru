@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { City } from './search.service';
+import { City, getCityTimeZone } from './search.service';
 
 const TIMEZONE_CONVERTER_STORAGE_KEY = 'jam-dunia-timezone-converter';
 
@@ -37,25 +37,24 @@ export class TimezoneConverterService {
     }
 
     const sourceDate = this.useCurrentTime()
-      ? this.getCurrentTimeForOffset(from.offset, this.currentTime())
-      : this.createDateFromInputs(from.offset);
+      ? this.currentTime()
+      : this.createDateFromInputs(getCityTimeZone(from));
 
     if (!sourceDate || isNaN(sourceDate.getTime())) {
       return null;
     }
 
-    // Hitung perbedaan offset
-    const offsetDiff = to.offset - from.offset;
-
-    // Konversi waktu berdasarkan selisih offset
-    const convertedDate = new Date(sourceDate.getTime() + offsetDiff * 60 * 60 * 1000);
+    const offsetDifference =
+      (this.getTimeZoneOffsetMinutes(getCityTimeZone(to), sourceDate) -
+        this.getTimeZoneOffsetMinutes(getCityTimeZone(from), sourceDate)) /
+      60;
 
     return {
       fromCity: from,
       toCity: to,
       sourceTime: sourceDate,
-      convertedTime: convertedDate,
-      offsetDifference: offsetDiff,
+      convertedTime: sourceDate,
+      offsetDifference,
     } as TimeConversion;
   });
 
@@ -131,12 +130,7 @@ export class TimezoneConverterService {
     this.saveToStorage();
   }
 
-  private getCurrentTimeForOffset(offset: number, now: Date): Date {
-    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utcMs + offset * 3600000);
-  }
-
-  private createDateFromInputs(offset: number): Date | null {
+  private createDateFromInputs(timeZone: string): Date | null {
     const timeValue = this.inputTime();
     const dateValue = this.inputDate();
     const timeMatch = /^(\d{1,2}):(\d{2})$/.exec(timeValue);
@@ -151,14 +145,17 @@ export class TimezoneConverterService {
       return null;
     }
 
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return null;
-    }
-
-    date.setUTCHours(hours - offset, minutes, 0, 0);
-    return date;
+    const wallClockUtc = Date.UTC(
+      Number(dateValue.slice(0, 4)),
+      Number(dateValue.slice(5, 7)) - 1,
+      Number(dateValue.slice(8, 10)),
+      hours,
+      minutes,
+    );
+    let candidate = new Date(wallClockUtc - this.getTimeZoneOffsetMinutes(timeZone, new Date(wallClockUtc)) * 60000);
+    const correctedOffset = this.getTimeZoneOffsetMinutes(timeZone, candidate);
+    candidate = new Date(wallClockUtc - correctedOffset * 60000);
+    return candidate;
   }
 
   private isValidDate(value: string): boolean {
@@ -184,12 +181,12 @@ export class TimezoneConverterService {
    * @param format Format waktu ('12h' atau '24h')
    * @returns String waktu yang diformat
    */
-  formatTime(date: Date, format: '12h' | '24h' = '24h'): string {
+  formatTime(date: Date, format: '12h' | '24h' = '24h', timeZone = 'UTC'): string {
     return new Intl.DateTimeFormat('id-ID', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: format === '12h',
-      timeZone: 'UTC',
+      timeZone,
     }).format(date);
   }
 
@@ -198,13 +195,13 @@ export class TimezoneConverterService {
    * @param date Objek Date
    * @returns String tanggal yang diformat
    */
-  formatDate(date: Date): string {
+  formatDate(date: Date, timeZone = 'UTC'): string {
     return new Intl.DateTimeFormat('id-ID', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      timeZone: 'UTC',
+      timeZone,
     }).format(date);
   }
 
@@ -225,6 +222,31 @@ export class TimezoneConverterService {
       return `${sign}${diff} jam (${hours}j ${minutes}m)`;
     }
     return `${sign}${diff} jam`;
+  }
+
+  getCityOffset(city: City, date = this.currentTime()): number {
+    return this.getTimeZoneOffsetMinutes(getCityTimeZone(city), date) / 60;
+  }
+
+  getCityTimeZone(city: City): string {
+    return getCityTimeZone(city);
+  }
+
+  private getTimeZoneOffsetMinutes(timeZone: string, date: Date): number {
+    const offsetText = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      timeZoneName: 'shortOffset',
+    })
+      .formatToParts(date)
+      .find((part) => part.type === 'timeZoneName')?.value;
+
+    if (!offsetText || offsetText === 'GMT') return 0;
+
+    const match = /^GMT([+-])(\d{1,2})(?::(\d{2}))?$/.exec(offsetText);
+    if (!match) return 0;
+
+    const minutes = Number(match[2]) * 60 + Number(match[3] ?? 0);
+    return match[1] === '+' ? minutes : -minutes;
   }
 
   private saveToStorage(): void {

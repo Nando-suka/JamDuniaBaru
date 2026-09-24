@@ -37,14 +37,14 @@
               <button type="button" class="clear-selection-btn" aria-label="Clear from city" (click)="clearFromSelection()">×</button>
             }
             @if (selectedFromCity()) {
-              <span class="offset-badge">{{ getOffsetString(selectedFromCity()!.offset) }}</span>
+              <span class="offset-badge">{{ getCityOffsetString(selectedFromCity()!) }}</span>
             }
             @if (showFromDropdown()) {
               <div id="from-city-listbox" class="dropdown-list" role="listbox" aria-label="From city options">
                 @for (city of filteredFromCities; track city.name; let index = $index) {
                   <button type="button" class="dropdown-item" role="option" [id]="'from-city-option-' + index" [class.highlighted]="highlightedFromIndex() === index" [attr.aria-selected]="selectedFromCity()?.name === city.name" (click)="selectFromCity(city)">
                     <span class="city-name">{{ city.name }}</span>
-                    <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
+                    <span class="city-offset">{{ getCityOffsetString(city) }}</span>
                   </button>
                 }
               </div>
@@ -88,14 +88,14 @@
               <button type="button" class="clear-selection-btn" aria-label="Clear to city" (click)="clearToSelection()">×</button>
             }
             @if (selectedToCity()) {
-              <span class="offset-badge">{{ getOffsetString(selectedToCity()!.offset) }}</span>
+              <span class="offset-badge">{{ getCityOffsetString(selectedToCity()!) }}</span>
             }
             @if (showToDropdown()) {
               <div id="to-city-listbox" class="dropdown-list" role="listbox" aria-label="To city options">
                 @for (city of filteredToCities; track city.name; let index = $index) {
                   <button type="button" class="dropdown-item" role="option" [id]="'to-city-option-' + index" [class.highlighted]="highlightedToIndex() === index" [attr.aria-selected]="selectedToCity()?.name === city.name" (click)="selectToCity(city)">
                     <span class="city-name">{{ city.name }}</span>
-                    <span class="city-offset">{{ getOffsetString(city.offset) }}</span>
+                    <span class="city-offset">{{ getCityOffsetString(city) }}</span>
                   </button>
                 }
               </div>
@@ -143,8 +143,8 @@
             <div class="result-card source">
               <div class="card-label">{{ dict().from || 'Dari' }}</div>
               <div class="city-name">{{ convertedResult()!.fromCity.name }}</div>
-              <div class="time-display">{{ formatTime(convertedResult()!.sourceTime) }}</div>
-              <div class="date-display">{{ formatDate(convertedResult()!.sourceTime) }}</div>
+              <div class="time-display">{{ getCityTime(convertedResult()!.sourceTime, convertedResult()!.fromCity) }}</div>
+              <div class="date-display">{{ getCityDate(convertedResult()!.sourceTime, convertedResult()!.fromCity) }}</div>
             </div>
 
             <!-- Arrow -->
@@ -154,8 +154,8 @@
             <div class="result-card target">
               <div class="card-label">{{ dict().to || 'Ke' }}</div>
               <div class="city-name">{{ convertedResult()!.toCity.name }}</div>
-              <div class="time-display">{{ formatTime(convertedResult()!.convertedTime) }}</div>
-              <div class="date-display">{{ formatDate(convertedResult()!.convertedTime) }}</div>
+              <div class="time-display">{{ getCityTime(convertedResult()!.convertedTime, convertedResult()!.toCity) }}</div>
+              <div class="date-display">{{ getCityDate(convertedResult()!.convertedTime, convertedResult()!.toCity) }}</div>
             </div>
           </div>
         </div>
