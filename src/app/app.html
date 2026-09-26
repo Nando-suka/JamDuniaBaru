@@ -84,7 +84,7 @@
       {{ actionFeedback() }}
     </div>
 
-    <div class="clock-status" role="status" aria-live="polite">
+    <div class="clock-status">
       <span>Local time now: {{ getLocalTime() }}</span>
       <span>Last updated: {{ getLastUpdatedTime() }}</span>
     </div>
@@ -185,7 +185,7 @@
       <!-- Search Input Section -->
       <div class="search-section">
         <label class="visually-hidden" for="city-search-input">Search cities</label>
-        <div *ngIf="activeMapCity()" class="selected-city-chip" aria-live="polite">
+        <div *ngIf="activeMapCity()" class="selected-city-chip">
           <span>Selected city: {{ activeMapCity() }}</span>
           <button type="button" (click)="clearSearch()" aria-label="Remove selected city">×</button>
         </div>
@@ -264,6 +264,8 @@
               class="favorite-btn"
               [class.favorited]="favoritesService.isFavorite(loc)"
               (click)="toggleFavorite(loc)"
+              [attr.aria-label]="favoritesService.isFavorite(loc) ? 'Remove ' + loc.name + ' from favorites' : 'Add ' + loc.name + ' to favorites'"
+              [attr.aria-pressed]="favoritesService.isFavorite(loc)"
               [title]="favoritesService.isFavorite(loc) ? 'Remove from favorites' : 'Add to favorites'"
             >
               <svg *ngIf="favoritesService.isFavorite(loc)" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">

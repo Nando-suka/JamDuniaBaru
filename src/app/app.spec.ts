@@ -46,6 +46,27 @@ describe('App', () => {
     const status = fixture.nativeElement.querySelector('.clock-status') as HTMLElement;
     expect(status.textContent).toContain('Local time now:');
     expect(status.textContent).toContain('Last updated:');
+    expect(status.hasAttribute('aria-live')).toBe(false);
+    expect(status.hasAttribute('role')).toBe(false);
+  });
+
+  it('should give each favorite toggle a city-specific accessible name and pressed state', async () => {
+    await fixture.whenStable();
+
+    const button = fixture.nativeElement.querySelector('.favorite-btn') as HTMLButtonElement;
+    const cityName = fixture.nativeElement.querySelector('.city-name')?.textContent?.trim();
+
+    expect(button.getAttribute('aria-label')).toContain(cityName);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+
+    button.click();
+    fixture.detectChanges();
+
+    expect(button.getAttribute('aria-label')).toContain(`Remove ${cityName} from favorites`);
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+
+    button.click();
+    fixture.detectChanges();
   });
 
   it('should offer a show-all action when favorites are empty', async () => {

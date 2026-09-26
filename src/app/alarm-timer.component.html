@@ -41,7 +41,7 @@
         <div class="alarm-label-center alarm-label">{{ alarm.label }}</div>
         <div class="alarm-next-occurrence" [class.paused]="!alarm.enabled">
           <span class="status-label">Status:</span>
-          <strong class="status-value" [class.enabled]="alarm.enabled" [class.paused]="!alarm.enabled" aria-live="polite">
+          <strong class="status-value" [class.enabled]="alarm.enabled" [class.paused]="!alarm.enabled">
             {{ alarm.enabled ? 'Enabled' : 'Paused' }}
           </strong>
           <span class="status-separator">•</span>
@@ -119,7 +119,7 @@
       <div class="form-group">
         <label for="alarm-time">Waktu:</label>
         <div class="time-picker-card">
-          <div class="large-time-display" aria-live="polite">{{ alarmTime() || '--:--' }}</div>
+          <div class="large-time-display">{{ alarmTime() || '--:--' }}</div>
           <span class="device-timezone">Waktu perangkat: {{ getDeviceTimeZone() }}</span>
           <input id="alarm-time" type="time" [(ngModel)]="alarmTime" name="alarmTime" required />
         </div>
@@ -213,7 +213,7 @@
         <p class="field-hint error-hint" *ngIf="alarmDateError()">{{ alarmDateError() }}</p>
       </div>
 
-      <div class="schedule-summary" aria-live="polite">
+      <div class="schedule-summary">
         <span class="summary-label">Ringkasan</span>
         <strong>{{ scheduleSummary() }}</strong>
       </div>
