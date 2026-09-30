@@ -41,6 +41,9 @@
             }
             @if (showFromDropdown()) {
               <div id="from-city-listbox" class="dropdown-list" role="listbox" aria-label="From city options">
+                @if (filteredFromCities.length === 0) {
+                  <div class="dropdown-empty" role="status">{{ dict().noCitiesFound || 'No cities found' }}</div>
+                }
                 @for (city of filteredFromCities; track city.name; let index = $index) {
                   <button type="button" class="dropdown-item" role="option" [id]="'from-city-option-' + index" [class.highlighted]="highlightedFromIndex() === index" [attr.aria-selected]="selectedFromCity()?.name === city.name" (click)="selectFromCity(city)">
                     <span class="city-name">{{ city.name }}</span>
@@ -92,6 +95,9 @@
             }
             @if (showToDropdown()) {
               <div id="to-city-listbox" class="dropdown-list" role="listbox" aria-label="To city options">
+                @if (filteredToCities.length === 0) {
+                  <div class="dropdown-empty" role="status">{{ dict().noCitiesFound || 'No cities found' }}</div>
+                }
                 @for (city of filteredToCities; track city.name; let index = $index) {
                   <button type="button" class="dropdown-item" role="option" [id]="'to-city-option-' + index" [class.highlighted]="highlightedToIndex() === index" [attr.aria-selected]="selectedToCity()?.name === city.name" (click)="selectToCity(city)">
                     <span class="city-name">{{ city.name }}</span>

@@ -12,6 +12,10 @@ export class AlarmTimerService {
   private timerIntervals = new Map<string, ReturnType<typeof setInterval>>();
   notificationPermission = signal<NotificationPermission>('default');
 
+  isNotificationSupported(): boolean {
+    return 'Notification' in window;
+  }
+
   constructor() {
     this.checkNotificationPermission();
     this.loadAlarmsFromStorage();
@@ -24,7 +28,7 @@ export class AlarmTimerService {
   }
 
   async requestNotificationPermission(): Promise<boolean> {
-    if (!('Notification' in window)) {
+    if (!this.isNotificationSupported()) {
       console.warn('Browser tidak mendukung Notification API');
       return false;
     }

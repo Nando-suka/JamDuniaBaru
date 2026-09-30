@@ -176,6 +176,13 @@
   transition: background 0.15s ease;
 }
 
+.dropdown-empty {
+  padding: 12px;
+  color: var(--secondary-text, #666);
+  font-size: 13px;
+  text-align: center;
+}
+
 .dropdown-item:hover {
   background: var(--hover-bg, #f0f4f8);
 }

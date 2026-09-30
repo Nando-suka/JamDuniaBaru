@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
 import { ToastService } from './toast.service';
 import { AlarmNextOccurrenceService } from './alarm-next-occurrence.service';
+import { LanguageService } from './languange.service';
 
 // Type of alarm
 type AlarmRepeatMode = 'never' | 'daily' | 'custom';
@@ -19,6 +20,7 @@ export class AlarmTimerComponent {
   private alarmTimerService = inject(AlarmTimerService);
   private toastService = inject(ToastService);
   private nextOccurrenceService = inject(AlarmNextOccurrenceService);
+  private langService = inject(LanguageService);
 
   showAlarmModal = signal(false);
   showTimerModal = signal(false);
@@ -145,7 +147,19 @@ export class AlarmTimerComponent {
   activeTimers = this.alarmTimerService.activeTimers;
   notificationPermission = this.alarmTimerService.notificationPermission;
   toasts = this.toastService.toasts;
+  dict = this.langService.text;
   private focusReturnTarget: HTMLElement | null = null;
+
+  shouldShowNotificationGuidance(): boolean {
+    return (
+      this.notificationPermission() !== 'granted' &&
+      (this.alarms().length > 0 || this.activeTimers().length > 0)
+    );
+  }
+
+  isNotificationSupported(): boolean {
+    return this.alarmTimerService.isNotificationSupported();
+  }
 
   getAlarmNextOccurrence = (alarm: any) => {
     return this.nextOccurrenceService.calculateNextOccurrence(

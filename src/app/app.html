@@ -177,6 +177,22 @@
               </button>
             </div>
           </div>
+          <div class="map-city-list" aria-label="Cities on map">
+            <h4>Choose a city</h4>
+            <div class="map-city-list-grid">
+              <button
+                *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
+                type="button"
+                class="map-city-list-item"
+                [class.selected]="activeMapCity() === city.name"
+                [attr.aria-pressed]="activeMapCity() === city.name"
+                (click)="selectCityOnMap(city.name)"
+              >
+                <span>{{ city.name }}</span>
+                <span>{{ getFormattedTime(city.offset) }}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </ng-container>
     </ng-template>

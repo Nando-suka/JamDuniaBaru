@@ -23,6 +23,12 @@ export const translations = {
     to: 'Ke',
     selectBothCities: 'Pilih kota asal dan tujuan',
     reset: 'Reset',
+    notificationPermissionPrompt: 'Izinkan notifikasi untuk menerima alarm dan timer.',
+    allowNotifications: 'Izinkan Notifikasi',
+    notificationsBlocked: 'Notifikasi diblokir.',
+    notificationHelp: 'Pelajari cara mengizinkan notifikasi',
+    notificationsUnsupported: 'Notifikasi tidak didukung oleh browser ini.',
+    noCitiesFound: 'Kota tidak ditemukan',
   },
   en: {
     title: 'Modern World Clock',
@@ -43,6 +49,12 @@ export const translations = {
     to: 'To',
     selectBothCities: 'Select source and destination cities',
     reset: 'Reset',
+    notificationPermissionPrompt: 'Allow notifications to receive alarm and timer alerts.',
+    allowNotifications: 'Allow Notifications',
+    notificationsBlocked: 'Notifications are blocked.',
+    notificationHelp: 'Learn how to allow notifications',
+    notificationsUnsupported: 'Notifications are not supported by this browser.',
+    noCitiesFound: 'No cities found',
   },
 };
 

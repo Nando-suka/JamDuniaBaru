@@ -15,9 +15,13 @@
     </button>
   </div>
 
-  <div class="notification-banner" *ngIf="notificationPermission() !== 'granted'">
-    <p>Untuk menerima notifikasi alarm dan timer, izinkan akses notifikasi.</p>
-    <button class="btn-primary" (click)="requestNotificationPermission()">Izinkan Notifikasi</button>
+  <div class="notification-banner" *ngIf="shouldShowNotificationGuidance()">
+    <p>
+      {{ !isNotificationSupported() ? dict().notificationsUnsupported : notificationPermission() === 'denied' ? dict().notificationsBlocked : dict().notificationPermissionPrompt }}
+    </p>
+    <button *ngIf="isNotificationSupported() && notificationPermission() !== 'denied'" class="btn-primary" (click)="requestNotificationPermission()">
+      {{ dict().allowNotifications }}
+    </button>
     <a
       *ngIf="notificationPermission() === 'denied'"
       class="notification-help-link"
@@ -25,7 +29,7 @@
       target="_blank"
       rel="noopener noreferrer"
     >
-      Notifications blocked: how to allow them
+      {{ dict().notificationHelp }}
     </a>
   </div>
 
