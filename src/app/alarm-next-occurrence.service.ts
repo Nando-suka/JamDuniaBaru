@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AlarmDay } from './alarm-timer.service';
+import { LanguageService } from './languange.service';
 
 export interface AlarmNextOccurrence {
   type: 'today' | 'tomorrow' | 'weekday' | 'paused' | 'invalid';
@@ -11,6 +12,8 @@ export interface AlarmNextOccurrence {
   providedIn: 'root',
 })
 export class AlarmNextOccurrenceService {
+  private langService = inject(LanguageService);
+
   calculateNextOccurrence(
     alarmTime: string,
     enabled: boolean,
@@ -19,12 +22,12 @@ export class AlarmNextOccurrenceService {
     date?: string
   ): AlarmNextOccurrence {
     if (!enabled) {
-      return { type: 'paused', message: 'Alarm is paused' };
+      return { type: 'paused', message: this.dict().alarmPaused };
     }
 
     const [hours, minutes] = alarmTime.split(':').map(Number);
     if (Number.isNaN(hours) || Number.isNaN(minutes)) {
-      return { type: 'invalid', message: 'Invalid alarm time' };
+      return { type: 'invalid', message: this.dict().invalidAlarmTime };
     }
 
     const now = new Date();
@@ -32,12 +35,12 @@ export class AlarmNextOccurrenceService {
 
     if (repeatMode === 'never') {
       if (!date) {
-        return { type: 'invalid', message: 'No date set' };
+        return { type: 'invalid', message: this.dict().noDateSet };
       }
 
       const alarmDate = new Date(date + 'T' + alarmTime);
       if (alarmDate < now) {
-        return { type: 'invalid', message: 'Alarm time has passed' };
+        return { type: 'invalid', message: this.dict().alarmPassed };
       }
 
       const dateOnly = new Date(date);
@@ -45,14 +48,14 @@ export class AlarmNextOccurrenceService {
         const timeUntil = this.getTimeUntilString(now, alarmDate);
         return {
           type: 'today',
-          message: `Next alarm: Today at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
           timeUntil,
         };
       }
 
       return {
         type: 'tomorrow',
-        message: `Next alarm: ${this.formatDateAdjective(dateOnly)} at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${this.formatDateAdjective(dateOnly)} at ${alarmTime}`,
       };
     }
 
@@ -64,7 +67,7 @@ export class AlarmNextOccurrenceService {
         const timeUntil = this.getTimeUntilString(now, alarmDateToday);
         return {
           type: 'today',
-          message: `Next alarm: Today at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
           timeUntil,
         };
       }
@@ -75,14 +78,14 @@ export class AlarmNextOccurrenceService {
 
       return {
         type: 'tomorrow',
-        message: `Next alarm: Tomorrow at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} at ${alarmTime}`,
       };
     }
 
     if (repeatMode === 'custom' && repeatDays.length > 0) {
       const nextDate = this.getNextAlarmDate(hours, minutes, repeatDays, now);
       if (!nextDate) {
-        return { type: 'invalid', message: 'No upcoming alarm' };
+        return { type: 'invalid', message: this.dict().noUpcomingAlarm };
       }
 
       const dayName = this.getDayName(nextDate);
@@ -92,18 +95,18 @@ export class AlarmNextOccurrenceService {
         const timeUntil = this.getTimeUntilString(now, nextDate);
         return {
           type: 'today',
-          message: `Next alarm: Today at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
           timeUntil,
         };
       }
 
       return {
         type: 'weekday',
-        message: `Next alarm: ${dayName} at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${dayName} at ${alarmTime}`,
       };
     }
 
-    return { type: 'invalid', message: 'No repeat configuration' };
+    return { type: 'invalid', message: this.dict().noRepeatConfiguration };
   }
 
   private getTimeUntilString(now: Date, alarmDate: Date): string {
@@ -113,9 +116,9 @@ export class AlarmNextOccurrenceService {
     const minutes = diffMinutes % 60;
 
     if (hours > 0) {
-      return `Alarm is scheduled in ${hours}h ${minutes}m`;
+      return `${this.dict().alarmScheduledIn} ${hours}h ${minutes}m`;
     }
-    return `Alarm is scheduled in ${minutes}m`;
+    return `${this.dict().alarmScheduledIn} ${minutes}m`;
   }
 
   private getNextAlarmDate(
@@ -160,12 +163,14 @@ export class AlarmNextOccurrenceService {
   }
 
   private getDayName(date: Date): string {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[date.getDay()];
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', { weekday: 'long' }).format(date);
   }
 
   private formatDateAdjective(date: Date): string {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[date.getDay()];
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', { weekday: 'long' }).format(date);
+  }
+
+  private dict() {
+    return this.langService.text();
   }
 }

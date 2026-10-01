@@ -46,7 +46,7 @@
         <div class="alarm-next-occurrence" [class.paused]="!alarm.enabled">
           <span class="status-label">Status:</span>
           <strong class="status-value" [class.enabled]="alarm.enabled" [class.paused]="!alarm.enabled">
-            {{ alarm.enabled ? 'Enabled' : 'Paused' }}
+            {{ alarm.enabled ? dict().enabled : dict().paused }}
           </strong>
           <span class="status-separator">•</span>
           {{ getAlarmNextOccurrence(alarm).message }}

@@ -38,8 +38,8 @@
             class="control-btn"
             [class.active]="facade.showFavoritesOnly()"
             (click)="facade.toggleFavoritesOnly()"
-            [title]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
-            [attr.aria-label]="facade.showFavoritesOnly() ? 'Tampilkan Semua Kota' : 'Tampilkan Favorit Saja'"
+            [title]="facade.showFavoritesOnly() ? dict().showAllCities : 'Tampilkan Favorit Saja'"
+            [attr.aria-label]="facade.showFavoritesOnly() ? dict().showAllCities : 'Tampilkan Favorit Saja'"
           >
             <span aria-hidden="true">❤️</span>
             <span *ngIf="favoritesService.getFavoritesCount() > 0" class="badge">{{ favoritesService.getFavoritesCount() }}</span>
@@ -142,12 +142,12 @@
         <div class="map-view-section">
           <div class="map-view-header">
             <h3 id="world-map-title">Peta Kota</h3>
-            <p>Pilih kota pada peta untuk melihat waktu lokalnya.</p>
+            <p>{{ dict().mapInstructions }}</p>
             <p class="map-selection-status" role="status" aria-live="polite">
               @if (activeMapCity()) {
-                Selected city: {{ activeMapCity() }}
+                {{ dict().selectedCity }}: {{ activeMapCity() }}
               } @else {
-                No city selected
+                {{ dict().noCitySelected }}
               }
             </p>
           </div>
@@ -178,7 +178,7 @@
             </div>
           </div>
           <div class="map-city-list" aria-label="Cities on map">
-            <h4>Choose a city</h4>
+            <h4>{{ dict().chooseCity }}</h4>
             <div class="map-city-list-grid">
               <button
                 *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
@@ -241,9 +241,9 @@
       <!-- Display Result or No Results Message -->
       <ng-container *ngIf="facade.showFavoritesOnly() && facade.filteredLocations().length === 0; else searchOrClockList">
         <div class="empty-state favorites-empty-state">
-          <p>No favorite cities yet.</p>
+          <p>{{ dict().noFavoriteCities }}</p>
           <button class="reset-search-btn" type="button" (click)="showAllCities()">
-            Show all cities
+            {{ dict().showAllCities }}
           </button>
         </div>
       </ng-container>

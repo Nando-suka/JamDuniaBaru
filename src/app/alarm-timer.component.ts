@@ -457,9 +457,9 @@ export class AlarmTimerComponent {
   async requestNotificationPermission(): Promise<void> {
     const granted = await this.alarmTimerService.requestNotificationPermission();
     if (granted) {
-      this.toastService.success('Notifications enabled');
+      this.toastService.success(this.dict().notificationsEnabled);
     } else if (this.notificationPermission() === 'denied') {
-      this.toastService.warning('Notifications blocked. Enable them in browser settings.');
+      this.toastService.warning(this.dict().notificationBlockedToast);
     }
   }
 

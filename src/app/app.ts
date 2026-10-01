@@ -154,7 +154,7 @@ export class App implements OnInit, OnDestroy {
     const wasFavorite = this.favoritesService.isFavorite(city);
     this.favoritesService.toggleFavorite(city);
     this.actionFeedback.set(
-      wasFavorite ? `${city.name} removed from favorites` : `${city.name} added to favorites`
+      `${city.name} ${wasFavorite ? this.dict().favoriteRemoved : this.dict().favoriteAdded}`
     );
   }
 
