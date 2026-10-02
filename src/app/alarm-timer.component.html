@@ -1,7 +1,7 @@
 <div class="alarm-timer-container">
   <!-- Toast Container -->
   <div class="toast-container" role="region" aria-label="Notifications" aria-live="polite" aria-atomic="false">
-    <div *ngFor="let toast of toasts()" [class]="'toast toast-' + toast.type" [@fadeInOut]>
+    <div *ngFor="let toast of toasts()" [class]="'toast toast-' + toast.type">
       {{ toast.message }}
     </div>
   </div>
@@ -15,15 +15,15 @@
     </button>
   </div>
 
-  <div class="notification-banner" *ngIf="shouldShowNotificationGuidance()">
-    <p>
-      {{ !isNotificationSupported() ? dict().notificationsUnsupported : notificationPermission() === 'denied' ? dict().notificationsBlocked : dict().notificationPermissionPrompt }}
-    </p>
-    <button *ngIf="isNotificationSupported() && notificationPermission() !== 'denied'" class="btn-primary" (click)="requestNotificationPermission()">
+  <div class="notification-banner" *ngIf="notificationGuidanceState() !== 'hidden'">
+    <p *ngIf="notificationGuidanceState() === 'default'">{{ dict().notificationPermissionPrompt }}</p>
+    <p *ngIf="notificationGuidanceState() === 'denied'">{{ dict().notificationsBlocked }}</p>
+    <p *ngIf="notificationGuidanceState() === 'unsupported'">{{ dict().notificationsUnsupported }}</p>
+    <button *ngIf="notificationGuidanceState() === 'default'" class="btn-primary" (click)="requestNotificationPermission()">
       {{ dict().allowNotifications }}
     </button>
     <a
-      *ngIf="notificationPermission() === 'denied'"
+      *ngIf="notificationGuidanceState() === 'denied'"
       class="notification-help-link"
       href="https://support.google.com/chrome/answer/3220216"
       target="_blank"

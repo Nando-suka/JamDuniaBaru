@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { vi } from 'vitest';
 import { App } from './app';
 import { AlarmTimerService } from './alarm-timer.service';
+import { AlarmTimerComponent } from './alarm-timer.component';
 
 describe('App', () => {
   let fixture: any;
@@ -14,6 +17,7 @@ describe('App', () => {
 
   afterEach(() => {
     fixture.destroy();
+    vi.restoreAllMocks();
   });
 
   it('should create the app', () => {
@@ -147,5 +151,60 @@ describe('App', () => {
     );
 
     expect(statusText).toBe(true);
+  });
+
+  it('should defer notification guidance until scheduling and distinguish permission states', async () => {
+    const alarmService = TestBed.inject(AlarmTimerService);
+    const app = fixture.componentInstance;
+    app.showAlarmTimer.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const alarmComponent = fixture.debugElement.query(By.directive(AlarmTimerComponent))
+      .componentInstance as AlarmTimerComponent;
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.notification-banner')).toBeNull();
+
+    vi.spyOn(alarmService, 'isNotificationSupported').mockReturnValue(true);
+    alarmService.notificationPermission.set('default');
+    alarmComponent.addOrUpdateAlarm();
+    fixture.detectChanges();
+
+    let banner = root.querySelector('.notification-banner') as HTMLElement;
+    expect(banner.textContent).toContain('Allow notifications');
+    expect(banner.querySelector('button')?.textContent).toContain('Allow Notifications');
+    expect(banner.querySelector('a')).toBeNull();
+
+    alarmService.notificationPermission.set('denied');
+    expect(alarmComponent.notificationGuidanceState()).toBe('denied');
+
+    const alarm = alarmService.alarms()[0];
+    vi.spyOn(alarmService, 'isNotificationSupported').mockReturnValue(false);
+    expect(alarmComponent.notificationGuidanceState()).toBe('unsupported');
+    alarmService.removeAlarm(alarm.id);
+  });
+
+  it('should show notification guidance after starting a timer in a new session', async () => {
+    const app = fixture.componentInstance;
+    const alarmService = TestBed.inject(AlarmTimerService);
+    app.showAlarmTimer.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const alarmComponent = fixture.debugElement.query(By.directive(AlarmTimerComponent))
+      .componentInstance as AlarmTimerComponent;
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.notification-banner')).toBeNull();
+
+    vi.spyOn(alarmService, 'isNotificationSupported').mockReturnValue(true);
+    alarmService.notificationPermission.set('default');
+    alarmComponent.startTimer();
+    fixture.detectChanges();
+
+    const banner = root.querySelector('.notification-banner') as HTMLElement;
+    expect(banner.textContent).toContain('Allow notifications');
+
+    const timer = alarmService.activeTimers()[0];
+    if (timer) alarmService.stopTimer(timer.id);
   });
 });

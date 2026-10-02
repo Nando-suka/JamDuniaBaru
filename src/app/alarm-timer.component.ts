@@ -25,6 +25,7 @@ export class AlarmTimerComponent {
   showAlarmModal = signal(false);
   showTimerModal = signal(false);
   activeTab = signal<'alarm' | 'timer'>('alarm');
+  hasScheduledDuringSession = signal(false);
 
   editingAlarmId = signal<string | null>(null);
   isEditing = computed(() => this.editingAlarmId() !== null);
@@ -150,11 +151,17 @@ export class AlarmTimerComponent {
   dict = this.langService.text;
   private focusReturnTarget: HTMLElement | null = null;
 
-  shouldShowNotificationGuidance(): boolean {
-    return (
-      this.notificationPermission() !== 'granted' &&
-      (this.alarms().length > 0 || this.activeTimers().length > 0)
-    );
+  notificationGuidanceState(): 'hidden' | 'default' | 'denied' | 'unsupported' {
+    if (!this.hasScheduledDuringSession()) {
+      return 'hidden';
+    }
+    if (!this.isNotificationSupported()) {
+      return 'unsupported';
+    }
+
+    const permission = this.notificationPermission();
+    if (permission === 'granted') return 'hidden';
+    return permission === 'denied' ? 'denied' : 'default';
   }
 
   isNotificationSupported(): boolean {
@@ -238,6 +245,7 @@ export class AlarmTimerComponent {
         this.snoozeMinutes(),
         this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
+      this.hasScheduledDuringSession.set(true);
       this.toastService.success(`Alarm added for ${time}`);
     }
     this.closeAlarmModal();
@@ -389,6 +397,7 @@ export class AlarmTimerComponent {
     if (this.timerFormInvalid()) return;
 
     this.alarmTimerService.startTimer(this.timerDuration(), this.timerLabel().trim());
+    this.hasScheduledDuringSession.set(true);
     this.toastService.success(`Timer started for ${this.timerLabel().trim()}`);
     this.closeTimerModal();
   }
