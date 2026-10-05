@@ -1,7 +1,12 @@
 <div class="alarm-timer-container">
   <!-- Toast Container -->
-  <div class="toast-container" role="region" aria-label="Notifications" aria-live="polite" aria-atomic="false">
-    <div *ngFor="let toast of toasts()" [class]="'toast toast-' + toast.type">
+  <div class="toast-container">
+    <div
+      *ngFor="let toast of toasts()"
+      [class]="'toast toast-' + toast.type"
+      [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+      aria-atomic="true"
+    >
       {{ toast.message }}
     </div>
   </div>

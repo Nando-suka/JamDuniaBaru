@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 import { App } from './app';
 import { AlarmTimerService } from './alarm-timer.service';
 import { AlarmTimerComponent } from './alarm-timer.component';
+import { ToastService } from './toast.service';
 
 describe('App', () => {
   let fixture: any;
@@ -151,6 +152,24 @@ describe('App', () => {
     );
 
     expect(statusText).toBe(true);
+  });
+
+  it('should announce errors assertively and routine toast feedback politely', async () => {
+    const toastService = TestBed.inject(ToastService);
+    toastService.success('Alarm saved');
+    toastService.error('Alarm could not be saved');
+    fixture.componentInstance.showAlarmTimer.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const successToast = root.querySelector('.toast-success') as HTMLElement;
+    const errorToast = root.querySelector('.toast-error') as HTMLElement;
+
+    expect(successToast.getAttribute('role')).toBe('status');
+    expect(successToast.getAttribute('aria-atomic')).toBe('true');
+    expect(errorToast.getAttribute('role')).toBe('alert');
+    expect(errorToast.getAttribute('aria-atomic')).toBe('true');
   });
 
   it('should defer notification guidance until scheduling and distinguish permission states', async () => {
