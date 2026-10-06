@@ -152,7 +152,13 @@
             </p>
           </div>
           <div class="world-map-container" role="region" aria-labelledby="world-map-title">
-            <div class="world-map" (click)="clearMapSelection()">
+            <div class="map-zoom-controls" role="group" [attr.aria-label]="dict().mapZoomControls">
+              <button type="button" [attr.aria-label]="dict().zoomOut" [disabled]="mapZoom() <= 1" (click)="zoomMapOut()">−</button>
+              <span aria-live="off">{{ mapZoomPercent() }}%</span>
+              <button type="button" [attr.aria-label]="dict().zoomIn" [disabled]="mapZoom() >= 2.5" (click)="zoomMapIn()">+</button>
+              <button type="button" [attr.aria-label]="dict().resetMapZoom" [disabled]="mapZoom() === 1" (click)="resetMapZoom()">{{ dict().resetMapZoom }}</button>
+            </div>
+            <div class="world-map" [style.transform]="'scale(' + mapZoom() + ')'" (click)="clearMapSelection()">
               <svg class="world-map-land" viewBox="0 0 1000 500" aria-hidden="true" focusable="false" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72" fill="rgba(31,104,87,.48)" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linejoin="round">
                 <path d="M80 118 126 82 194 72 245 96 270 139 245 164 208 155 184 181 145 170 117 194 84 176 57 145Z" />
                 <path d="M258 206 304 216 331 256 327 298 300 336 278 390 248 414 232 383 246 337 229 301 241 264Z" />
@@ -162,7 +168,7 @@
                 <path d="M852 362 899 349 937 369 944 399 912 418 870 408 844 389Z" />
               </svg>
               <button
-                *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
+                *ngFor="let city of mapLocations; trackBy: trackByLocationName"
                 type="button"
                 class="map-pin"
                 [class.selected]="activeMapCity() === city.name"
@@ -177,11 +183,11 @@
               </button>
             </div>
           </div>
-          <div class="map-city-list" aria-label="Cities on map">
-            <h4>{{ dict().chooseCity }}</h4>
+          <section class="map-city-list" aria-labelledby="map-city-list-title">
+            <h4 id="map-city-list-title">{{ dict().chooseCity }}</h4>
             <div class="map-city-list-grid">
               <button
-                *ngFor="let city of facade.filteredLocations(); trackBy: trackByLocationName"
+                *ngFor="let city of mapLocations; trackBy: trackByLocationName"
                 type="button"
                 class="map-city-list-item"
                 [class.selected]="activeMapCity() === city.name"
@@ -189,10 +195,10 @@
                 (click)="selectCityOnMap(city.name)"
               >
                 <span>{{ city.name }}</span>
-                <span>{{ getFormattedTime(city.offset) }}</span>
+                <time>{{ getFormattedTime(city.offset) }}</time>
               </button>
             </div>
-          </div>
+          </section>
         </div>
       </ng-container>
     </ng-template>

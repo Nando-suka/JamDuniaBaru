@@ -101,6 +101,22 @@ describe('App', () => {
     expect(status.getAttribute('role')).toBe('status');
     expect(status.getAttribute('aria-live')).toBe('polite');
     expect(status.textContent).toContain('Selected city: Jakarta');
+
+    const cityItems = Array.from(
+      fixture.nativeElement.querySelectorAll('.map-city-list-item')
+    ) as HTMLButtonElement[];
+    expect(cityItems.length).toBe(app.mapLocations.length);
+    const selectedCityItem = cityItems.find((item) => item.textContent?.includes('Jakarta'));
+    expect(selectedCityItem?.getAttribute('aria-pressed')).toBe('true');
+    expect(fixture.nativeElement.querySelector('.map-pin.selected')?.getAttribute('aria-label')).toBe('Jakarta');
+
+    app.zoomMapIn();
+    fixture.detectChanges();
+    expect((fixture.nativeElement.querySelector('.world-map') as HTMLElement).style.transform).toBe('scale(1.25)');
+    for (let step = 0; step < 10; step++) app.zoomMapIn();
+    expect(app.mapZoom()).toBe(2.5);
+    for (let step = 0; step < 20; step++) app.zoomMapOut();
+    expect(app.mapZoom()).toBe(1);
   });
 
   it('should label the mobile tools trigger for assistive technology', async () => {

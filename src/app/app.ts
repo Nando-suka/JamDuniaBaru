@@ -35,6 +35,7 @@ export class App implements OnInit, OnDestroy {
   showAnalogClock = signal(false);
   showMapView = signal(false);
   activeMapCity = signal<string | null>(null);
+  mapZoom = signal(1);
   showToolsSheet = signal(false);
   isMobileView = signal(false);
   scrollVisible = signal(false);
@@ -54,6 +55,26 @@ export class App implements OnInit, OnDestroy {
   private timer: any;
 
   dict = this.langService.text;
+
+  get mapLocations(): City[] {
+    return this.facade.getAllLocations();
+  }
+
+  mapZoomPercent(): number {
+    return Math.round(this.mapZoom() * 100);
+  }
+
+  zoomMapIn(): void {
+    this.mapZoom.update((zoom) => Math.min(2.5, Math.round((zoom + 0.25) * 100) / 100));
+  }
+
+  zoomMapOut(): void {
+    this.mapZoom.update((zoom) => Math.max(1, Math.round((zoom - 0.25) * 100) / 100));
+  }
+
+  resetMapZoom(): void {
+    this.mapZoom.set(1);
+  }
 
   private getStoredTimeFormat(): '12h' | '24h' {
     try {

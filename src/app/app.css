@@ -586,6 +586,7 @@
 }
 
 .world-map-container {
+  position: relative;
   width: 100%;
   aspect-ratio: 2 / 1;
   background: linear-gradient(180deg, rgba(142, 197, 252, 0.9), rgba(224, 195, 252, 0.95));
@@ -596,9 +597,10 @@
 }
 
 .map-city-list {
-  display: none;
   margin-top: 1rem;
   text-align: left;
+  border-top: 1px solid var(--card-border);
+  padding-top: 1rem;
 }
 
 .map-city-list h4 {
@@ -632,6 +634,12 @@
   font-weight: 600;
 }
 
+.map-city-list-item time {
+  white-space: nowrap;
+  color: var(--secondary-text);
+  font-variant-numeric: tabular-nums;
+}
+
 .world-map {
   position: relative;
   width: 100%;
@@ -645,6 +653,55 @@
     linear-gradient(0deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05));
   background-size: 44px 44px, 44px 44px, auto, auto, auto;
   overflow: hidden;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.map-zoom-controls {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.map-zoom-controls button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.map-zoom-controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.map-zoom-controls button:focus-visible,
+.map-city-list-item:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.map-zoom-controls span {
+  min-width: 3.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .world-map::before {
@@ -713,10 +770,6 @@
 }
 
 @media (max-width: 768px) {
-  .map-city-list {
-    display: block;
-  }
-
   .container.map-mode-container,
   .container.analog-mode-container,
   .container.alarm-mode-container,
