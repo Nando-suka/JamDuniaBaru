@@ -89,15 +89,23 @@
 
 .city-search-input {
   width: 100%;
-  padding: 10px 12px;
+  min-width: 0;
+  padding: 10px 48px 10px 12px;
   border: 1px solid var(--border-color, #ddd);
   border-radius: 8px;
   font-size: 14px;
   background: var(--input-bg, var(--card-bg, #fff));
   color: var(--text-color, #333);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+.city-search-input.has-offset {
+  padding-right: 116px;
 }
 
 .city-search-input:focus {
@@ -145,21 +153,29 @@
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
+  max-width: calc(100% - 50px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Dropdown List */
-.dropdown-list {
+.dropdown-panel {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  max-height: 200px;
-  overflow-y: auto;
+  z-index: 100;
+  margin-top: 4px;
   background: var(--card-bg, #fff);
   border: 1px solid var(--border-color, #ddd);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-  z-index: 100;
-  margin-top: 4px;
+}
+
+.dropdown-list {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--card-bg, #fff);
 }
 
 .dropdown-item {
@@ -181,6 +197,13 @@
   color: var(--secondary-text, #666);
   font-size: 13px;
   text-align: center;
+}
+
+.dropdown-result-count {
+  padding: 6px 12px;
+  border-top: 1px solid var(--border-color, #ddd);
+  color: var(--secondary-text, #666);
+  font-size: 12px;
 }
 
 .dropdown-item:hover {

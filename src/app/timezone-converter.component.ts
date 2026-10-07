@@ -68,6 +68,10 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     return [...starts, ...includes];
   }
 
+  getCityResultAnnouncement(count: number): string {
+    return this.dict().matchingCities.replace('{count}', String(count));
+  }
+
   // Signal bindings
   get selectedFromCity() {
     return this.converterService.selectedFromCity;

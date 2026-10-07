@@ -26,8 +26,12 @@
               aria-autocomplete="list"
               [attr.aria-expanded]="showFromDropdown()"
               aria-controls="from-city-listbox"
+              [attr.aria-describedby]="showFromDropdown() && searchFromQuery().trim() ? 'from-city-result-status' : null"
               [attr.aria-activedescendant]="highlightedFromIndex() >= 0 ? 'from-city-option-' + highlightedFromIndex() : null"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
+              [class.has-clear]="searchFromQuery() || selectedFromCity()"
+              [class.has-offset]="selectedFromCity()"
+              [title]="selectedFromCity()?.name || searchFromQuery()"
               [value]="searchFromQuery() || selectedFromCity()?.name || ''"
               (input)="onFromSearchChange($any($event.target).value)"
               (focus)="toggleFromDropdown()"
@@ -40,15 +44,21 @@
               <span class="offset-badge">{{ getCityOffsetString(selectedFromCity()!) }}</span>
             }
             @if (showFromDropdown()) {
-              <div id="from-city-listbox" class="dropdown-list" role="listbox" aria-label="From city options">
-                @if (filteredFromCities.length === 0) {
-                  <div class="dropdown-empty" role="status">{{ dict().noCitiesFound || 'No cities found' }}</div>
-                }
-                @for (city of filteredFromCities; track city.name; let index = $index) {
-                  <button type="button" class="dropdown-item" role="option" [id]="'from-city-option-' + index" [class.highlighted]="highlightedFromIndex() === index" [attr.aria-selected]="selectedFromCity()?.name === city.name" (click)="selectFromCity(city)">
-                    <span class="city-name">{{ city.name }}</span>
-                    <span class="city-offset">{{ getCityOffsetString(city) }}</span>
-                  </button>
+              <div class="dropdown-panel">
+                <div id="from-city-listbox" class="dropdown-list" role="listbox" aria-label="From city options">
+                  @for (city of filteredFromCities; track city.name; let index = $index) {
+                    <button type="button" class="dropdown-item" role="option" [id]="'from-city-option-' + index" [class.highlighted]="highlightedFromIndex() === index" [attr.aria-selected]="selectedFromCity()?.name === city.name" (click)="selectFromCity(city)">
+                      <span class="city-name">{{ city.name }}</span>
+                      <span class="city-offset">{{ getCityOffsetString(city) }}</span>
+                    </button>
+                  }
+                </div>
+                @if (searchFromQuery().trim() && filteredFromCities.length === 0) {
+                  <div id="from-city-result-status" class="dropdown-empty" role="status" aria-live="polite">{{ dict().noCitiesFound || 'No cities found' }}</div>
+                } @else if (searchFromQuery().trim()) {
+                  <div id="from-city-result-status" class="dropdown-result-count" role="status" aria-live="polite" aria-atomic="true">
+                    {{ getCityResultAnnouncement(filteredFromCities.length) }}
+                  </div>
                 }
               </div>
             }
@@ -80,8 +90,12 @@
               aria-autocomplete="list"
               [attr.aria-expanded]="showToDropdown()"
               aria-controls="to-city-listbox"
+              [attr.aria-describedby]="showToDropdown() && searchToQuery().trim() ? 'to-city-result-status' : null"
               [attr.aria-activedescendant]="highlightedToIndex() >= 0 ? 'to-city-option-' + highlightedToIndex() : null"
               [placeholder]="dict().selectCity || 'Pilih kota...'"
+              [class.has-clear]="searchToQuery() || selectedToCity()"
+              [class.has-offset]="selectedToCity()"
+              [title]="selectedToCity()?.name || searchToQuery()"
               [value]="searchToQuery() || selectedToCity()?.name || ''"
               (input)="onToSearchChange($any($event.target).value)"
               (focus)="toggleToDropdown()"
@@ -94,15 +108,21 @@
               <span class="offset-badge">{{ getCityOffsetString(selectedToCity()!) }}</span>
             }
             @if (showToDropdown()) {
-              <div id="to-city-listbox" class="dropdown-list" role="listbox" aria-label="To city options">
-                @if (filteredToCities.length === 0) {
-                  <div class="dropdown-empty" role="status">{{ dict().noCitiesFound || 'No cities found' }}</div>
-                }
-                @for (city of filteredToCities; track city.name; let index = $index) {
-                  <button type="button" class="dropdown-item" role="option" [id]="'to-city-option-' + index" [class.highlighted]="highlightedToIndex() === index" [attr.aria-selected]="selectedToCity()?.name === city.name" (click)="selectToCity(city)">
-                    <span class="city-name">{{ city.name }}</span>
-                    <span class="city-offset">{{ getCityOffsetString(city) }}</span>
-                  </button>
+              <div class="dropdown-panel">
+                <div id="to-city-listbox" class="dropdown-list" role="listbox" aria-label="To city options">
+                  @for (city of filteredToCities; track city.name; let index = $index) {
+                    <button type="button" class="dropdown-item" role="option" [id]="'to-city-option-' + index" [class.highlighted]="highlightedToIndex() === index" [attr.aria-selected]="selectedToCity()?.name === city.name" (click)="selectToCity(city)">
+                      <span class="city-name">{{ city.name }}</span>
+                      <span class="city-offset">{{ getCityOffsetString(city) }}</span>
+                    </button>
+                  }
+                </div>
+                @if (searchToQuery().trim() && filteredToCities.length === 0) {
+                  <div id="to-city-result-status" class="dropdown-empty" role="status" aria-live="polite">{{ dict().noCitiesFound || 'No cities found' }}</div>
+                } @else if (searchToQuery().trim()) {
+                  <div id="to-city-result-status" class="dropdown-result-count" role="status" aria-live="polite" aria-atomic="true">
+                    {{ getCityResultAnnouncement(filteredToCities.length) }}
+                  </div>
                 }
               </div>
             }

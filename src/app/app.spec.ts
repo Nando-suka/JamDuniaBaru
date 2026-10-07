@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 import { App } from './app';
 import { AlarmTimerService } from './alarm-timer.service';
 import { AlarmTimerComponent } from './alarm-timer.component';
+import { TimezoneConverterComponent } from './timezone-converter.component';
 import { ToastService } from './toast.service';
 
 describe('App', () => {
@@ -117,6 +118,35 @@ describe('App', () => {
     expect(app.mapZoom()).toBe(2.5);
     for (let step = 0; step < 20; step++) app.zoomMapOut();
     expect(app.mapZoom()).toBe(1);
+  });
+
+  it('should expose autocomplete no-results and result-count status outside the listbox', async () => {
+    const app = fixture.componentInstance;
+    app.showTimezoneConverter.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const converter = fixture.debugElement.query(By.directive(TimezoneConverterComponent))
+      .componentInstance as TimezoneConverterComponent;
+    const root = fixture.nativeElement as HTMLElement;
+    const fromInput = root.querySelector('#from-city-input') as HTMLInputElement;
+
+    converter.searchFromQuery.set('not-a-real-city');
+    converter.showFromDropdown.set(true);
+    fixture.detectChanges();
+
+    let resultStatus = root.querySelector('#from-city-result-status') as HTMLElement;
+    expect(resultStatus.getAttribute('role')).toBe('status');
+    expect(resultStatus.textContent).toContain('No cities found');
+    expect(fromInput.getAttribute('aria-describedby')).toBe('from-city-result-status');
+    expect(root.querySelectorAll('#from-city-listbox [role="option"]')).toHaveLength(0);
+
+    converter.searchFromQuery.set('New');
+    fixture.detectChanges();
+    resultStatus = root.querySelector('#from-city-result-status') as HTMLElement;
+    expect(resultStatus.getAttribute('aria-live')).toBe('polite');
+    expect(resultStatus.textContent).toContain('Matching cities: 1');
+    expect(root.querySelectorAll('#from-city-listbox [role="option"]')).toHaveLength(1);
   });
 
   it('should label the mobile tools trigger for assistive technology', async () => {
