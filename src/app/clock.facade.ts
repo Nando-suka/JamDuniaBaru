@@ -85,6 +85,13 @@ export class ClockFacade {
     { name: 'Guam', offset: 10, lat: 13.4443, lon: 144.7937 }, // Teritori AS
     { name: 'Auckland', offset: 12, lat: -36.8485, lon: 174.7633 }, // Selandia Baru
     { name: 'Fiji', offset: 12, lat: -17.7134, lon: 178.0650 }, // Fiji
+    { name: 'Adelaide', offset: 9.5, lat: -34.9285, lon: 138.6007 }, // Australia Tengah
+    { name: 'Darwin', offset: 9.5, lat: -12.4634, lon: 130.8456 },   // Australia Tengah (tanpa DST)
+    { name: 'Perth', offset: 8, lat: -31.9505, lon: 115.8605 },      // Australia Barat
+    { name: 'Hobart', offset: 10, lat: -42.8821, lon: 147.3272 },
+    { name: 'Suva', offset: 12, lat: -18.1416, lon: 178.4419 },     // Fiji (ibukota)
+    { name: 'Honiara', offset: 11, lat: -9.4319, lon: 159.9554 },   // Kep. Solomon
+    { name: 'Papeete', offset: -10, lat: -17.5516, lon: -149.5585 },// Polinesia Prancis (UTC-10)
   ];
 
   // ===== COMPUTED =====

@@ -43,6 +43,7 @@ export class App implements OnInit, OnDestroy {
   actionFeedback = signal('');
   private focusReturnTarget: HTMLElement | null = null;
   private scrollLabelTimer: any;
+  private actionFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
   };
@@ -177,6 +178,13 @@ export class App implements OnInit, OnDestroy {
     this.actionFeedback.set(
       `${city.name} ${wasFavorite ? this.dict().favoriteRemoved : this.dict().favoriteAdded}`
     );
+    if (this.actionFeedbackTimer) {
+      clearTimeout(this.actionFeedbackTimer);
+    }
+    this.actionFeedbackTimer = setTimeout(() => {
+      this.actionFeedback.set('');
+      this.actionFeedbackTimer = null;
+    }, 2500);
   }
 
   toggleToolsSheet(): void {
@@ -381,6 +389,9 @@ export class App implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.timer);
+    if (this.actionFeedbackTimer) {
+      clearTimeout(this.actionFeedbackTimer);
+    }
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onResize);
     if (this.scrollLabelTimer) {

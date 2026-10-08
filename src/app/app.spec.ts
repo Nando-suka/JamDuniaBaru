@@ -75,6 +75,30 @@ describe('App', () => {
     fixture.detectChanges();
   });
 
+  it('should dismiss favorite confirmation feedback after a short delay', async () => {
+    const app = fixture.componentInstance;
+    const city = app.facade.getAllLocations()[0];
+    const wasFavorite = app.favoritesService.isFavorite(city);
+
+    vi.useFakeTimers();
+    try {
+      app.toggleFavorite(city);
+      fixture.detectChanges();
+      expect(app.actionFeedback()).toContain(city.name);
+      expect(fixture.nativeElement.querySelector('.action-feedback')).toBeTruthy();
+
+      vi.advanceTimersByTime(2500);
+      fixture.detectChanges();
+      expect(app.actionFeedback()).toBe('');
+      expect(fixture.nativeElement.querySelector('.action-feedback')).toBeNull();
+    } finally {
+      if (app.favoritesService.isFavorite(city) !== wasFavorite) {
+        app.favoritesService.toggleFavorite(city);
+      }
+      vi.useRealTimers();
+    }
+  });
+
   it('should offer a show-all action when favorites are empty', async () => {
     const app = fixture.componentInstance;
     app.facade.showFavoritesOnly.set(true);
@@ -106,10 +130,24 @@ describe('App', () => {
     const cityItems = Array.from(
       fixture.nativeElement.querySelectorAll('.map-city-list-item')
     ) as HTMLButtonElement[];
-    expect(cityItems.length).toBe(app.mapLocations.length);
+    expect(cityItems.length).toBe(Math.min(12, app.mapLocations.length));
     const selectedCityItem = cityItems.find((item) => item.textContent?.includes('Jakarta'));
-    expect(selectedCityItem?.getAttribute('aria-pressed')).toBe('true');
+    expect(selectedCityItem).toBeUndefined();
     expect(fixture.nativeElement.querySelector('.map-pin.selected')?.getAttribute('aria-label')).toBe('Jakarta');
+
+    const firstCity = cityItems[0].querySelector('span')?.textContent?.trim();
+    cityItems[0].click();
+    fixture.detectChanges();
+    expect(app.activeMapCity()).toBe(firstCity);
+    expect(cityItems[0].getAttribute('aria-pressed')).toBe('true');
+    expect(fixture.nativeElement.querySelector('.map-pin.selected')?.getAttribute('aria-label')).toBe(firstCity);
+
+    const loadMoreButton = fixture.nativeElement.querySelector('.map-city-load-more') as HTMLButtonElement;
+    expect(loadMoreButton).toBeTruthy();
+    loadMoreButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 1050));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.map-city-list-item')).toHaveLength(24);
 
     app.zoomMapIn();
     fixture.detectChanges();

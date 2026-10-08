@@ -80,7 +80,7 @@
       </ng-container>
     </div>
 
-    <div class="action-feedback" role="status" aria-live="polite" aria-atomic="true">
+    <div *ngIf="actionFeedback()" class="action-feedback" role="status" aria-live="polite" aria-atomic="true">
       {{ actionFeedback() }}
     </div>
 
@@ -187,7 +187,7 @@
             <h4 id="map-city-list-title">{{ dict().chooseCity }}</h4>
             <div class="map-city-list-grid">
               <button
-                *ngFor="let city of mapLocations; trackBy: trackByLocationName"
+                *ngFor="let city of mapLocations.slice(0, facade.itemsToShow()); trackBy: trackByLocationName"
                 type="button"
                 class="map-city-list-item"
                 [class.selected]="activeMapCity() === city.name"
@@ -198,6 +198,15 @@
                 <time>{{ getFormattedTime(city.offset) }}</time>
               </button>
             </div>
+            <button
+              *ngIf="facade.itemsToShow() < mapLocations.length"
+              type="button"
+              class="load-more-btn map-city-load-more"
+              [disabled]="facade.isLoading()"
+              (click)="facade.loadMore()"
+            >
+              {{ facade.isLoading() ? dict().loading : dict().loadMore }}
+            </button>
           </section>
         </div>
       </ng-container>

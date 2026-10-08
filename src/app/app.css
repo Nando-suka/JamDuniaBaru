@@ -132,7 +132,6 @@
 }
 
 .action-feedback {
-  min-height: 1.25rem;
   margin: -0.75rem 0 0.75rem;
   color: var(--success-color);
   font-size: 0.8rem;
