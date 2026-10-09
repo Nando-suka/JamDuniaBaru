@@ -18,6 +18,9 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
 
   private analogClockService = inject(AnalogClockService);
   private animationFrameId: number | null = null;
+  private updateIntervalId: ReturnType<typeof setInterval> | null = null;
+  private motionPreference: MediaQueryList | null = null;
+  private readonly onMotionPreferenceChange = () => this.configureUpdates();
 
   clockHandAngles: ClockHandAngles = { hour: 0, minute: 0, second: 0 };
   clockConfig = this.analogClockService.clockConfig;
@@ -26,16 +29,16 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
 
   // Initialize the ng on making animation and update of the clockked hands. using another hand angles.
   ngOnInit(): void {
-    this.updateClockHands();
-    this.startAnimation();
+    this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.motionPreference.addEventListener('change', this.onMotionPreferenceChange);
+    this.configureUpdates();
   }
 
 
   // Destroy the ng on cancek animation on the following option that givenn.
   ngOnDestroy(): void {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
+    this.stopUpdates();
+    this.motionPreference?.removeEventListener('change', this.onMotionPreferenceChange);
   }
 
   /**
@@ -48,12 +51,31 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
   /**
    * Start smooth animation loop
    */
-  private startAnimation(): void {
+  private configureUpdates(): void {
+    this.stopUpdates();
+    this.updateClockHands();
+
+    if (this.motionPreference?.matches) {
+      this.updateIntervalId = setInterval(() => this.updateClockHands(), 1000);
+      return;
+    }
+
     const animate = () => {
       this.updateClockHands();
       this.animationFrameId = requestAnimationFrame(animate);
     };
     animate();
+  }
+
+  private stopUpdates(): void {
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    if (this.updateIntervalId !== null) {
+      clearInterval(this.updateIntervalId);
+      this.updateIntervalId = null;
+    }
   }
 
   /**
