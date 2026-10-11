@@ -1,7 +1,7 @@
 /* Timezone Converter Component Styles */
 
 .timezone-converter {
-  background: var(--card-bg, #fff);
+  background: var(--card-bg);
   overflow: hidden;
   margin-bottom: 16px;
 }
@@ -13,8 +13,8 @@
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  background: var(--primary-color, #4a90d9);
-  color: var(--button-on-primary, #fff);
+  background: var(--primary-color);
+  color: var(--button-on-primary);
   border: none;
   cursor: pointer;
   font-size: 16px;
@@ -23,7 +23,7 @@
 }
 
 .converter-toggle:hover {
-  background: var(--primary-color-dark, #357abd);
+  background: var(--primary-color-dark);
 }
 
 .toggle-icon {
@@ -70,7 +70,7 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color, #333);
+  color: var(--text-color);
   margin-bottom: 6px;
 }
 
@@ -79,23 +79,23 @@
 }
 
 .dropdown-item.active {
-  background: #4a90d9;
-  color: white;
+  background: var(--primary-color);
+  color: var(--button-on-primary);
 }
 
 .dropdown-item.active .city-offset {
-  color: #e0e0e0;
+  color: var(--button-on-primary);
 }
 
 .city-search-input {
   width: 100%;
   min-width: 0;
   padding: 10px 48px 10px 12px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--input-bg, var(--card-bg, #fff));
-  color: var(--text-color, #333);
+  background: var(--input-bg, var(--card-bg));
+  color: var(--text-color);
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -109,8 +109,8 @@
 }
 
 .city-search-input:focus {
-  border-color: var(--primary-color, #4a90d9);
-  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
 
 .city-search-input:focus-visible {
@@ -127,8 +127,8 @@
   height: 28px;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.08);
-  color: var(--text-color, #333);
+  background: var(--soft-surface);
+  color: var(--text-color);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -147,8 +147,8 @@
   right: 42px;
   top: 50%;
   transform: translateY(-50%);
-  background: var(--primary-color, #4a90d9);
-  color: white;
+  background: var(--primary-color);
+  color: var(--button-on-primary);
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -167,21 +167,21 @@
   right: 0;
   z-index: 100;
   margin-top: 4px;
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--border-color, #ddd);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 3px 8px var(--shadow-color);
 }
 
 .dropdown-list {
   max-height: 200px;
   overflow-y: auto;
-  background: var(--card-bg, #fff);
+  background: var(--card-bg);
 }
 
 .dropdown-item {
   width: 100%;
   border: 0;
-  background: var(--card-bg, #fff);
+  background: var(--card-bg);
   color: inherit;
   text-align: left;
   display: flex;
@@ -233,8 +233,8 @@
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: var(--primary-color, #4a90d9);
-  color: var(--button-on-primary, #fff);
+  background: var(--primary-color);
+  color: var(--button-on-primary);
   font-size: 20px;
   cursor: pointer;
   transition:
@@ -244,7 +244,7 @@
 }
 
 .swap-btn:hover:not(:disabled) {
-  background: var(--primary-color-dark, #357abd);
+  background: var(--primary-color-dark);
   transform: rotate(180deg);
 }
 
@@ -296,15 +296,15 @@
 .manual-time-inputs input[type='date'] {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
-  background: var(--input-bg, var(--card-bg, #fff));
-  color: var(--text-color, #333);
+  background: var(--input-bg, var(--card-bg));
+  color: var(--text-color);
 }
 
 .manual-time-inputs input:focus {
-  border-color: var(--primary-color, #4a90d9);
+  border-color: var(--primary-color);
 }
 
 .manual-time-inputs input:focus-visible {
@@ -314,11 +314,11 @@
 
 /* Result Section */
 .result-section {
-  background: var(--card-bg, #fff);
+  background: var(--card-bg);
   padding: 16px;
   margin-bottom: 16px;
-  border-top: 1px solid var(--border-color, #ddd);
-  border-bottom: 1px solid var(--border-color, #ddd);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .offset-info {
@@ -345,15 +345,15 @@
   text-align: center;
   padding: 12px;
   border-radius: 0px;
-  background: var(--bg-color, #f8f9fa);
+  background: var(--bg-color);
 }
 
 .result-card.source {
-  border-left: 0px solid var(--primary-color, #4a90d9);
+  border-left: 0px solid var(--primary-color);
 }
 
 .result-card.target {
-  border-right: 0px solid var(--success-color, #28a745);
+  border-right: 0px solid var(--success-color);
 }
 
 .result-card .card-label {
@@ -373,7 +373,7 @@
 .result-card .time-display {
   font-size: 24px;
   font-weight: 700;
-  color: var(--primary-color, #4a90d9);
+  color: var(--primary-color);
   margin-bottom: 4px;
 }
 
@@ -392,10 +392,10 @@
 .no-result {
   text-align: center;
   padding: 24px;
-  color: var(--secondary-text, #666);
+  color: var(--secondary-text);
   font-size: 14px;
-  border-top: 1px solid var(--border-color, #ddd);
-  border-bottom: 1px solid var(--border-color, #ddd);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Reset Button */
@@ -403,10 +403,10 @@
   width: 100%;
   padding: 10px;
   border: 0;
-  border-top: 1px solid var(--border-color, #ddd);
+  border-top: 1px solid var(--border-color);
   border-radius: 0;
   background: transparent;
-  color: var(--text-color, #333);
+  color: var(--text-color);
   font-size: 14px;
   cursor: pointer;
   transition:
@@ -415,8 +415,8 @@
 }
 
 .reset-btn:hover {
-  background: var(--hover-bg, #f0f4f8);
-  color: var(--primary-color, #4a90d9);
+  background: var(--hover-bg);
+  color: var(--primary-color);
 }
 
 /* Dropdown Overlay */

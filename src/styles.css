@@ -22,8 +22,8 @@
   --button-text: #ffffff;
   --button-on-primary: #ffffff;
   --button-hover: #0056b3;
-  --border-color: var(--card-border);
   --primary-color: var(--button-bg);
+  --primary-color-dark: var(--button-hover);
   --primary-hover: var(--button-hover);
   --secondary-bg: #6c757d;
   --secondary-hover: #545b62;
@@ -38,6 +38,8 @@
   --muted-text: #6c757d;
   --secondary-text: #6c757d;
   --hover-bg: #f5f5f5;
+  --soft-surface: rgba(0, 0, 0, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.12);
   --disabled-color: #adb5bd;
   --overlay-bg: rgba(0, 0, 0, 0.6);
   --focus-ring: #005fcc;
@@ -53,6 +55,8 @@
   --button-on-primary: #121212;
   --input-bg: #242424;
   --button-hover: #9d4edd;
+  --primary-color: var(--button-bg);
+  --primary-color-dark: var(--button-hover);
   --secondary-bg: #495057;
   --secondary-hover: #343a40;
   --danger-bg: #fa5252;
@@ -66,6 +70,8 @@
   --muted-text: #adb5bd;
   --secondary-text: #adb5bd;
   --hover-bg: rgba(255, 255, 255, 0.08);
+  --soft-surface: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.35);
   --disabled-color: #6c757d;
   --focus-ring: #74c0fc;
 }
