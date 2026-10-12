@@ -86,8 +86,12 @@
 
     <div class="clock-status">
       <span>Local time now: {{ getLocalTime() }}</span>
-      <span>Last updated: {{ getLastUpdatedTime() }}</span>
     </div>
+    <span class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+      @if (clockAnnouncement()) {
+        Local time changed: {{ clockAnnouncement() }}
+      }
+    </span>
 
     <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu" aria-labelledby="mobile-tools-title" tabindex="-1" (keydown)="handleToolsSheetKeydown($event)">
       <div class="mobile-tools-header" id="mobile-tools-title">Quick tools</div>

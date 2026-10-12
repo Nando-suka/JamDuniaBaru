@@ -46,12 +46,38 @@ describe('App', () => {
     expect(label?.textContent).toContain('Search cities');
   });
 
-  it('should render local time and last-updated indicators', async () => {
+  it('keeps the ticking clock out of live announcements and announces minute changes separately', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-12T10:34:58'));
+      fixture.detectChanges();
+
+      const visibleStatus = fixture.nativeElement.querySelector('.clock-status') as HTMLElement;
+      const liveStatus = fixture.nativeElement.querySelector('.clock-status + .visually-hidden') as HTMLElement;
+      expect(visibleStatus.textContent).toContain('Local time now:');
+      expect(visibleStatus.textContent).not.toContain('Last updated:');
+      expect(visibleStatus.hasAttribute('aria-live')).toBe(false);
+      expect(liveStatus.getAttribute('aria-live')).toBe('polite');
+      expect(liveStatus.textContent?.trim()).toBe('');
+
+      vi.advanceTimersByTime(1000);
+      fixture.detectChanges();
+      expect(liveStatus.textContent?.trim()).toBe('');
+
+      vi.advanceTimersByTime(1000);
+      fixture.detectChanges();
+      expect(liveStatus.textContent).toContain('Local time changed:');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not display a last-updated time when no data refresh occurs', async () => {
     await fixture.whenStable();
 
     const status = fixture.nativeElement.querySelector('.clock-status') as HTMLElement;
     expect(status.textContent).toContain('Local time now:');
-    expect(status.textContent).toContain('Last updated:');
+    expect(status.textContent).not.toContain('Last updated:');
     expect(status.hasAttribute('aria-live')).toBe(false);
     expect(status.hasAttribute('role')).toBe(false);
   });

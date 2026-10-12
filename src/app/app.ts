@@ -41,9 +41,11 @@ export class App implements OnInit, OnDestroy {
   scrollVisible = signal(false);
   scrollLabelVisible = signal(false);
   actionFeedback = signal('');
+  clockAnnouncement = signal('');
   private focusReturnTarget: HTMLElement | null = null;
   private scrollLabelTimer: any;
   private actionFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastAnnouncedMinute = 0;
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
   };
@@ -87,8 +89,15 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.lastAnnouncedMinute = Math.floor(Date.now() / 60000);
     this.timer = setInterval(() => {
-      this.currentTime.set(new Date());
+      const now = new Date();
+      this.currentTime.set(now);
+      const minute = Math.floor(now.getTime() / 60000);
+      if (minute !== this.lastAnnouncedMinute) {
+        this.lastAnnouncedMinute = minute;
+        this.clockAnnouncement.set(this.formatClockAnnouncement(now));
+      }
     }, 1000);
 
     this.onResize();
@@ -138,12 +147,12 @@ export class App implements OnInit, OnDestroy {
     }).format(this.currentTime());
   }
 
-  getLastUpdatedTime(): string {
+  private formatClockAnnouncement(date: Date): string {
     return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
-    }).format(this.currentTime());
+      hour12: this.timeFormat() === '12h',
+    }).format(date);
   }
 
   toggleTimeFormat(): void {
