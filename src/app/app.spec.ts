@@ -88,7 +88,7 @@ describe('App', () => {
     const button = fixture.nativeElement.querySelector('.favorite-btn') as HTMLButtonElement;
     const cityName = fixture.nativeElement.querySelector('.city-name')?.textContent?.trim();
 
-    expect(button.getAttribute('aria-label')).toContain(cityName);
+    expect(button.getAttribute('aria-label')).toBe(`Add ${cityName} to favorites`);
     expect(button.getAttribute('aria-pressed')).toBe('false');
 
     button.click();
