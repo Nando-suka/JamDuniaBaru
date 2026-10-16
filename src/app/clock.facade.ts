@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { SearchService, City } from './search.service';
+import { SearchService, City, getCityTimeZone } from './search.service';
 import { FavoritesService } from './favorites.service';
 import { effect } from '@angular/core';
 
@@ -92,7 +92,7 @@ export class ClockFacade {
     { name: 'Suva', offset: 12, lat: -18.1416, lon: 178.4419 },     // Fiji (ibukota)
     { name: 'Honiara', offset: 11, lat: -9.4319, lon: 159.9554 },   // Kep. Solomon
     { name: 'Papeete', offset: -10, lat: -17.5516, lon: -149.5585 },// Polinesia Prancis (UTC-10)
-  ];
+  ].map((city) => ({ ...city, timeZone: getCityTimeZone(city) }));
 
   // ===== COMPUTED =====
   filteredLocations = computed(() => {

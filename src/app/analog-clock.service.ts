@@ -18,6 +18,8 @@ export interface ClockHandAngles {
   providedIn: 'root'
 })
 export class AnalogClockService {
+  private readonly timeFormatters = new Map<string, Intl.DateTimeFormat>();
+
   // Configuration signals
   clockConfig = signal<AnalogClockConfig>({
     showLabels: true,
@@ -32,10 +34,8 @@ export class AnalogClockService {
    * @param date Date to calculate from
    * @returns Object with hour, minute, second angles in degrees
    */
-  getClockHandAngles(date: Date): ClockHandAngles {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
+  getClockHandAngles(date: Date, timeZone = 'UTC'): ClockHandAngles {
+    const { hours, minutes, seconds } = this.getTimeParts(date, timeZone);
     const milliseconds = date.getMilliseconds();
 
     // Calculate smooth second hand angle (30 degrees per second + milliseconds)
@@ -146,10 +146,8 @@ export class AnalogClockService {
   /**
    * Format time for display in analog clock
    */
-  formatTimeForClock(date: Date, use24Hour: boolean): string {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
+  formatTimeForClock(date: Date, use24Hour: boolean, timeZone = 'UTC'): string {
+    const { hours, minutes, seconds } = this.getTimeParts(date, timeZone);
 
     if (use24Hour) {
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -158,6 +156,29 @@ export class AnalogClockService {
       const ampm = hours >= 12 ? 'PM' : 'AM';
       return `${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${ampm}`;
     }
+  }
+
+  private getTimeParts(date: Date, timeZone: string): { hours: number; minutes: number; seconds: number } {
+    const parts = this.getTimeFormatter(timeZone).formatToParts(date);
+    const getPart = (type: 'hour' | 'minute' | 'second') =>
+      Number(parts.find((part) => part.type === type)?.value ?? 0);
+
+    return { hours: getPart('hour'), minutes: getPart('minute'), seconds: getPart('second') };
+  }
+
+  private getTimeFormatter(timeZone: string): Intl.DateTimeFormat {
+    let formatter = this.timeFormatters.get(timeZone);
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23',
+      });
+      this.timeFormatters.set(timeZone, formatter);
+    }
+    return formatter;
   }
 
   /**

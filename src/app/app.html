@@ -133,8 +133,8 @@
         <div class="analog-clocks-grid">
           <app-analog-clock
             *ngFor="let loc of facade.analogLocations(); trackBy: trackByLocationName"
-            [time]="getTimeByOffset(loc.offset)"
-            [timezone]="'UTC' + (loc.offset >= 0 ? '+' : '') + loc.offset"
+            [time]="currentTime()"
+            [timezone]="getCityTimeZone(loc)"
             [cityName]="loc.name"
           ></app-analog-clock>
         </div>
@@ -199,7 +199,7 @@
                 (click)="selectCityOnMap(city.name)"
               >
                 <span>{{ city.name }}</span>
-                <time>{{ getFormattedTime(city.offset) }}</time>
+                <time>{{ getFormattedTime(city) }}</time>
               </button>
             </div>
             <button
@@ -291,7 +291,7 @@
             <div class="location-info">
               <p class="city-name">{{ loc.name }}</p>
               <p class="time-box">
-                {{ getFormattedTime(loc.offset) }}
+                {{ getFormattedTime(loc) }}
               </p>
             </div>
 

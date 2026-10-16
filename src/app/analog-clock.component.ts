@@ -45,7 +45,7 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
    * Update clock hand positions
    */
   private updateClockHands(): void {
-    this.clockHandAngles = this.analogClockService.getClockHandAngles(this.time);
+    this.clockHandAngles = this.analogClockService.getClockHandAngles(this.time, this.timezone);
   }
 
   /**
@@ -131,7 +131,8 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
   getTimeString(): string {
     return this.analogClockService.formatTimeForClock(
       this.time,
-      this.clockConfig().use24Hour
+      this.clockConfig().use24Hour,
+      this.timezone
     );
   }
 

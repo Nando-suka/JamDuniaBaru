@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, signal, inject, computed } from '@angular
 import { LanguageService } from './languange.service';
 import { LanguageDetectionService } from './languange-detection.service';
 import { ThemeService } from './theme.service';
-import { SearchService, City } from './search.service';
+import { SearchService, City, getCityTimeZone as resolveCityTimeZone } from './search.service';
 import { FavoritesService } from './favorites.service';
 import { CommonModule } from '@angular/common';
 import { ClockFacade } from './clock.facade';
@@ -120,14 +120,11 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  getTimeByOffset(offset: number): Date {
-    const d = this.currentTime();
-    const utc = d.getTime() + d.getTimezoneOffset() * 60000;
-    return new Date(utc + 3600000 * offset);
+  getCityTimeZone(city: City): string {
+    return resolveCityTimeZone(city);
   }
 
-  getFormattedTime(offset: number): string {
-    const timeDate = this.getTimeByOffset(offset);
+  getFormattedTime(city: City): string {
     const locale = this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US';
 
     return new Intl.DateTimeFormat(locale, {
@@ -135,8 +132,8 @@ export class App implements OnInit, OnDestroy {
       minute: '2-digit',
       second: '2-digit',
       hour12: this.timeFormat() === '12h',
-      timeZone: 'UTC',
-    }).format(timeDate);
+      timeZone: resolveCityTimeZone(city),
+    }).format(this.currentTime());
   }
 
   getLocalTime(): string {

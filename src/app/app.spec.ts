@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { vi } from 'vitest';
 import { App } from './app';
+import { City } from './search.service';
 import { AlarmTimerService } from './alarm-timer.service';
 import { AlarmTimerComponent } from './alarm-timer.component';
 import { TimezoneConverterComponent } from './timezone-converter.component';
@@ -80,6 +81,33 @@ describe('App', () => {
     expect(status.textContent).not.toContain('Last updated:');
     expect(status.hasAttribute('aria-live')).toBe(false);
     expect(status.hasAttribute('role')).toBe(false);
+  });
+
+  it('formats city clocks using IANA timezone daylight-saving rules', () => {
+    const app = fixture.componentInstance;
+    const cities = app.facade.getAllLocations();
+    const newYork = cities.find((city: City) => city.name === 'New York')!;
+    const sydney = cities.find((city: City) => city.name === 'Sydney')!;
+    expect(newYork.timeZone).toBe('America/New_York');
+    expect(sydney.timeZone).toBe('Australia/Sydney');
+    app.timeFormat.set('24h');
+
+    app.currentTime.set(new Date('2024-07-01T16:00:00Z'));
+    expect(app.getFormattedTime(newYork)).toMatch(/12[.:]00[.:]00/);
+    expect(app.getFormattedTime(sydney)).toMatch(/02[.:]00[.:]00/);
+
+    app.currentTime.set(new Date('2024-01-01T16:00:00Z'));
+    expect(app.getFormattedTime(newYork)).toMatch(/11[.:]00[.:]00/);
+    expect(app.getFormattedTime(sydney)).toMatch(/03[.:]00[.:]00/);
+  });
+
+  it('assigns a valid IANA timezone to every clock location', () => {
+    const app = fixture.componentInstance;
+
+    for (const city of app.facade.getAllLocations()) {
+      expect(city.timeZone).toBeTruthy();
+      expect(() => new Intl.DateTimeFormat('en-US', { timeZone: city.timeZone }).format(new Date())).not.toThrow();
+    }
   });
 
   it('should give each favorite toggle a city-specific accessible name and pressed state', async () => {

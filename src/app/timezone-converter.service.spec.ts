@@ -48,5 +48,13 @@ describe('TimezoneConverterService', () => {
     expect(service.formatTime(result!.sourceTime, '24h', 'America/New_York')).toMatch(/12[.:]00/);
     expect(service.formatTime(result!.convertedTime, '24h', 'America/Phoenix')).toMatch(/09[.:]00/);
     expect(result!.offsetDifference).toBe(-3);
+
+    service.setInputDate('2024-01-01');
+    const winterResult = service.convertedResult();
+
+    expect(winterResult).toBeTruthy();
+    expect(service.formatTime(winterResult!.sourceTime, '24h', 'America/New_York')).toMatch(/12[.:]00/);
+    expect(service.formatTime(winterResult!.convertedTime, '24h', 'America/Phoenix')).toMatch(/10[.:]00/);
+    expect(winterResult!.offsetDifference).toBe(-2);
   });
 });

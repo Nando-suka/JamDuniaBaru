@@ -61,9 +61,14 @@ const CITY_TIME_ZONES: Record<string, string> = {
   Jayapura: 'Asia/Jayapura',
   Adelaide: 'Australia/Adelaide',
   Sydney: 'Australia/Sydney',
+  Hobart: 'Australia/Hobart',
+  Darwin: 'Australia/Darwin',
   Guam: 'Pacific/Guam',
   Auckland: 'Pacific/Auckland',
   Fiji: 'Pacific/Fiji',
+  Suva: 'Pacific/Fiji',
+  Honiara: 'Pacific/Guadalcanal',
+  Papeete: 'Pacific/Tahiti',
 };
 
 export function getCityTimeZone(city: City): string {
