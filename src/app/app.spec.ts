@@ -101,6 +101,23 @@ describe('App', () => {
     expect(app.getFormattedTime(sydney)).toMatch(/03[.:]00[.:]00/);
   });
 
+  it('names the time-format button by the format it will switch to', () => {
+    const app = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('.floating-controls .control-btn') as HTMLButtonElement;
+    const initialFormat = app.timeFormat();
+    expect(button.getAttribute('aria-label')).toBe(
+      initialFormat === '24h' ? 'Switch to 12-hour format' : 'Switch to 24-hour format'
+    );
+
+    button.click();
+    fixture.detectChanges();
+    expect(button.getAttribute('aria-label')).toBe(
+      initialFormat === '24h' ? 'Switch to 24-hour format' : 'Switch to 12-hour format'
+    );
+  });
+
   it('assigns a valid IANA timezone to every clock location', () => {
     const app = fixture.componentInstance;
 

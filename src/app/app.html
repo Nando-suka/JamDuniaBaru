@@ -28,6 +28,7 @@
           <button
             class="control-btn"
             [title]="timeFormat() === '24h' ? 'Ubah ke Format 12 Jam' : 'Ubah ke Format 24 Jam'"
+            [attr.aria-label]="timeFormat() === '24h' ? 'Switch to 12-hour format' : 'Switch to 24-hour format'"
             (click)="toggleTimeFormat()"
           >
             {{ timeFormat() }}
