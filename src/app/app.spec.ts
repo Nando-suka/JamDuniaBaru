@@ -127,6 +127,12 @@ describe('App', () => {
     }
   });
 
+  it('keeps city names unique for template tracking', () => {
+    const cityNames = fixture.componentInstance.facade.getAllLocations().map((city: City) => city.name);
+
+    expect(new Set(cityNames).size).toBe(cityNames.length);
+  });
+
   it('should give each favorite toggle a city-specific accessible name and pressed state', async () => {
     await fixture.whenStable();
 
