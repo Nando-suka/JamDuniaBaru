@@ -46,6 +46,7 @@ export class App implements OnInit, OnDestroy {
   private scrollLabelTimer: any;
   private actionFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
   private lastAnnouncedMinute = 0;
+  private readonly cityTimeFormatters = new Map<string, Intl.DateTimeFormat>();
   private onScroll = () => {
     this.scrollVisible.set(window.scrollY > 240);
   };
@@ -126,14 +127,23 @@ export class App implements OnInit, OnDestroy {
 
   getFormattedTime(city: City): string {
     const locale = this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US';
+    const hour12 = this.timeFormat() === '12h';
+    const timeZone = resolveCityTimeZone(city);
+    const formatterKey = JSON.stringify([locale, hour12, timeZone]);
+    let formatter = this.cityTimeFormatters.get(formatterKey);
 
-    return new Intl.DateTimeFormat(locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: this.timeFormat() === '12h',
-      timeZone: resolveCityTimeZone(city),
-    }).format(this.currentTime());
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12,
+        timeZone,
+      });
+      this.cityTimeFormatters.set(formatterKey, formatter);
+    }
+
+    return formatter.format(this.currentTime());
   }
 
   getLocalTime(): string {

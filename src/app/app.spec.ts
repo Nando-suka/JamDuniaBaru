@@ -101,6 +101,20 @@ describe('App', () => {
     expect(app.getFormattedTime(sydney)).toMatch(/03[.:]00[.:]00/);
   });
 
+  it('reuses city time formatters for repeated clock updates', () => {
+    const app = fixture.componentInstance;
+    const newYork = app.facade.getAllLocations().find((city: City) => city.name === 'New York')!;
+    const formatterCache = (app as unknown as {
+      cityTimeFormatters: Map<string, Intl.DateTimeFormat>;
+    }).cityTimeFormatters;
+
+    app.getFormattedTime(newYork);
+    expect(formatterCache.size).toBe(1);
+    app.getFormattedTime(newYork);
+
+    expect(formatterCache.size).toBe(1);
+  });
+
   it('names the time-format button by the format it will switch to', () => {
     const app = fixture.componentInstance;
     fixture.detectChanges();
