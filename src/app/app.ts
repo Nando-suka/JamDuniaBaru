@@ -52,8 +52,15 @@ export class App implements OnInit, OnDestroy {
   };
   private onResize = () => {
     this.isMobileView.set(window.innerWidth <= 767);
-    if (!this.isMobileView()) {
-      this.showToolsSheet.set(false);
+    if (!this.isMobileView() && this.showToolsSheet()) {
+      this.closeToolsSheet();
+    }
+  };
+  private onToolsSheetFocusIn = (event: FocusEvent) => {
+    const dialog = document.getElementById('mobile-tools-sheet');
+    const target = event.target;
+    if (this.showToolsSheet() && dialog && target instanceof Node && !dialog.contains(target)) {
+      this.focusFirstToolButton();
     }
   };
   private timer: any;
@@ -207,19 +214,23 @@ export class App implements OnInit, OnDestroy {
     const willOpen = !this.showToolsSheet();
     if (willOpen) {
       this.focusReturnTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      document.addEventListener('focusin', this.onToolsSheetFocusIn, true);
+    } else {
+      document.removeEventListener('focusin', this.onToolsSheetFocusIn, true);
     }
     this.showToolsSheet.set(willOpen);
 
     if (willOpen) {
       setTimeout(() => this.focusFirstToolButton());
     } else {
-      this.restoreToolsFocus();
+      setTimeout(() => this.restoreToolsFocus());
     }
   }
 
   closeToolsSheet(): void {
     this.showToolsSheet.set(false);
-    this.restoreToolsFocus();
+    document.removeEventListener('focusin', this.onToolsSheetFocusIn, true);
+    setTimeout(() => this.restoreToolsFocus());
   }
 
   handleToolsSheetKeydown(event: KeyboardEvent): void {
@@ -410,6 +421,7 @@ export class App implements OnInit, OnDestroy {
     }
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onResize);
+    document.removeEventListener('focusin', this.onToolsSheetFocusIn, true);
     if (this.scrollLabelTimer) {
       clearTimeout(this.scrollLabelTimer);
     }

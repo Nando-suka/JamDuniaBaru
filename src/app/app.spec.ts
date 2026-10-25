@@ -295,6 +295,42 @@ describe('App', () => {
     expect(trigger.getAttribute('aria-label')).toBe('Open tools menu');
   });
 
+  it('keeps focus inside the mobile tools dialog when focus moves to the background', async () => {
+    const app = fixture.componentInstance as any;
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      writable: true,
+      value: 500,
+    });
+    app.onResize();
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const trigger = root.querySelector('.tools-trigger') as HTMLButtonElement;
+    trigger.focus();
+    app.toggleToolsSheet();
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    const dialog = root.querySelector('#mobile-tools-sheet') as HTMLElement;
+    const backgroundButton = root.querySelector('.favorite-btn') as HTMLButtonElement;
+    expect(root.querySelector('.container')?.hasAttribute('inert')).toBe(true);
+    expect(document.activeElement).toBe(dialog.querySelector('.mobile-tool-btn'));
+
+    backgroundButton.focus();
+    expect(document.activeElement).toBe(dialog.querySelector('.mobile-tool-btn'));
+
+    root.querySelector('.mobile-tools-backdrop')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    expect(app.showToolsSheet()).toBe(false);
+    expect(root.querySelector('.container')?.hasAttribute('inert')).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+  });
+
   it('should show an explicit status label for enabled alarms', async () => {
     const alarmService = TestBed.inject(AlarmTimerService);
     alarmService.addAlarm('07:00', 'Wake up', true, [], 'chime', 5);

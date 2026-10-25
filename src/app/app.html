@@ -5,6 +5,7 @@
     [class.analog-mode-container]="showAnalogClock()"
     [class.alarm-mode-container]="showAlarmTimer()"
     [class.converter-mode-container]="showTimezoneConverter()"
+    [attr.inert]="showToolsSheet() ? '' : null"
   >
 
     <!-- Floating Controls -->
@@ -93,40 +94,6 @@
         Local time changed: {{ clockAnnouncement() }}
       }
     </span>
-
-    <div *ngIf="isMobileView() && showToolsSheet()" class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu" aria-labelledby="mobile-tools-title" tabindex="-1" (keydown)="handleToolsSheetKeydown($event)">
-      <div class="mobile-tools-header" id="mobile-tools-title">Quick tools</div>
-      <div class="mobile-tools-grid">
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('format')">
-          <span class="tool-icon">⏰</span>
-          <span>Format</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('favorites')">
-          <span class="tool-icon">❤️</span>
-          <span>Favorites</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('theme')">
-          <span class="tool-icon">🌙</span>
-          <span>Theme</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('alarm')">
-          <span class="tool-icon">🔔</span>
-          <span>Alarm</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('converter')">
-          <span class="tool-icon">🌐</span>
-          <span>Converter</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('map')">
-          <span class="tool-icon">🌍</span>
-          <span>Map</span>
-        </button>
-        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('view')">
-          <span class="tool-icon">🕐</span>
-          <span>View</span>
-        </button>
-      </div>
-    </div>
 
     <ng-container *ngIf="showAnalogClock(); else nonAnalogMode">
       <div class="analog-clock-section">
@@ -347,4 +314,41 @@
     <!-- Mobile helper label that appears briefly after tapping the button -->
     <span *ngIf="scrollLabelVisible()" class="scroll-to-top-label" aria-hidden="true">Scroll to top</span>
   </div>
+
+  <ng-container *ngIf="isMobileView() && showToolsSheet()">
+    <div class="mobile-tools-backdrop" aria-hidden="true" (click)="closeToolsSheet()"></div>
+    <div class="mobile-tools-sheet" id="mobile-tools-sheet" role="dialog" aria-modal="true" aria-label="Tools menu" aria-labelledby="mobile-tools-title" tabindex="-1" (keydown)="handleToolsSheetKeydown($event)">
+      <div class="mobile-tools-header" id="mobile-tools-title">Quick tools</div>
+      <div class="mobile-tools-grid">
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('format')">
+          <span class="tool-icon">⏰</span>
+          <span>Format</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('favorites')">
+          <span class="tool-icon">❤️</span>
+          <span>Favorites</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('theme')">
+          <span class="tool-icon">🌙</span>
+          <span>Theme</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('alarm')">
+          <span class="tool-icon">🔔</span>
+          <span>Alarm</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('converter')">
+          <span class="tool-icon">🌐</span>
+          <span>Converter</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('map')">
+          <span class="tool-icon">🌍</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="mobile-tool-btn" (click)="handleToolAction('view')">
+          <span class="tool-icon">🕐</span>
+          <span>View</span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
 </div>

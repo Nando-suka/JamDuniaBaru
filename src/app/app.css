@@ -1326,6 +1326,13 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
 }
 
+.mobile-tools-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.6));
+}
+
 .mobile-tools-header {
   margin: 0 0 12px;
   font-size: 0.76rem;
