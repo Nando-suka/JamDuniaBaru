@@ -94,11 +94,15 @@ describe('AnalogClockComponent motion scheduling', () => {
   });
 
   it('formats clock hands and text in the configured IANA timezone', () => {
-    fixture.componentInstance.time = new Date('2024-07-01T16:00:00Z');
+    fixture.componentInstance.time = new Date('2024-07-01T07:15:30Z');
     fixture.componentInstance.timezone = 'America/New_York';
     fixture.detectChanges();
 
-    expect(fixture.componentInstance.clockHandAngles.hour).toBe(0);
-    expect(fixture.componentInstance.getTimeString()).toBe('12:00:00');
+    expect(fixture.componentInstance.clockHandAngles).toEqual({
+      hour: 97.5,
+      minute: 93,
+      second: 180,
+    });
+    expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
   });
 });
