@@ -105,4 +105,24 @@ describe('AnalogClockComponent motion scheduling', () => {
     });
     expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
   });
+
+  it('falls back to UTC and continues updating for an invalid timezone', () => {
+    fixture.componentInstance.time = new Date('2024-07-01T03:15:30Z');
+    fixture.componentInstance.timezone = 'Invalid/TimeZone';
+    motionPreference = { ...motionPreference, matches: true } as MediaQueryList;
+    vi.useFakeTimers();
+    const updateSpy = vi.spyOn(clockService, 'getClockHandAngles');
+
+    expect(() => fixture.detectChanges()).not.toThrow();
+    expect(fixture.componentInstance.clockHandAngles).toEqual({
+      hour: 97.5,
+      minute: 93,
+      second: 180,
+    });
+    expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
+    expect(fixture.componentInstance.getDisplayTimeZone()).toBe('UTC');
+
+    vi.advanceTimersByTime(1000);
+    expect(updateSpy).toHaveBeenCalledTimes(2);
+  });
 });

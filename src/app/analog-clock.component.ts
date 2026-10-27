@@ -136,6 +136,10 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
     );
   }
 
+  getDisplayTimeZone(): string {
+    return this.analogClockService.getDisplayTimeZone(this.timezone);
+  }
+
   /**
    * Get size class
    */

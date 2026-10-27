@@ -52,7 +52,7 @@
   <!-- Clock info section -->
   <div class="clock-info">
     <div class="time-display">{{ getTimeString() }}</div>
-    <div class="timezone-label">{{ timezone }}</div>
+    <div class="timezone-label">{{ getDisplayTimeZone() }}</div>
     @if (cityName) {
       <div class="city-name">{{ cityName }}</div>
     }

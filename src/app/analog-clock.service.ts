@@ -19,6 +19,7 @@ export interface ClockHandAngles {
 })
 export class AnalogClockService {
   private readonly timeFormatters = new Map<string, Intl.DateTimeFormat>();
+  private readonly resolvedTimeZones = new Map<string, string>();
 
   // Configuration signals
   clockConfig = signal<AnalogClockConfig>({
@@ -158,6 +159,11 @@ export class AnalogClockService {
     }
   }
 
+  getDisplayTimeZone(timeZone = 'UTC'): string {
+    this.getTimeFormatter(timeZone);
+    return this.resolvedTimeZones.get(timeZone) ?? 'UTC';
+  }
+
   private getTimeParts(date: Date, timeZone: string): { hours: number; minutes: number; seconds: number } {
     const parts = this.getTimeFormatter(timeZone).formatToParts(date);
     const getPart = (type: 'hour' | 'minute' | 'second') =>
@@ -169,16 +175,29 @@ export class AnalogClockService {
   private getTimeFormatter(timeZone: string): Intl.DateTimeFormat {
     let formatter = this.timeFormatters.get(timeZone);
     if (!formatter) {
-      formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hourCycle: 'h23',
-      });
+      try {
+        formatter = this.createTimeFormatter(timeZone);
+      } catch (error) {
+        if (!(error instanceof RangeError)) {
+          throw error;
+        }
+        formatter = this.createTimeFormatter('UTC');
+      }
+
       this.timeFormatters.set(timeZone, formatter);
+      this.resolvedTimeZones.set(timeZone, formatter.resolvedOptions().timeZone);
     }
     return formatter;
+  }
+
+  private createTimeFormatter(timeZone: string): Intl.DateTimeFormat {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    });
   }
 
   /**
