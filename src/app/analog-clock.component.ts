@@ -1,6 +1,7 @@
 import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalogClockService, ClockHandAngles } from './analog-clock.service';
+import { LanguageService } from './languange.service';
 
 @Component({
   selector: 'app-analog-clock',
@@ -17,6 +18,7 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
   @Input() cityName: string = '';
 
   private analogClockService = inject(AnalogClockService);
+  private languageService = inject(LanguageService);
   private animationFrameId: number | null = null;
   private updateIntervalId: ReturnType<typeof setInterval> | null = null;
   private motionPreference: MediaQueryList | null = null;
@@ -132,7 +134,8 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
     return this.analogClockService.formatTimeForClock(
       this.time,
       this.clockConfig().use24Hour,
-      this.timezone
+      this.timezone,
+      this.languageService.currentLang() === 'id' ? 'id-ID' : 'en-US'
     );
   }
 

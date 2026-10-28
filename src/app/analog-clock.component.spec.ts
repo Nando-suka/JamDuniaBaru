@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { AnalogClockComponent } from './analog-clock.component';
 import { AnalogClockService } from './analog-clock.service';
+import { LanguageService } from './languange.service';
 
 describe('AnalogClockComponent motion scheduling', () => {
   let fixture: ComponentFixture<AnalogClockComponent>;
@@ -104,6 +105,31 @@ describe('AnalogClockComponent motion scheduling', () => {
       second: 180,
     });
     expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
+  });
+
+  it('formats 12-hour time with localized day periods', () => {
+    const languageService = TestBed.inject(LanguageService);
+    const originalLanguage = languageService.currentLang();
+    const originalFormat = clockService.clockConfig().use24Hour;
+    fixture.componentInstance.timezone = 'UTC';
+    clockService.setConfig({ use24Hour: false });
+
+    try {
+      languageService.currentLang.set('en');
+      fixture.componentInstance.time = new Date('2024-07-01T03:15:30Z');
+      expect(fixture.componentInstance.getTimeString()).toBe('03:15:30 AM');
+      fixture.componentInstance.time = new Date('2024-07-01T15:15:30Z');
+      expect(fixture.componentInstance.getTimeString()).toBe('03:15:30 PM');
+
+      languageService.currentLang.set('id');
+      fixture.componentInstance.time = new Date('2024-07-01T03:15:30Z');
+      expect(fixture.componentInstance.getTimeString()).toBe('03.15.30 pagi');
+      fixture.componentInstance.time = new Date('2024-07-01T15:15:30Z');
+      expect(fixture.componentInstance.getTimeString()).toBe('03.15.30 sore');
+    } finally {
+      languageService.currentLang.set(originalLanguage);
+      clockService.setConfig({ use24Hour: originalFormat });
+    }
   });
 
   it('falls back to UTC and continues updating for an invalid timezone', () => {

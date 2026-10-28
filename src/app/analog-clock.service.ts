@@ -19,6 +19,7 @@ export interface ClockHandAngles {
 })
 export class AnalogClockService {
   private readonly timeFormatters = new Map<string, Intl.DateTimeFormat>();
+  private readonly twelveHourFormatters = new Map<string, Intl.DateTimeFormat>();
   private readonly resolvedTimeZones = new Map<string, string>();
 
   // Configuration signals
@@ -147,15 +148,32 @@ export class AnalogClockService {
   /**
    * Format time for display in analog clock
    */
-  formatTimeForClock(date: Date, use24Hour: boolean, timeZone = 'UTC'): string {
+  formatTimeForClock(date: Date, use24Hour: boolean, timeZone = 'UTC', locale = 'en-US'): string {
     const { hours, minutes, seconds } = this.getTimeParts(date, timeZone);
 
     if (use24Hour) {
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     } else {
-      const hours12 = hours % 12 || 12;
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      return `${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${ampm}`;
+      const resolvedTimeZone = this.getDisplayTimeZone(timeZone);
+      const formatterKey = JSON.stringify([locale, resolvedTimeZone]);
+      let formatter = this.twelveHourFormatters.get(formatterKey);
+
+      if (!formatter) {
+        const options: Intl.DateTimeFormatOptions = {
+          timeZone: resolvedTimeZone,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+        };
+        if (locale === 'id-ID') {
+          options.dayPeriod = 'short';
+        }
+        formatter = new Intl.DateTimeFormat(locale, options);
+        this.twelveHourFormatters.set(formatterKey, formatter);
+      }
+
+      return formatter.format(date);
     }
   }
 
