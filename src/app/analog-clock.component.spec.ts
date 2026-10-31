@@ -13,6 +13,8 @@ describe('AnalogClockComponent motion scheduling', () => {
   let originalCancelAnimationFrame: PropertyDescriptor | undefined;
   let requestFrameMock: ReturnType<typeof vi.fn>;
   let cancelFrameMock: ReturnType<typeof vi.fn>;
+  let nextFrameId: number;
+  let frameCallbacks: Map<number, FrameRequestCallback>;
 
   beforeEach(async () => {
     motionPreference = {
@@ -26,13 +28,22 @@ describe('AnalogClockComponent motion scheduling', () => {
       dispatchEvent: vi.fn(),
     } as unknown as MediaQueryList;
     originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
-    originalRequestAnimationFrame = Object.getOwnPropertyDescriptor(window, 'requestAnimationFrame');
+    originalRequestAnimationFrame = Object.getOwnPropertyDescriptor(
+      window,
+      'requestAnimationFrame'
+    );
     originalCancelAnimationFrame = Object.getOwnPropertyDescriptor(window, 'cancelAnimationFrame');
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
       value: vi.fn(() => motionPreference),
     });
-    requestFrameMock = vi.fn(() => 123);
+    nextFrameId = 123;
+    frameCallbacks = new Map();
+    requestFrameMock = vi.fn((callback: FrameRequestCallback) => {
+      const frameId = nextFrameId++;
+      frameCallbacks.set(frameId, callback);
+      return frameId;
+    });
     cancelFrameMock = vi.fn();
     Object.defineProperty(window, 'requestAnimationFrame', {
       configurable: true,
@@ -84,14 +95,25 @@ describe('AnalogClockComponent motion scheduling', () => {
 
     vi.advanceTimersByTime(1000);
     expect(updateSpy).toHaveBeenCalledTimes(2);
+
+    fixture.destroy();
+    vi.advanceTimersByTime(1000);
+    expect(updateSpy).toHaveBeenCalledTimes(2);
   });
 
   it('uses and cancels the animation frame loop for normal motion', () => {
     fixture.detectChanges();
 
     expect(requestFrameMock).toHaveBeenCalled();
+    const pendingFrameId = nextFrameId - 1;
+    const requestsBeforeFrame = requestFrameMock.mock.calls.length;
+    frameCallbacks.get(pendingFrameId)?.(16);
+    expect(requestFrameMock).toHaveBeenCalledTimes(requestsBeforeFrame + 1);
+    const latestFrameId = nextFrameId - 1;
+
     fixture.destroy();
-    expect(cancelFrameMock).toHaveBeenCalledWith(123);
+    expect(cancelFrameMock).toHaveBeenCalledWith(latestFrameId);
+    expect(latestFrameId).not.toBe(pendingFrameId);
   });
 
   it('updates the active clock when time and timezone inputs change', () => {
