@@ -101,6 +101,38 @@ describe('AnalogClockComponent motion scheduling', () => {
     expect(updateSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('switches from interval to frame loop when reduced motion changes at runtime', () => {
+    motionPreference = { ...motionPreference, matches: true } as MediaQueryList;
+    vi.useFakeTimers();
+    const updateSpy = vi.spyOn(clockService, 'getClockHandAngles');
+    const addEventListenerMock = motionPreference.addEventListener as ReturnType<typeof vi.fn>;
+
+    fixture.detectChanges();
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+
+    const changeHandler = addEventListenerMock.mock.calls.find(
+      (call: unknown[]) => call[0] === 'change'
+    )?.[1] as EventListener;
+    expect(changeHandler).toBeDefined();
+
+    Object.defineProperty(motionPreference, 'matches', {
+      configurable: true,
+      value: false,
+    });
+    updateSpy.mockClear();
+    changeHandler(new Event('change') as Event);
+
+    expect(updateSpy).toHaveBeenCalled();
+    expect(requestFrameMock).toHaveBeenCalled();
+
+    const frameIdBeforeDestroy = nextFrameId - 1;
+    frameCallbacks.get(frameIdBeforeDestroy)?.(16);
+    expect(requestFrameMock.mock.calls.length).toBeGreaterThanOrEqual(1);
+
+    fixture.destroy();
+    expect(cancelFrameMock).toHaveBeenCalledWith(frameIdBeforeDestroy);
+  });
+
   it('uses and cancels the animation frame loop for normal motion', () => {
     fixture.detectChanges();
 
