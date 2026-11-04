@@ -89,6 +89,7 @@ describe('AnalogClockComponent motion scheduling', () => {
     vi.useFakeTimers();
     const updateSpy = vi.spyOn(clockService, 'getClockHandAngles');
     const rafCallsBeforeInitialization = requestFrameMock.mock.calls.length;
+    const addEventListenerMock = motionPreference.addEventListener as ReturnType<typeof vi.fn>;
 
     fixture.detectChanges();
     expect(requestFrameMock).toHaveBeenCalledTimes(rafCallsBeforeInitialization);
@@ -96,7 +97,12 @@ describe('AnalogClockComponent motion scheduling', () => {
     vi.advanceTimersByTime(1000);
     expect(updateSpy).toHaveBeenCalledTimes(2);
 
+    const changeHandler = addEventListenerMock.mock.calls.find(
+      (call: unknown[]) => call[0] === 'change'
+    )?.[1] as EventListener;
+
     fixture.destroy();
+    expect(motionPreference.removeEventListener).toHaveBeenCalledWith('change', changeHandler);
     vi.advanceTimersByTime(1000);
     expect(updateSpy).toHaveBeenCalledTimes(2);
   });
@@ -151,20 +157,37 @@ describe('AnalogClockComponent motion scheduling', () => {
   it('updates the active clock when time and timezone inputs change', () => {
     motionPreference = { ...motionPreference, matches: true } as MediaQueryList;
     vi.useFakeTimers();
-    fixture.detectChanges();
-    fixture.componentRef.setInput('time', new Date('2024-07-01T07:15:30Z'));
-    fixture.componentRef.setInput('timezone', 'America/New_York');
-    fixture.detectChanges();
-    expect(fixture.componentInstance.time.toISOString()).toBe('2024-07-01T07:15:30.000Z');
-    expect(fixture.componentInstance.timezone).toBe('America/New_York');
-    vi.advanceTimersByTime(1000);
+    const languageService = TestBed.inject(LanguageService);
+    const originalLanguage = languageService.currentLang();
+    const originalFormat = clockService.clockConfig().use24Hour;
 
-    expect(fixture.componentInstance.clockHandAngles).toEqual({
-      hour: 97.5,
-      minute: 93,
-      second: 180,
-    });
-    expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
+    try {
+      languageService.currentLang.set('en');
+      fixture.detectChanges();
+      fixture.componentRef.setInput('time', new Date('2024-07-01T07:15:30Z'));
+      fixture.componentRef.setInput('timezone', 'America/New_York');
+      fixture.detectChanges();
+      expect(fixture.componentInstance.time.toISOString()).toBe('2024-07-01T07:15:30.000Z');
+      expect(fixture.componentInstance.timezone).toBe('America/New_York');
+      vi.advanceTimersByTime(1000);
+
+      expect(fixture.componentInstance.clockHandAngles).toEqual({
+        hour: 97.5,
+        minute: 93,
+        second: 180,
+      });
+
+      expect(fixture.componentInstance.getTimeString()).toBe('03:15:30');
+
+      clockService.setConfig({ use24Hour: false });
+      expect(fixture.componentInstance.getTimeString()).toBe('03:15:30 AM');
+
+      languageService.currentLang.set('id');
+      expect(fixture.componentInstance.getTimeString()).toBe('03.15.30 pagi');
+    } finally {
+      languageService.currentLang.set(originalLanguage);
+      clockService.setConfig({ use24Hour: originalFormat });
+    }
   });
 
   it('formats 12-hour time with localized day periods', () => {
