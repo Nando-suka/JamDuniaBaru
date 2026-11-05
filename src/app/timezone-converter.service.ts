@@ -150,17 +150,48 @@ export class TimezoneConverterService {
       Number(dateValue.slice(5, 7)) - 1,
       Number(dateValue.slice(8, 10)),
       hours,
-      minutes,
+      minutes
     );
-    let candidate = new Date(wallClockUtc - this.getTimeZoneOffsetMinutes(timeZone, new Date(wallClockUtc)) * 60000);
-    const correctedOffset = this.getTimeZoneOffsetMinutes(timeZone, candidate);
-    candidate = new Date(wallClockUtc - correctedOffset * 60000);
+    const offsetBefore = this.getTimeZoneOffsetMinutes(timeZone, new Date(wallClockUtc));
+    const candidateBefore = wallClockUtc - offsetBefore * 60000;
+    const offsetAfter = this.getTimeZoneOffsetMinutes(timeZone, new Date(candidateBefore));
+    // Apply the post-transition offset so fall-back ambiguous times resolve to
+    // their first occurrence; round-trip to reject nonexistent spring-forward gaps.
+    const candidate = new Date(wallClockUtc - offsetAfter * 60000);
+    const verificationOffset = this.getTimeZoneOffsetMinutes(timeZone, candidate);
+    const roundTripWall = new Date(candidate.getTime() + verificationOffset * 60000);
+    const inputYear = Number(dateValue.slice(0, 4));
+    const inputMonth = Number(dateValue.slice(5, 7)) - 1;
+    const inputDay = Number(dateValue.slice(8, 10));
+    if (
+      roundTripWall.getUTCFullYear() !== inputYear ||
+      roundTripWall.getUTCMonth() !== inputMonth ||
+      roundTripWall.getUTCDate() !== inputDay ||
+      roundTripWall.getUTCHours() !== hours ||
+      roundTripWall.getUTCMinutes() !== minutes
+    ) {
+      return null;
+    }
     return candidate;
   }
 
   private isValidDate(value: string): boolean {
-    const date = new Date(value);
-    return !Number.isNaN(date.getTime()) && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return false;
+    }
+    const year = Number(value.slice(0, 4));
+    const month = Number(value.slice(5, 7));
+    const day = Number(value.slice(8, 10));
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+      return false;
+    }
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      !Number.isNaN(date.getTime()) &&
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
   }
 
   /**
