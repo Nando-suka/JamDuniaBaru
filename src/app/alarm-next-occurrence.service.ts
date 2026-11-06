@@ -39,11 +39,12 @@ export class AlarmNextOccurrenceService {
       }
 
       const alarmDate = new Date(date + 'T' + alarmTime);
-      if (alarmDate < now) {
+      if (Number.isNaN(alarmDate.getTime()) || alarmDate < now) {
         return { type: 'invalid', message: this.dict().alarmPassed };
       }
 
-      const dateOnly = new Date(date);
+      const [y, m, d] = date.split('-').map(Number);
+      const dateOnly = new Date(y, m - 1, d);
       if (dateOnly.toDateString() === today.toDateString()) {
         const timeUntil = this.getTimeUntilString(now, alarmDate);
         return {
@@ -163,11 +164,15 @@ export class AlarmNextOccurrenceService {
   }
 
   private getDayName(date: Date): string {
-    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', { weekday: 'long' }).format(date);
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
+      weekday: 'long',
+    }).format(date);
   }
 
   private formatDateAdjective(date: Date): string {
-    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', { weekday: 'long' }).format(date);
+    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
+      weekday: 'long',
+    }).format(date);
   }
 
   private dict() {

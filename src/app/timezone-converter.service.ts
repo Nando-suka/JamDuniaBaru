@@ -19,7 +19,7 @@ export class TimezoneConverterService {
   selectedFromCity = signal<City | null>(null);
   selectedToCity = signal<City | null>(null);
   inputTime = signal<string>('00:00');
-  inputDate = signal<string>(new Date().toISOString().split('T')[0]);
+  inputDate = signal<string>(this.todayLocalDate());
   useCurrentTime = signal<boolean>(true);
   currentTime = signal(new Date());
 
@@ -175,6 +175,11 @@ export class TimezoneConverterService {
     return candidate;
   }
 
+  private todayLocalDate(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
   private isValidDate(value: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
       return false;
@@ -201,7 +206,7 @@ export class TimezoneConverterService {
     this.selectedFromCity.set(null);
     this.selectedToCity.set(null);
     this.inputTime.set('00:00');
-    this.inputDate.set(new Date().toISOString().split('T')[0]);
+    this.inputDate.set(this.todayLocalDate());
     this.useCurrentTime.set(true);
     this.saveToStorage();
   }
@@ -271,10 +276,16 @@ export class TimezoneConverterService {
       .formatToParts(date)
       .find((part) => part.type === 'timeZoneName')?.value;
 
-    if (!offsetText || offsetText === 'GMT') return 0;
+    if (!offsetText) {
+      throw new Error(`Unable to determine time zone offset for ${timeZone}`);
+    }
+
+    if (offsetText === 'GMT') return 0;
 
     const match = /^GMT([+-])(\d{1,2})(?::(\d{2}))?$/.exec(offsetText);
-    if (!match) return 0;
+    if (!match) {
+      throw new Error(`Unsupported time zone offset format "${offsetText}" for ${timeZone}`);
+    }
 
     const minutes = Number(match[2]) * 60 + Number(match[3] ?? 0);
     return match[1] === '+' ? minutes : -minutes;
@@ -310,7 +321,7 @@ export class TimezoneConverterService {
       this.selectedFromCity.set(parsed.fromCity);
       this.selectedToCity.set(parsed.toCity);
       this.inputTime.set(parsed.inputTime || '00:00');
-      this.inputDate.set(parsed.inputDate || new Date().toISOString().split('T')[0]);
+      this.inputDate.set(parsed.inputDate || this.todayLocalDate());
       this.useCurrentTime.set(parsed.useCurrentTime ?? true);
     } catch {
       // ignore storage errors
