@@ -25,8 +25,20 @@ export class AlarmNextOccurrenceService {
       return { type: 'paused', message: this.dict().alarmPaused };
     }
 
-    const [hours, minutes] = alarmTime.split(':').map(Number);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    const timeParts = alarmTime.split(':');
+    if (timeParts.length !== 2) {
+      return { type: 'invalid', message: this.dict().invalidAlarmTime };
+    }
+    const hours = Number(timeParts[0]);
+    const minutes = Number(timeParts[1]);
+    if (
+      Number.isNaN(hours) ||
+      Number.isNaN(minutes) ||
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59
+    ) {
       return { type: 'invalid', message: this.dict().invalidAlarmTime };
     }
 
@@ -54,8 +66,22 @@ export class AlarmNextOccurrenceService {
         };
       }
 
+      const diffMs = dateOnly.getTime() - today.getTime();
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+      if (diffMs > 0 && diffMs < 24 * 60 * 60 * 1000) {
+        // Alarm is later today but not caught by today check;
+        // fall through to weekday type below.
+      } else if (diffDays >= 1 && diffMs < 48 * 60 * 60 * 1000) {
+        // Alarm is more than a day but less than 2 days in the future → 'tomorrow'.
+        return {
+          type: 'tomorrow',
+          message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} at ${alarmTime}`,
+        };
+      }
+
       return {
-        type: 'tomorrow',
+        type: 'weekday',
         message: `${this.dict().nextAlarm}: ${this.formatDateAdjective(dateOnly)} at ${alarmTime}`,
       };
     }
