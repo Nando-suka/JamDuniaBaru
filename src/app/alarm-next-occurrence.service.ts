@@ -61,7 +61,7 @@ export class AlarmNextOccurrenceService {
         const timeUntil = this.getTimeUntilString(now, alarmDate);
         return {
           type: 'today',
-          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} ${this.dict().at} ${alarmTime}`,
           timeUntil,
         };
       }
@@ -76,13 +76,13 @@ export class AlarmNextOccurrenceService {
         // Alarm is more than a day but less than 2 days in the future → 'tomorrow'.
         return {
           type: 'tomorrow',
-          message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} ${this.dict().at} ${alarmTime}`,
         };
       }
 
       return {
         type: 'weekday',
-        message: `${this.dict().nextAlarm}: ${this.formatDateAdjective(dateOnly)} at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${this.formatDateAdjective(dateOnly)} ${this.dict().at} ${alarmTime}`,
       };
     }
 
@@ -94,7 +94,7 @@ export class AlarmNextOccurrenceService {
         const timeUntil = this.getTimeUntilString(now, alarmDateToday);
         return {
           type: 'today',
-          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} ${this.dict().at} ${alarmTime}`,
           timeUntil,
         };
       }
@@ -105,7 +105,7 @@ export class AlarmNextOccurrenceService {
 
       return {
         type: 'tomorrow',
-        message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} ${this.dict().at} ${alarmTime}`,
       };
     }
 
@@ -129,7 +129,7 @@ export class AlarmNextOccurrenceService {
 
       return {
         type: 'weekday',
-        message: `${this.dict().nextAlarm}: ${dayName} at ${alarmTime}`,
+        message: `${this.dict().nextAlarm}: ${dayName} ${this.dict().at} ${alarmTime}`,
       };
     }
 
@@ -143,9 +143,9 @@ export class AlarmNextOccurrenceService {
     const minutes = diffMinutes % 60;
 
     if (hours > 0) {
-      return `${this.dict().alarmScheduledIn} ${hours}h ${minutes}m`;
+      return `${this.dict().alarmScheduledIn} ${hours}${this.dict().hourShort} ${minutes}${this.dict().minuteShort}`;
     }
-    return `${this.dict().alarmScheduledIn} ${minutes}m`;
+    return `${this.dict().alarmScheduledIn} ${minutes}${this.dict().minuteShort}`;
   }
 
   private getNextAlarmDate(
