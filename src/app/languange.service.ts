@@ -59,6 +59,7 @@ export const translations = {
     at: 'pukul',
     hourShort: 'j',
     minuteShort: 'm',
+    secondShort: 'd',
   },
   en: {
     title: 'Modern World Clock',
@@ -115,6 +116,7 @@ export const translations = {
     at: 'at',
     hourShort: 'h',
     minuteShort: 'm',
+    secondShort: 's',
   },
 };
 

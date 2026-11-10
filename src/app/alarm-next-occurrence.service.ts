@@ -138,12 +138,16 @@ export class AlarmNextOccurrenceService {
 
   private getTimeUntilString(now: Date, alarmDate: Date): string {
     const diffMs = alarmDate.getTime() - now.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000);
+    const diffMinutes = Math.ceil(diffMs / 60000);
     const hours = Math.floor(diffMinutes / 60);
     const minutes = diffMinutes % 60;
 
     if (hours > 0) {
       return `${this.dict().alarmScheduledIn} ${hours}${this.dict().hourShort} ${minutes}${this.dict().minuteShort}`;
+    }
+    if (diffMs < 60000 && diffMs >= 0) {
+      const seconds = Math.round(diffMs / 1000);
+      return `${this.dict().alarmScheduledIn} ${seconds}${this.dict().secondShort}`;
     }
     return `${this.dict().alarmScheduledIn} ${minutes}${this.dict().minuteShort}`;
   }
