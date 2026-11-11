@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { AlarmNextOccurrenceService } from './alarm-next-occurrence.service';
 import { LanguageService } from './languange.service';
@@ -6,10 +7,16 @@ describe('AlarmNextOccurrenceService', () => {
   let service: AlarmNextOccurrenceService;
 
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-12-11T10:00:00'));
     TestBed.configureTestingModule({
       providers: [AlarmNextOccurrenceService, LanguageService]
     });
     service = TestBed.inject(AlarmNextOccurrenceService);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should display countdown for alarms under 1 minute (rounding up)', () => {
@@ -131,7 +138,7 @@ describe('AlarmNextOccurrenceService', () => {
 
     const result = service.calculateNextOccurrence(alarmTime, enabled, repeatMode, [], date);
     expect(result.type).toBe('weekday');
-    expect(result.message).toContain('Wednesday at 14:30');
+    expect(result.message).toContain('Friday at 14:30');
   });
 
   it('should return "paused" when alarm is disabled', () => {

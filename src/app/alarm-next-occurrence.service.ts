@@ -99,10 +99,6 @@ export class AlarmNextOccurrenceService {
         };
       }
 
-      const tomorrowAlarm = new Date(today);
-      tomorrowAlarm.setDate(today.getDate() + 1);
-      tomorrowAlarm.setHours(hours, minutes, 0, 0);
-
       return {
         type: 'tomorrow',
         message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} ${this.dict().at} ${alarmTime}`,
@@ -115,14 +111,14 @@ export class AlarmNextOccurrenceService {
         return { type: 'invalid', message: this.dict().noUpcomingAlarm };
       }
 
-      const dayName = this.getDayName(nextDate);
+      const dayName = this.formatDateAdjective(nextDate);
       const isToday = nextDate.toDateString() === today.toDateString();
 
       if (isToday) {
         const timeUntil = this.getTimeUntilString(now, nextDate);
         return {
           type: 'today',
-          message: `${this.dict().nextAlarm}: ${this.dict().today} at ${alarmTime}`,
+          message: `${this.dict().nextAlarm}: ${this.dict().today} ${this.dict().at} ${alarmTime}`,
           timeUntil,
         };
       }
@@ -170,7 +166,6 @@ export class AlarmNextOccurrenceService {
 
     const repeatDayNums = repeatDays.map((d) => dayMap[d]).sort((a, b) => a - b);
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const currentDayOfWeek = new Date(today).getDay();
 
     let nextDate: Date | null = null;
 
@@ -193,16 +188,18 @@ export class AlarmNextOccurrenceService {
     return nextDate;
   }
 
-  private getDayName(date: Date): string {
+  private formatWeekday(date: Date): string {
     return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
       weekday: 'long',
     }).format(date);
   }
 
+  private getDayName(date: Date): string {
+    return this.formatDateAdjective(date);
+  }
+
   private formatDateAdjective(date: Date): string {
-    return new Intl.DateTimeFormat(this.langService.currentLang() === 'id' ? 'id-ID' : 'en-US', {
-      weekday: 'long',
-    }).format(date);
+    return this.formatWeekday(date);
   }
 
   private dict() {
