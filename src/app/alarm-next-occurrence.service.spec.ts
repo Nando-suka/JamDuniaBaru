@@ -119,7 +119,19 @@ describe('AlarmNextOccurrenceService', () => {
     expect(result.message).toBe('Alarm time has passed');
   });
 
-  it('should return "tomorrow" when alarm is tomorrow (less than 48h)', () => {
+  it('should return "invalid" for normalized calendar dates like Feb 31', () => {
+    const result = service.calculateNextOccurrence('14:30', true, 'never', [], '2024-02-31');
+    expect(result.type).toBe('invalid');
+    expect(result.message).toBe('Invalid alarm time');
+  });
+
+  it('should return "invalid" for nonexistent dates like Apr 31', () => {
+    const result = service.calculateNextOccurrence('14:30', true, 'never', [], '2024-04-31');
+    expect(result.type).toBe('invalid');
+    expect(result.message).toBe('Invalid alarm time');
+  });
+
+  it('should return "tomorrow" when alarm is the next calendar day', () => {
     const alarmTime = '14:30';
     const enabled = true;
     const repeatMode = 'never';
@@ -130,7 +142,7 @@ describe('AlarmNextOccurrenceService', () => {
     expect(result.message).toContain('Tomorrow at 14:30');
   });
 
-  it('should return "weekday" when alarm is beyond tomorrow (more than 48h)', () => {
+  it('should return "weekday" when alarm is two or more calendar days away', () => {
     const alarmTime = '14:30';
     const enabled = true;
     const repeatMode = 'never';

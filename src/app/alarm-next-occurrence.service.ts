@@ -50,14 +50,30 @@ export class AlarmNextOccurrenceService {
         return { type: 'invalid', message: this.dict().noDateSet };
       }
 
+      const [y, m, d] = date.split('-').map(Number);
+      const dateOnly = new Date(y, m - 1, d);
+      if (
+        Number.isNaN(y) ||
+        Number.isNaN(m) ||
+        Number.isNaN(d) ||
+        dateOnly.getFullYear() !== y ||
+        dateOnly.getMonth() !== m - 1 ||
+        dateOnly.getDate() !== d
+      ) {
+        return { type: 'invalid', message: this.dict().invalidAlarmTime };
+      }
+
       const alarmDate = new Date(date + 'T' + alarmTime);
       if (Number.isNaN(alarmDate.getTime()) || alarmDate < now) {
         return { type: 'invalid', message: this.dict().alarmPassed };
       }
 
-      const [y, m, d] = date.split('-').map(Number);
-      const dateOnly = new Date(y, m - 1, d);
-      if (dateOnly.toDateString() === today.toDateString()) {
+      const dayDiff = Math.round(
+        (Date.UTC(y, m - 1, d) - Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())) /
+          86400000
+      );
+
+      if (dayDiff === 0) {
         const timeUntil = this.getTimeUntilString(now, alarmDate);
         return {
           type: 'today',
@@ -66,14 +82,7 @@ export class AlarmNextOccurrenceService {
         };
       }
 
-      const diffMs = dateOnly.getTime() - today.getTime();
-      const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-      if (diffMs > 0 && diffMs < 24 * 60 * 60 * 1000) {
-        // Alarm is later today but not caught by today check;
-        // fall through to weekday type below.
-      } else if (diffDays >= 1 && diffMs < 48 * 60 * 60 * 1000) {
-        // Alarm is more than a day but less than 2 days in the future → 'tomorrow'.
+      if (dayDiff === 1) {
         return {
           type: 'tomorrow',
           message: `${this.dict().nextAlarm}: ${this.dict().tomorrow} ${this.dict().at} ${alarmTime}`,
