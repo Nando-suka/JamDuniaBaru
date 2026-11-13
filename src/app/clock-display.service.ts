@@ -2,11 +2,6 @@ import { Injectable, signal } from '@angular/core';
 
 export type ClockDisplayMode = 'digital' | 'analog' | 'binary';
 
-interface ClockDisplayPreference {
-  mode: ClockDisplayMode;
-  timestamp: number;
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -82,10 +77,6 @@ export class ClockDisplayService {
    */
   private savePreference(mode: ClockDisplayMode): void {
     try {
-      const preference: ClockDisplayPreference = {
-        mode,
-        timestamp: Date.now(),
-      };
       localStorage.setItem(this.STORAGE_KEY, mode);
     } catch {
       console.warn('Failed to save clock display preference to localStorage');

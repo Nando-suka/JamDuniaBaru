@@ -203,10 +203,6 @@ export class AlarmNextOccurrenceService {
     }).format(date);
   }
 
-  private getDayName(date: Date): string {
-    return this.formatDateAdjective(date);
-  }
-
   private formatDateAdjective(date: Date): string {
     return this.formatWeekday(date);
   }
