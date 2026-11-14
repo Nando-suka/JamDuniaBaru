@@ -9,8 +9,9 @@ export class ClockDisplayService {
   private readonly STORAGE_KEY = 'jam-dunia-clock-display-mode';
   private readonly DEFAULT_MODE: ClockDisplayMode = 'digital';
 
-  // Signal untuk mode tampilan jam saat ini
-  currentMode = signal<ClockDisplayMode>(this.loadPreference());
+  private readonly _currentMode = signal<ClockDisplayMode>(this.loadPreference());
+  // Read-only signal untuk mode tampilan jam saat ini
+  readonly currentMode = this._currentMode.asReadonly();
 
   constructor() {
     this.initializeDisplay();
@@ -42,7 +43,7 @@ export class ClockDisplayService {
    * Initialize display mode dengan menyimpan ke localStorage
    */
   private initializeDisplay(): void {
-    this.savePreference(this.currentMode());
+    this.savePreference(this._currentMode());
   }
 
   /**
@@ -50,7 +51,7 @@ export class ClockDisplayService {
    */
   setMode(mode: ClockDisplayMode): void {
     if (this.isValidMode(mode)) {
-      this.currentMode.set(mode);
+      this._currentMode.set(mode);
       this.savePreference(mode);
     }
   }
@@ -60,7 +61,7 @@ export class ClockDisplayService {
    */
   toggleMode(): void {
     const modes: ClockDisplayMode[] = ['digital', 'analog', 'binary'];
-    const currentIndex = modes.indexOf(this.currentMode());
+    const currentIndex = modes.indexOf(this._currentMode());
     const nextIndex = (currentIndex + 1) % modes.length;
     this.setMode(modes[nextIndex]);
   }
@@ -69,7 +70,7 @@ export class ClockDisplayService {
    * Get mode tampilan jam saat ini
    */
   getMode(): ClockDisplayMode {
-    return this.currentMode();
+    return this._currentMode();
   }
 
   /**
