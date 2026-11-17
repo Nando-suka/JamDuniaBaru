@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlarmTimerService, AlarmDay } from './alarm-timer.service';
+import { Alarm, AlarmDay, AlarmTimerService } from './alarm-timer.service';
 import { ToastService } from './toast.service';
 import { AlarmNextOccurrenceService } from './alarm-next-occurrence.service';
 import { LanguageService } from './languange.service';
@@ -168,7 +168,7 @@ export class AlarmTimerComponent {
     return this.alarmTimerService.isNotificationSupported();
   }
 
-  getAlarmNextOccurrence = (alarm: any) => {
+  getAlarmNextOccurrence = (alarm: Alarm) => {
     return this.nextOccurrenceService.calculateNextOccurrence(
       alarm.time,
       alarm.enabled,
