@@ -6,7 +6,7 @@ import { ToastService } from './toast.service';
 import { AlarmNextOccurrenceService } from './alarm-next-occurrence.service';
 import { LanguageService } from './languange.service';
 
-// Type of alarm
+// Type of alarm || This variable is used to marked the following reported mode.
 type AlarmRepeatMode = 'never' | 'daily' | 'custom';
 
 @Component({
