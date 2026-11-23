@@ -272,7 +272,7 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     return this.converterService.getOffsetInfo();
   }
 
-  // Get offset string for a city
+  // Get offset string for a numeric offset (e.g. from getCityOffset)
   getOffsetString(offset: number): string {
     const sign = offset >= 0 ? '+' : '-';
     const absoluteOffset = Math.abs(offset);
@@ -285,8 +285,10 @@ export class TimezoneConverterComponent implements OnInit, OnDestroy {
     return `UTC${sign}${hours}`;
   }
 
+  // Get offset string for a city (DST-aware via IANA zone)
   getCityOffsetString(city: City): string {
-    return this.getOffsetString(this.converterService.getCityOffset(city));
+    const offset = this.converterService.getCityOffset(city);
+    return this.getOffsetString(offset);
   }
 
   getCityTime(date: Date, city: City): string {

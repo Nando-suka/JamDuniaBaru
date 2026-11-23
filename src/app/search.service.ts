@@ -2,7 +2,6 @@ import { Injectable, signal } from '@angular/core';
 
 export interface City {
   name: string;
-  offset: number;
   lat: number;
   lon: number;
   timeZone?: string;

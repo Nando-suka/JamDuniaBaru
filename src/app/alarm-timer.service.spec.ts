@@ -51,4 +51,48 @@ describe('AlarmTimerService', () => {
       snoozeMinutes: 10,
     });
   });
+
+  it('transitions timer through running, expired terminal state, and deterministic cleanup', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-01-01T10:00:00Z'));
+      // keep window timers aligned with fake timers
+      (window as any).setInterval = globalThis.setInterval.bind(globalThis);
+      (window as any).clearInterval = globalThis.clearInterval.bind(globalThis);
+      (window as any).setTimeout = globalThis.setTimeout.bind(globalThis);
+      (window as any).clearTimeout = globalThis.clearTimeout.bind(globalThis);
+      // avoid Notification constructor/audio in test env; state transition is under test
+      (window as any).Notification = { permission: 'denied' };
+      vi.spyOn(service as any, 'sendNotification').mockImplementation(() => {});
+      vi.spyOn(service as any, 'playAlarmSound').mockImplementation(() => {});
+
+      service.startTimer(2, 'Tea');
+
+      expect(service.timers()).toHaveLength(1);
+      expect(service.timers()[0]).toMatchObject({
+        label: 'Tea',
+        remaining: 2,
+        isRunning: true,
+        state: 'running',
+      });
+
+      vi.advanceTimersByTime(1000);
+      expect(service.timers()[0]).toMatchObject({ remaining: 1, isRunning: true, state: 'running' });
+
+      vi.advanceTimersByTime(1000);
+      expect(service.timers()).toHaveLength(1);
+      expect(service.timers()[0]).toMatchObject({
+        remaining: 0,
+        isRunning: false,
+        state: 'expired',
+      });
+
+      // Expired timer is terminal and removed on next tick; no stale active timer remains.
+      vi.runOnlyPendingTimers();
+      expect(service.timers()).toHaveLength(0);
+      expect(service.activeTimers()).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

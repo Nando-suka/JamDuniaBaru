@@ -276,6 +276,7 @@ export class AlarmTimerService {
       label,
       endTime: Date.now() + duration * 1000,
       isRunning: true,
+      state: 'running',
     };
 
     this.timers.update((timers) => [...timers, timer]);
@@ -284,6 +285,11 @@ export class AlarmTimerService {
 
   stopTimer(id: string): void {
     this.clearTimerInterval(id);
+    this.timers.update((timers) =>
+      timers.map((timer) =>
+        timer.id === id ? { ...timer, isRunning: false, remaining: 0, state: 'stopped' } : timer
+      )
+    );
     this.timers.update((timers) => timers.filter((timer) => timer.id !== id));
   }
 
@@ -295,6 +301,7 @@ export class AlarmTimerService {
           ? {
               ...timer,
               isRunning: false,
+              state: 'paused',
             }
           : timer
       )
@@ -304,11 +311,12 @@ export class AlarmTimerService {
   resumeTimer(id: string): void {
     const timer = this.timers().find((t) => t.id === id);
 
-    if (!timer) return;
+    if (!timer || timer.state === 'expired' || timer.state === 'stopped') return;
 
     const updatedTimer: Timer = {
       ...timer,
       isRunning: true,
+      state: 'running',
       endTime: Date.now() + timer.remaining * 1000,
     };
 
@@ -321,7 +329,7 @@ export class AlarmTimerService {
 
     const interval = window.setInterval(() => {
       const existingTimer = this.timers().find((t) => t.id === timer.id);
-      if (!existingTimer || !existingTimer.isRunning) {
+      if (!existingTimer || !existingTimer.isRunning || existingTimer.state !== 'running') {
         this.clearTimerInterval(timer.id);
         return;
       }
@@ -330,7 +338,7 @@ export class AlarmTimerService {
 
       if (remaining <= 0) {
         this.clearTimerInterval(timer.id);
-        this.triggerTimer(existingTimer);
+        this.expireTimer(existingTimer.id);
         return;
       }
 
@@ -349,11 +357,23 @@ export class AlarmTimerService {
     this.timerIntervals.set(timer.id, interval);
   }
 
-  private triggerTimer(timer: Timer): void {
+  private expireTimer(id: string): void {
+    const timer = this.timers().find((t) => t.id === id);
+    if (!timer || timer.state === 'expired' || timer.state === 'stopped') {
+      this.clearTimerInterval(id);
+      return;
+    }
+
+    const expired: Timer = { ...timer, remaining: 0, isRunning: false, state: 'expired' };
+    this.timers.update((timers) => timers.map((t) => (t.id === id ? expired : t)));
     this.sendNotification('Timer Selesai!', `Timer "${timer.label}" telah selesai`, '/favicon.ico');
     this.playAlarmSound();
-    this.clearTimerInterval(timer.id);
-    this.timers.update((timers) => timers.filter((t) => t.id !== timer.id));
+
+    window.setTimeout(() => {
+      this.timers.update((timers) =>
+        timers.filter((t) => !(t.id === id && t.state === 'expired'))
+      );
+    }, 0);
   }
 
   private clearTimerInterval(id: string): void {
@@ -434,5 +454,5 @@ export interface Timer {
   label: string;
   endTime: number;
   isRunning: boolean;
-  intervalRef?: any;
+  state: 'running' | 'paused' | 'expired' | 'stopped';
 }

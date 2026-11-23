@@ -343,7 +343,6 @@ export class TimezoneConverterService {
     const isCity = (item: unknown): item is City =>
       this.hasCityShape(item) &&
       typeof item.name === 'string' &&
-      typeof item.offset === 'number' &&
       typeof item.lat === 'number' &&
       typeof item.lon === 'number';
 

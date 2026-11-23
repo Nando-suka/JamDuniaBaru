@@ -7,20 +7,32 @@ describe('TimezoneConverterService', () => {
 
   const newYork: City = {
     name: 'New York',
-    offset: -5,
     lat: 40.7128,
     lon: -74.006,
     timeZone: 'America/New_York',
   };
   const phoenix: City = {
     name: 'Phoenix',
-    offset: -7,
     lat: 33.4484,
     lon: -112.074,
     timeZone: 'America/Phoenix',
   };
 
   beforeEach(() => {
+    const storage = new Map<string, string>();
+    const fakeLocalStorage = {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        storage.set(key, value);
+      },
+      removeItem: (key: string) => {
+        storage.delete(key);
+      },
+      clear: () => {
+        storage.clear();
+      },
+    };
+    Object.defineProperty(globalThis, 'localStorage', { value: fakeLocalStorage, configurable: true });
     localStorage.clear();
     TestBed.configureTestingModule({});
     service = TestBed.inject(TimezoneConverterService);
