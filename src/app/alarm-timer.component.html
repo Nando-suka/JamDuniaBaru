@@ -219,7 +219,7 @@
 
       <div class="form-group" *ngIf="repeatMode() === 'never'">
         <label for="alarm-date">Tanggal alarm:</label>
-        <input id="alarm-date" type="date" [min]="alarmDate()" [(ngModel)]="alarmDate" name="alarmDate" required />
+        <input id="alarm-date" type="date" [min]="getTodayDate()" [(ngModel)]="alarmDate" name="alarmDate" required />
         <p class="field-hint error-hint" *ngIf="alarmDateError()">{{ alarmDateError() }}</p>
       </div>
 

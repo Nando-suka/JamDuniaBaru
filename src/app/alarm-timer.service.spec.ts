@@ -95,4 +95,14 @@ describe('AlarmTimerService', () => {
       vi.useRealTimers();
     }
   });
+
+  it('rejects invalid timer durations', () => {
+    service.startTimer(0);
+    service.startTimer(-5);
+    service.startTimer(1.5);
+    service.startTimer(Number.NaN);
+    service.startTimer(Number.POSITIVE_INFINITY);
+
+    expect(service.timers()).toHaveLength(0);
+  });
 });

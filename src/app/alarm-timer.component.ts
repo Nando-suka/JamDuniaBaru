@@ -446,7 +446,7 @@ export class AlarmTimerComponent {
     return `${labels.slice(0, -1).join(', ')}, dan ${labels[labels.length - 1]}`;
   }
 
-  private getTodayDate(): string {
+  getTodayDate(): string {
     return this.formatDateInput(new Date());
   }
 

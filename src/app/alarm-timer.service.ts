@@ -269,6 +269,10 @@ export class AlarmTimerService {
   }
 
   startTimer(duration: number, label: string = 'Timer'): void {
+    if (!Number.isFinite(duration) || !Number.isInteger(duration) || duration <= 0) {
+      return;
+    }
+
     const timer: Timer = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 6),
       duration,
