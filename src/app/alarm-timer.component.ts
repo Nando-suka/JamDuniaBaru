@@ -234,7 +234,7 @@ export class AlarmTimerComponent {
         this.snoozeMinutes(),
         this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
-      this.toastService.success(`Alarm updated for ${time}`);
+      this.toastService.success(this.dict().alarmUpdatedFor.replace('{time}', time));
     } else {
       this.alarmTimerService.addAlarm(
         time,
@@ -246,7 +246,7 @@ export class AlarmTimerComponent {
         this.repeatMode() === 'never' ? this.alarmDate() : undefined
       );
       this.hasScheduledDuringSession.set(true);
-      this.toastService.success(`Alarm added for ${time}`);
+      this.toastService.success(this.dict().alarmAddedFor.replace('{time}', time));
     }
     this.closeAlarmModal();
   }
@@ -294,7 +294,7 @@ export class AlarmTimerComponent {
 
   removeAlarm(id: string): void {
     this.alarmTimerService.removeAlarm(id);
-    this.toastService.success('Alarm deleted');
+    this.toastService.success(this.dict().alarmDeleted);
   }
 
   toggleAlarm(id: string): void {
@@ -303,15 +303,15 @@ export class AlarmTimerComponent {
 
     this.alarmTimerService.toggleAlarm(id);
     if (alarm.enabled) {
-      this.toastService.info(`Alarm paused`);
+      this.toastService.info(this.dict().alarmPaused);
     } else {
-      this.toastService.info(`Alarm enabled`);
+      this.toastService.info(this.dict().alarmEnabledToast);
     }
   }
 
   snoozeAlarm(id: string, minutes: number): void {
     this.alarmTimerService.snoozeAlarm(id, minutes);
-    this.toastService.info(`Snoozed for ${minutes} minutes`);
+    this.toastService.info(this.dict().timerSnoozed.replace('{minutes}', String(minutes)));
   }
 
   isDaySelected(day: AlarmDay): boolean {
@@ -398,7 +398,7 @@ export class AlarmTimerComponent {
 
     this.alarmTimerService.startTimer(this.timerDuration(), this.timerLabel().trim());
     this.hasScheduledDuringSession.set(true);
-    this.toastService.success(`Timer started for ${this.timerLabel().trim()}`);
+    this.toastService.success(this.dict().timerStarted.replace('{label}', this.timerLabel().trim()));
     this.closeTimerModal();
   }
 
@@ -412,7 +412,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
     if (timer) {
       this.alarmTimerService.stopTimer(timer.id);
-      this.toastService.info('Timer stopped');
+      this.toastService.info(this.dict().timerStopped);
     }
   }
 
@@ -420,7 +420,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimers().length > 0 ? this.activeTimers()[0] : null;
     if (timer) {
       this.alarmTimerService.pauseTimer(timer.id);
-      this.toastService.info('Timer paused');
+      this.toastService.info(this.dict().timerPaused);
     }
   }
 
@@ -428,7 +428,7 @@ export class AlarmTimerComponent {
     const timer = this.activeTimer();
     if (timer) {
       this.alarmTimerService.resumeTimer(timer.id);
-      this.toastService.info('Timer resumed');
+      this.toastService.info(this.dict().timerResumed);
     }
   }
 
@@ -446,7 +446,7 @@ export class AlarmTimerComponent {
     return `${labels.slice(0, -1).join(', ')}, dan ${labels[labels.length - 1]}`;
   }
 
-  getTodayDate(): string {
+  public getTodayDate(): string {
     return this.formatDateInput(new Date());
   }
 

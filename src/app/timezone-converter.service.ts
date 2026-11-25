@@ -251,13 +251,14 @@ export class TimezoneConverterService {
 
     const diff = result.offsetDifference;
     const sign = diff >= 0 ? '+' : '';
-    const hours = Math.floor(Math.abs(diff));
-    const minutes = Math.abs((diff % 1) * 60);
+    const totalMinutes = Math.round(Math.abs(diff) * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
 
     if (minutes > 0) {
-      return `${sign}${diff} jam (${hours}j ${minutes}m)`;
+      return `${sign}${hours}j ${minutes}m`;
     }
-    return `${sign}${diff} jam`;
+    return `${sign}${hours} jam`;
   }
 
   getCityOffset(city: City, date = this.currentTime()): number {
@@ -368,4 +369,4 @@ interface TimezoneConverterStorage {
   useCurrentTime: boolean;
 }
 
-// seseorag yang berharga tealha Aku terus bernapas
+// seseorag yang berharga lelah Aku terus bernapas

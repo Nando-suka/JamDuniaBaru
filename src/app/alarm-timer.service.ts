@@ -244,7 +244,10 @@ export class AlarmTimerService {
       return;
     }
 
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextCtor: typeof AudioContext | undefined =
+      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextCtor) return;
+    const audioContext = new AudioContextCtor();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     const frequencyMap: Record<string, [number, number]> = {
@@ -380,12 +383,70 @@ export class AlarmTimerService {
     }, 0);
   }
 
-  private clearTimerInterval(id: string): void {
+  private   clearTimerInterval(id: string): void {
     const interval = this.timerIntervals.get(id);
     if (interval) {
       clearInterval(interval);
       this.timerIntervals.delete(id);
     }
+  }
+
+  private isValidTime(time: unknown): time is string {
+    return (
+      typeof time === 'string' &&
+      /^\d{2}:\d{2}$/.test(time) &&
+      Number(time.split(':')[0]) >= 0 &&
+      Number(time.split(':')[0]) <= 23 &&
+      Number(time.split(':')[1]) >= 0 &&
+      Number(time.split(':')[1]) <= 59
+    );
+  }
+
+  private isValidDate(date: unknown): date is string {
+    if (typeof date !== 'string') return false;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+    const y = Number(date.slice(0, 4));
+    const m = Number(date.slice(5, 7));
+    const d = Number(date.slice(8, 10));
+    if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+    const dateObj = new Date(Date.UTC(y, m - 1, d));
+    return !Number.isNaN(dateObj.getTime()) && dateObj.getUTCFullYear() === y && dateObj.getUTCMonth() === m - 1 && dateObj.getUTCDate() === d;
+  }
+
+  private isValidAlarmDay(day: unknown): day is AlarmDay {
+    return ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].includes(day as AlarmDay);
+  }
+
+  private filterValidAlarms(alarms: unknown[]): Array<Alarm> {
+    const valid: Alarm[] = [];
+    for (const raw of alarms) {
+      if (!this.isAlarmShape(raw)) continue;
+      const record: Partial<Alarm> = raw;
+      const id = record.id;
+      const time = record.time;
+      const label = record.label;
+      const repeat = record.repeat ?? false;
+      const repeatDays = record.repeatDays ?? [];
+      const sound = record.sound ?? 'chime';
+      const snoozeMinutes = record.snoozeMinutes ?? 5;
+      const date = record.date;
+      const enabled = record.enabled !== undefined ? record.enabled : true;
+
+      if (typeof id !== 'string' || id.trim().length === 0) continue;
+      if (!this.isValidTime(time)) continue;
+      if (typeof label !== 'string' || label.trim().length === 0) continue;
+      if (!Array.isArray(repeatDays) || !repeatDays.every((day): day is AlarmDay => this.isValidAlarmDay(day))) continue;
+      if (typeof sound !== 'string') continue;
+      if (typeof snoozeMinutes !== 'number' || !Number.isInteger(snoozeMinutes) || snoozeMinutes < 1 || snoozeMinutes > 60) continue;
+      if (!this.isValidDate(date)) continue;
+
+      valid.push({ id, time, label, repeat, repeatDays, sound, snoozeMinutes, date, enabled });
+    }
+    return valid;
+  }
+
+  private isAlarmShape(value: unknown): value is Partial<Alarm> {
+    return typeof value === 'object' && value !== null;
   }
 
   private saveAlarmsToStorage(): void {
@@ -400,23 +461,17 @@ export class AlarmTimerService {
     try {
       const stored = localStorage.getItem('jam-dunia-alarms');
 
-      if (stored) {
-        const alarms = JSON.parse(stored) as Alarm[];
-        const normalized = alarms.map((alarm) => ({
-          ...alarm,
-          repeatDays: alarm.repeatDays ?? [],
-          sound: alarm.sound ?? 'chime',
-          snoozeMinutes: alarm.snoozeMinutes ?? 5,
-        }));
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return;
+      const validAlarms = this.filterValidAlarms(parsed);
+      this.alarms.set(validAlarms);
 
-        this.alarms.set(normalized);
-
-        normalized.forEach((alarm) => {
-          if (alarm.enabled) {
-            this.scheduleAlarm(alarm);
-          }
-        });
-      }
+      validAlarms.forEach((alarm) => {
+        if (alarm.enabled) {
+          this.scheduleAlarm(alarm);
+        }
+      });
     } catch (error) {
       console.error('Error loading alarms from storage:', error);
     }

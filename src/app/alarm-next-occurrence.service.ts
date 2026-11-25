@@ -25,6 +25,11 @@ export class AlarmNextOccurrenceService {
       return { type: 'paused', message: this.dict().alarmPaused };
     }
 
+    // Strict HH:mm format (two digits hour and minute)
+    if (!/^\d{2}:\d{2}$/.test(alarmTime)) {
+      return { type: 'invalid', message: this.dict().invalidAlarmTime };
+    }
+
     const timeParts = alarmTime.split(':');
     if (timeParts.length !== 2) {
       return { type: 'invalid', message: this.dict().invalidAlarmTime };
