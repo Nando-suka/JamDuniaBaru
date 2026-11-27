@@ -31,16 +31,40 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
 
   // Initialize the ng on making animation and update of the clockked hands. using another hand angles.
   ngOnInit(): void {
-    this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this.motionPreference.addEventListener('change', this.onMotionPreferenceChange);
+    this.motionPreference = this.resolveMotionPreference();
+    if (this.motionPreference) {
+      if (typeof this.motionPreference.addEventListener === 'function') {
+        this.motionPreference.addEventListener('change', this.onMotionPreferenceChange);
+      } else if (typeof this.motionPreference.addListener === 'function') {
+        // Legacy browsers (Safari < 14, older Edge) only expose addListener.
+        this.motionPreference.addListener(this.onMotionPreferenceChange);
+      }
+    }
     this.configureUpdates();
+  }
+
+  private resolveMotionPreference(): MediaQueryList | null {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return null;
+    }
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)');
+    } catch {
+      return null;
+    }
   }
 
 
   // Destroy the ng on cancek animation on the following option that givenn.
   ngOnDestroy(): void {
     this.stopUpdates();
-    this.motionPreference?.removeEventListener('change', this.onMotionPreferenceChange);
+    if (this.motionPreference) {
+      if (typeof this.motionPreference.removeEventListener === 'function') {
+        this.motionPreference.removeEventListener('change', this.onMotionPreferenceChange);
+      } else if (typeof this.motionPreference.removeListener === 'function') {
+        this.motionPreference.removeListener(this.onMotionPreferenceChange);
+      }
+    }
   }
 
   /**
@@ -62,6 +86,13 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Fall back to a one-second interval when requestAnimationFrame is unavailable
+    // (SSR or very old browsers).
+    if (typeof requestAnimationFrame !== 'function') {
+      this.updateIntervalId = setInterval(() => this.updateClockHands(), 1000);
+      return;
+    }
+
     const animate = () => {
       this.updateClockHands();
       this.animationFrameId = requestAnimationFrame(animate);
@@ -71,7 +102,9 @@ export class AnalogClockComponent implements OnInit, OnDestroy {
 
   private stopUpdates(): void {
     if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
+      if (typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(this.animationFrameId);
+      }
       this.animationFrameId = null;
     }
     if (this.updateIntervalId !== null) {

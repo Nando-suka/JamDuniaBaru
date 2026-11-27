@@ -60,18 +60,40 @@
 
   <!-- Clock controls -->
   <div class="clock-controls">
-    <button class="control-btn" (click)="toggleDesign()" [title]="'Current design: ' + clockConfig().design">
-      🎨 Design
+    <button
+      class="control-btn"
+      (click)="toggleDesign()"
+      [attr.aria-label]="'Change clock design. Current design: ' + clockConfig().design"
+      [title]="'Current design: ' + clockConfig().design"
+    >
+      <span aria-hidden="true">🎨</span> Design
     </button>
-    <button class="control-btn" (click)="toggleSize()" [title]="'Current size: ' + clockConfig().size">
-      📏 Size
+    <button
+      class="control-btn"
+      (click)="toggleSize()"
+      [attr.aria-label]="'Change clock size. Current size: ' + clockConfig().size"
+      [title]="'Current size: ' + clockConfig().size"
+    >
+      <span aria-hidden="true">📏</span> Size
     </button>
-    <button class="control-btn" (click)="toggleSeconds()" [title]="clockConfig().showSeconds ? 'Hide seconds' : 'Show seconds'">
-      @if (clockConfig().showSeconds) { ✓ }
+    <button
+      class="control-btn"
+      (click)="toggleSeconds()"
+      [attr.aria-pressed]="clockConfig().showSeconds"
+      [attr.aria-label]="clockConfig().showSeconds ? 'Hide seconds hand' : 'Show seconds hand'"
+      [title]="clockConfig().showSeconds ? 'Hide seconds' : 'Show seconds'"
+    >
+      @if (clockConfig().showSeconds) { <span aria-hidden="true">✓</span> }
       Sec
     </button>
-    <button class="control-btn" (click)="toggleLabels()" [title]="clockConfig().showLabels ? 'Hide labels' : 'Show labels'">
-      @if (clockConfig().showLabels) { ✓ }
+    <button
+      class="control-btn"
+      (click)="toggleLabels()"
+      [attr.aria-pressed]="clockConfig().showLabels"
+      [attr.aria-label]="clockConfig().showLabels ? 'Hide hour labels' : 'Show hour labels'"
+      [title]="clockConfig().showLabels ? 'Hide labels' : 'Show labels'"
+    >
+      @if (clockConfig().showLabels) { <span aria-hidden="true">✓</span> }
       Labels
     </button>
   </div>

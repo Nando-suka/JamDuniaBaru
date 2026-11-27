@@ -79,8 +79,12 @@ getSizeClass(): string
 ### AnalogClockComponent
 Component yang menampilkan analog clock dengan input:
 - `@Input() time: Date` - Time untuk display
-- `@Input() timezone: string` - Timezone label (e.g., "UTC+7")
+- `@Input() timezone: string` - IANA timezone identifier (e.g., "Asia/Jakarta", "America/New_York")
 - `@Input() cityName: string` - Nama kota
+
+> **Catatan API:** `timezone` hanya menerima **IANA timezone identifier** (mis. `Asia/Jakarta`),
+> bukan label offset seperti `UTC+7`. Nilai tersebut diteruskan ke `Intl.DateTimeFormat`
+> dan nama zona yang sudah di-resolve (mis. `Asia/Jakarta`) yang ditampilkan pada UI.
 
 Features:
 - Real-time animation loop
@@ -98,7 +102,7 @@ Ketika aktif, aplikasi menampilkan analog clock untuk semua kota yang tersedia (
 ```typescript
 <app-analog-clock
   [time]="currentDate"
-  [timezone]="'UTC+7'"
+  [timezone]="'Asia/Jakarta'"
   [cityName]="'Jakarta'"
 ></app-analog-clock>
 ```
@@ -139,8 +143,9 @@ Automatic dark mode detection dengan prefers-color-scheme:
    - Auto-sync dengan browser refresh rate
    - CPU-friendly
 
-2. **Memoized Calculations**
-   - Clock hand angles dihitung once per frame
+2. **Memoized Formatters**
+   - `Intl.DateTimeFormat` instances di-cache per timezone (memoized) di `AnalogClockService`
+   - Clock hand angles dihitung ulang setiap frame (perubahan waktu tiap frame), bukan di-memoize
    - Efficient DOM updates
 
 3. **CSS Animations**
@@ -161,8 +166,8 @@ toggleAnalogClock(): void { ... }
   <div class="analog-clocks-grid">
     @for (loc of cities; track loc.name) {
       <app-analog-clock
-        [time]="getTimeByOffset(loc.offset)"
-        [timezone]="timezone"
+        [time]="currentTime"
+        [timezone]="getCityTimeZone(loc)"
         [cityName]="loc.name"
       ></app-analog-clock>
     }
